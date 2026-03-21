@@ -1,15 +1,29 @@
 package com.jobportal.jobservice.controller;
 
+import java.util.Map;
+
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.jobportal.jobservice.dto.JobFilterDto;
 import com.jobportal.jobservice.dto.JobRequestDto;
 import com.jobportal.jobservice.dto.JobResponseDto;
 import com.jobportal.jobservice.service.JobService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/jobs")
@@ -56,11 +70,13 @@ public class JobController {
 
     // DELETE /api/jobs/{id}
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteJob(
+    public ResponseEntity<Map<String, String>> deleteJob(
             @PathVariable Long id,
             @RequestHeader("X-User-Id") Long recruiterId) {
+
         jobService.deleteJob(id, recruiterId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(
+                Map.of("message", "Job deleted successfully!"));
     }
 
     // POST /api/jobs/search
@@ -72,5 +88,13 @@ public class JobController {
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "desc") String direction) {
         return ResponseEntity.ok(jobService.searchJobs(filter, page, size, sortBy, direction));
+    }
+    
+    // DELETE /api/jobs/recruiter/{recruiterId}
+    // Called by Admin Service when deleting a recruiter
+    @DeleteMapping("/recruiter/{recruiterId}")
+    public ResponseEntity<Void> deleteRecruiterJobs(@PathVariable Long recruiterId) {
+    	jobService.deleteRecruiterJobs(recruiterId);
+    	return ResponseEntity.noContent().build();
     }
 }

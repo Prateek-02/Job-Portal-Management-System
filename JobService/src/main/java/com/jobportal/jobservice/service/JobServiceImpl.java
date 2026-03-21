@@ -77,4 +77,13 @@ public class JobServiceImpl implements JobService {
         return jobRepository.findAll(JobSpecification.getFilteredJobs(filter), pageable)
                 .map(job -> modelMapper.map(job, JobResponseDto.class));
     }
+    
+    
+	 // =====================================================
+	 // DELETE RECRUITER JOBS
+	 // =====================================================
+	 @Override
+	 public void deleteRecruiterJobs(Long recruiterId) {
+	     jobRepository.deleteByRecruiterId(recruiterId);
+	 }
 }

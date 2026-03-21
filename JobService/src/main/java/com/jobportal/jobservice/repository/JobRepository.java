@@ -8,4 +8,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface JobRepository extends JpaRepository<Job, Long>,
         JpaSpecificationExecutor<Job> {
+
+    // Delete all jobs by recruiterId
+    void deleteByRecruiterId(Long recruiterId);
 }

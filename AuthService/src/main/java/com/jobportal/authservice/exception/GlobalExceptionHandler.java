@@ -46,6 +46,12 @@ public class GlobalExceptionHandler {
                         + ex.getMessage(),
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<Map<String, String>> handleUnauthorized(
+            UnauthorizedException ex) {
+        return buildError(ex.getMessage(), HttpStatus.FORBIDDEN);
+    }
 
     private ResponseEntity<Map<String, String>> buildError(
             String message, HttpStatus status) {

@@ -19,15 +19,20 @@ public class JwtUtil {
     @Value("${jwt.expiration}")
     private long jwtExpiration;
 
-    // Generate signing key from secret
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
-    // Generate token using email
-    public String generateToken(String email) {
+    // =====================================================
+    // GENERATE TOKEN
+    // Now includes userId and role in token claims
+    // so API Gateway can extract them
+    // =====================================================
+    public String generateToken(String email, Long userId, String role) {
         return Jwts.builder()
                 .setSubject(email)
+                .claim("userId", userId)   // ← add userId
+                .claim("role", role)       // ← add role
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(
                         System.currentTimeMillis() + jwtExpiration))
@@ -44,7 +49,8 @@ public class JwtUtil {
     public boolean validateToken(String token, String email) {
         try {
             String extractedEmail = extractEmail(token);
-            return extractedEmail.equals(email) && !isTokenExpired(token);
+            return extractedEmail.equals(email)
+                    && !isTokenExpired(token);
         } catch (Exception e) {
             return false;
         }
