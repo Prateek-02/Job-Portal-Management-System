@@ -23,16 +23,14 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
-    // =====================================================
     // GENERATE TOKEN
     // Now includes userId and role in token claims
     // so API Gateway can extract them
-    // =====================================================
     public String generateToken(String email, Long userId, String role) {
         return Jwts.builder()
                 .setSubject(email)
-                .claim("userId", userId)   // ← add userId
-                .claim("role", role)       // ← add role
+                .claim("userId", userId)
+                .claim("role", role)       
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(
                         System.currentTimeMillis() + jwtExpiration))

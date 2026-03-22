@@ -10,8 +10,7 @@ import java.util.List;
 public interface ApplicationService {
 
     // Job Seeker applies for a job
-    ApplicationResponse applyForJob(
-            ApplicationRequest request, Long userId, String role);
+	ApplicationResponse applyForJob(ApplicationRequest request, Long userId,String role, String resumeUrl);
 
     // Job Seeker views their own applications
     List<ApplicationResponse> getUserApplications(

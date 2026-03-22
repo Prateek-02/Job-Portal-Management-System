@@ -87,6 +87,17 @@
 			<artifactId>auth-service</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		<!-- RabbitMQ -->
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-amqp</artifactId>
+		</dependency>
+		<!-- Cloudinary -->
+		<dependency>
+		    <groupId>com.cloudinary</groupId>
+		    <artifactId>cloudinary-http44</artifactId>
+		    <version>1.36.0</version>
+		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>

@@ -1,5 +1,6 @@
 package com.jobportal.applicationservice.controller;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -11,19 +12,19 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.jobportal.applicationservice.dto.request.ApplicationRequest;
 import com.jobportal.applicationservice.dto.response.ApplicationResponse;
 import com.jobportal.applicationservice.dto.response.JobApplicationResponse;
 import com.jobportal.applicationservice.enums.ApplicationStatus;
 import com.jobportal.applicationservice.service.ApplicationService;
+import com.jobportal.applicationservice.service.CloudinaryService;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -33,28 +34,38 @@ import lombok.RequiredArgsConstructor;
 public class ApplicationController {
 
     private final ApplicationService service;
+    private final CloudinaryService cloudinaryService;
 
-    // =====================================================
     // POST /api/applications/apply
     // Job Seeker applies for a job
-    // =====================================================
-    @PostMapping("/apply")
+    @PostMapping(value = "/apply",
+            consumes = "multipart/form-data")
     public ResponseEntity<ApplicationResponse> applyForJobs(
-            @Valid @RequestBody ApplicationRequest request,
+            @RequestParam("jobId") Long jobId,
+            @RequestParam("resume") MultipartFile resume,
             @RequestHeader("X-User-Id") Long userId,
-            @RequestHeader("X-User-Role") String role) {
+            @RequestHeader("X-User-Role") String role)
+            throws IOException {
+
+        // Upload resume to Cloudinary
+        String resumeUrl =
+                cloudinaryService.uploadResume(resume);
+
+        // Create request object
+        ApplicationRequest request = new ApplicationRequest();
+        request.setJobId(jobId);
 
         ApplicationResponse response =
-                service.applyForJob(request, userId, role);
+                service.applyForJob(
+                        request, userId, role, resumeUrl);
+
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(response);
     }
 
-    // =====================================================
     // GET /api/applications/user/viewApplications
     // Job Seeker views their own applications
-    // =====================================================
     @GetMapping("/user/viewApplications")
     public ResponseEntity<List<ApplicationResponse>> getUserApplications(
             @RequestHeader("X-User-Id") Long userId,
@@ -65,10 +76,8 @@ public class ApplicationController {
         return ResponseEntity.ok(applications);
     }
 
-    // =====================================================
     // GET /api/applications/jobApplications/{jobId}
     // Recruiter views all applicants for a job
-    // =====================================================
     @GetMapping("/jobApplications/{jobId}")
     public ResponseEntity<List<JobApplicationResponse>> getJobApplications(
             @PathVariable Long jobId,
@@ -79,10 +88,8 @@ public class ApplicationController {
         return ResponseEntity.ok(applications);
     }
 
-    // =====================================================
     // PATCH /api/applications/jobApplication/{id}/status
     // Recruiter updates application status
-    // =====================================================
     @PatchMapping("/jobApplication/{id}/status")
     public ResponseEntity<ApplicationResponse> updatedStatus(
             @PathVariable Long id,
@@ -91,14 +98,13 @@ public class ApplicationController {
             @RequestHeader("X-User-Role") String role) {
 
         ApplicationResponse response =
-                service.updateStatus(id, status, recruiterId, role);
+                service.updateStatus(
+                        id, status, recruiterId, role);
         return ResponseEntity.ok(response);
     }
 
-    // =====================================================
     // DELETE /api/applications/user/{userId}
     // Called by Admin Service when deleting a user
-    // =====================================================
     @DeleteMapping("/user/{userId}")
     public ResponseEntity<Map<String, String>> deleteUserApplications(
             @PathVariable Long userId) {
@@ -108,10 +114,8 @@ public class ApplicationController {
                         "All applications of user deleted successfully!"));
     }
 
-    // =====================================================
     // DELETE /api/applications/job/{jobId}
     // Called by Admin Service when deleting a job
-    // =====================================================
     @DeleteMapping("/job/{jobId}")
     public ResponseEntity<Map<String, String>> deleteJobApplications(
             @PathVariable Long jobId) {
@@ -120,10 +124,11 @@ public class ApplicationController {
                 Map.of("message",
                         "All applications for job deleted successfully!"));
     }
-    
+
     // GET /api/applications/count
     @GetMapping("/count")
     public ResponseEntity<Long> getTotalApplications() {
-        return ResponseEntity.ok(service.getTotalApplications());
+        return ResponseEntity.ok(
+                service.getTotalApplications());
     }
 }
