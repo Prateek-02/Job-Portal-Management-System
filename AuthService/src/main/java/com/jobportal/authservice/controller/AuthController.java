@@ -1,5 +1,6 @@
 package com.jobportal.authservice.controller;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +14,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.jobportal.authservice.dto.request.LoginRequest;
 import com.jobportal.authservice.dto.request.RegisterRequest;
@@ -47,6 +50,17 @@ public class AuthController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(response);
+    }
+    
+ // POST /api/auth/users/{id}/profile-image
+    @PostMapping(value = "/users/{id}/profile-image",consumes = "multipart/form-data")
+    public ResponseEntity<UserResponse> uploadProfileImage(
+            @PathVariable Long id,
+            @RequestParam("image") MultipartFile image)
+            throws IOException {
+
+        UserResponse response = authService.uploadProfileImage(id, image);
+        return ResponseEntity.ok(response);
     }
 
     // GET /api/auth/users

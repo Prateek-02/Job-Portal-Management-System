@@ -1,5 +1,6 @@
 package com.jobportal.authservice.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -7,6 +8,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.jobportal.authservice.dto.request.LoginRequest;
 import com.jobportal.authservice.dto.request.RegisterRequest;
@@ -29,6 +31,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private CloudinaryService cloudinaryService;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -107,6 +112,26 @@ public class AuthServiceImpl implements AuthService {
                 user.getRole(),
                 "Login successful!"
         );
+    }
+    
+    @Override
+    public UserResponse uploadProfileImage(Long userId,
+            MultipartFile file) throws IOException {
+
+        // Find user
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(
+                        "User not found with id: " + userId));
+
+        // Upload image to Cloudinary
+        String imageUrl =
+                cloudinaryService.uploadProfileImage(file);
+
+        // Update user profile image URL
+        user.setProfileImageUrl(imageUrl);
+        User updated = userRepository.save(user);
+
+        return modelMapper.map(updated, UserResponse.class);
     }
 
     

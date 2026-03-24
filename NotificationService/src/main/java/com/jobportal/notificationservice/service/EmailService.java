@@ -3,6 +3,7 @@ package com.jobportal.notificationservice.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -17,8 +18,10 @@ import lombok.RequiredArgsConstructor;
 public class EmailService {
 
     private final JavaMailSender mailSender;
-
     private final UserClient userClient;
+
+    @Value("${internal.secret}")
+    private String internalSecret;
 
     // Email to ALL Job Seekers when job is posted
     public void sendJobPostedEmailToAllJobSeekers(
@@ -28,8 +31,9 @@ public class EmailService {
 
         try {
             // Get all users from Auth Service
+            // passing internal secret for service-to-service call
             List<UserResponse> users =
-                    userClient.getAllUsers();
+                    userClient.getAllUsers(internalSecret);
 
             // Filter only Job Seekers
             List<UserResponse> jobSeekers = users.stream()
@@ -59,22 +63,15 @@ public class EmailService {
                         + "Job Portal Team"
                 );
                 mailSender.send(message);
-                System.out.println(
-                        "Job alert sent to: "
-                        + jobSeeker.getEmail());
             }
 
-        } catch (Exception e) {
-            System.out.println(
-                    "Failed to send job alerts: "
-                    + e.getMessage());
+        } 
+        catch (Exception e) {
+            System.out.println("Failed to send job alerts: "+ e.getMessage());
         }
     }
 
-    // =====================================================
-    // Email 2 — Job Applied (to Recruiter)
-    // Sent when a job seeker applies for a job
-    // =====================================================
+    // Email to Recruiter when Job Seeker applies
     public void sendJobAppliedEmail(String recruiterEmail,
             String applicantName, String applicantEmail,
             String jobTitle, String companyName) {
@@ -97,14 +94,10 @@ public class EmailService {
         );
 
         mailSender.send(message);
-        System.out.println(
-                "Job Applied email sent to: " + recruiterEmail);
+       
     }
 
-    // =====================================================
-    // Email 3 — Application Status Changed (to Job Seeker)
-    // Sent when recruiter updates application status
-    // =====================================================
+    // Email to Job Seeker when status changes
     public void sendApplicationStatusEmail(
             String applicantEmail, String applicantName,
             String jobTitle, String companyName,
@@ -127,8 +120,7 @@ public class EmailService {
         );
 
         mailSender.send(message);
-        System.out.println(
-                "Status email sent to: " + applicantEmail);
+        
     }
 
     // Helper method for status message

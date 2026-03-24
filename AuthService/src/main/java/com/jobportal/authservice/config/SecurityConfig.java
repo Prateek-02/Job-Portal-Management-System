@@ -37,11 +37,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/register").permitAll()
                 .requestMatchers("/api/auth/login").permitAll()
                 
-                // Kept public for internal service-to-service
-                // communication (Feign Client calls from
-                // Admin Service and Application Service)
-                // In production, use service mesh or
-                // internal secret header for security
+                // Allow internal service calls
+                // Security handled by X-Internal-Secret in JwtAuthFilter
                 .requestMatchers("/api/auth/users/**").permitAll()
                 
                 // PROTECTED — token required for everything else

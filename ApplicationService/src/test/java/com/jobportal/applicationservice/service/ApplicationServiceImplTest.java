@@ -20,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -55,12 +56,20 @@ class ApplicationServiceImplTest {
     private UserResponse userResponse;
     private JobResponse jobResponse;
 
-    // resumeUrl for testing
     private static final String RESUME_URL =
             "https://cloudinary.com/resume.pdf";
 
+    private static final String INTERNAL_SECRET =
+            "jobportal-internal-secret-2024";
+
     @BeforeEach
     void setUp() {
+
+        // Inject internal secret value
+        ReflectionTestUtils.setField(
+                applicationService,
+                "internalSecret",
+                INTERNAL_SECRET);
 
         applicationRequest = new ApplicationRequest();
         applicationRequest.setJobId(1L);
@@ -96,7 +105,6 @@ class ApplicationServiceImplTest {
 
     @Test
     void applyForJob_Success() {
-        // Arrange
         when(jobClient.getJobById(anyLong()))
                 .thenReturn(jobResponse);
         when(applicationRepository
@@ -108,16 +116,14 @@ class ApplicationServiceImplTest {
         when(modelMapper.map(any(JobApplication.class),
                 eq(ApplicationResponse.class)))
                 .thenReturn(applicationResponse);
-        when(userClient.getUserById(anyLong()))
+        when(userClient.getUserById(anyLong(), anyString()))
                 .thenReturn(userResponse);
 
-        // Act
         ApplicationResponse response =
                 applicationService.applyForJob(
                         applicationRequest, 1L,
-                        "JOB_SEEKER", RESUME_URL); // ← added resumeUrl
+                        "JOB_SEEKER", RESUME_URL);
 
-        // Assert
         assertThat(response).isNotNull();
         assertThat(response.getStatus())
                 .isEqualTo(ApplicationStatus.APPLIED);
@@ -130,11 +136,10 @@ class ApplicationServiceImplTest {
 
     @Test
     void applyForJob_NotJobSeeker_ThrowsException() {
-        // Act & Assert
         assertThatThrownBy(() ->
                 applicationService.applyForJob(
                         applicationRequest, 1L,
-                        "RECRUITER", RESUME_URL)) // ← added resumeUrl
+                        "RECRUITER", RESUME_URL))
                 .isInstanceOf(UnauthorizedException.class)
                 .hasMessageContaining(
                         "Only Job Seekers can apply");
@@ -145,15 +150,13 @@ class ApplicationServiceImplTest {
 
     @Test
     void applyForJob_JobNotFound_ThrowsException() {
-        // Arrange
         when(jobClient.getJobById(anyLong()))
                 .thenThrow(new RuntimeException("Job not found"));
 
-        // Act & Assert
         assertThatThrownBy(() ->
                 applicationService.applyForJob(
                         applicationRequest, 1L,
-                        "JOB_SEEKER", RESUME_URL)) // ← added resumeUrl
+                        "JOB_SEEKER", RESUME_URL))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Job not found");
 
@@ -163,18 +166,16 @@ class ApplicationServiceImplTest {
 
     @Test
     void applyForJob_DuplicateApplication_ThrowsException() {
-        // Arrange
         when(jobClient.getJobById(anyLong()))
                 .thenReturn(jobResponse);
         when(applicationRepository
                 .existsByUserIdAndJobId(anyLong(), anyLong()))
                 .thenReturn(true);
 
-        // Act & Assert
         assertThatThrownBy(() ->
                 applicationService.applyForJob(
                         applicationRequest, 1L,
-                        "JOB_SEEKER", RESUME_URL)) // ← added resumeUrl
+                        "JOB_SEEKER", RESUME_URL))
                 .isInstanceOf(DuplicateApplicationException.class)
                 .hasMessageContaining(
                         "You have already applied");
@@ -187,7 +188,6 @@ class ApplicationServiceImplTest {
 
     @Test
     void updateStatus_Success() {
-        // Arrange
         when(applicationRepository.findById(anyLong()))
                 .thenReturn(Optional.of(jobApplication));
         when(applicationRepository.save(
@@ -198,16 +198,14 @@ class ApplicationServiceImplTest {
                 .thenReturn(applicationResponse);
         when(jobClient.getJobById(anyLong()))
                 .thenReturn(jobResponse);
-        when(userClient.getUserById(anyLong()))
+        when(userClient.getUserById(anyLong(), anyString()))
                 .thenReturn(userResponse);
 
-        // Act
         ApplicationResponse response =
                 applicationService.updateStatus(
                         1L, ApplicationStatus.SHORTLISTED,
                         1L, "RECRUITER");
 
-        // Assert
         assertThat(response).isNotNull();
 
         verify(applicationRepository, times(1))
@@ -216,7 +214,6 @@ class ApplicationServiceImplTest {
 
     @Test
     void updateStatus_NotRecruiter_ThrowsException() {
-        // Act & Assert
         assertThatThrownBy(() ->
                 applicationService.updateStatus(
                         1L, ApplicationStatus.SHORTLISTED,
@@ -231,11 +228,9 @@ class ApplicationServiceImplTest {
 
     @Test
     void updateStatus_ApplicationNotFound_ThrowsException() {
-        // Arrange
         when(applicationRepository.findById(anyLong()))
                 .thenReturn(Optional.empty());
 
-        // Act & Assert
         assertThatThrownBy(() ->
                 applicationService.updateStatus(
                         999L, ApplicationStatus.SHORTLISTED,

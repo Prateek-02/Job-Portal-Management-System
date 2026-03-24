@@ -31,6 +31,8 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
+    
+    private String profileImageUrl;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

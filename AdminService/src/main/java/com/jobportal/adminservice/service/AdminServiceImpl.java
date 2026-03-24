@@ -1,16 +1,19 @@
 package com.jobportal.adminservice.service;
 
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import com.jobportal.adminservice.client.ApplicationServiceClient;
 import com.jobportal.adminservice.client.AuthServiceClient;
 import com.jobportal.adminservice.client.JobServiceClient;
 import com.jobportal.adminservice.dto.response.JobResponse;
 import com.jobportal.adminservice.dto.response.PageResponse;
 import com.jobportal.adminservice.dto.response.UserResponse;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -19,25 +22,28 @@ public class AdminServiceImpl implements AdminService {
     private final AuthServiceClient authServiceClient;
     private final JobServiceClient jobServiceClient;
     private final ApplicationServiceClient applicationServiceClient;
+    
+    @Value("${internal.secret}")
+    private String internalSecret;
 
     // =====================================================
     // USER MANAGEMENT
     // =====================================================
     @Override
     public List<UserResponse> getAllUsers() {
-        return authServiceClient.getAllUsers();
+        return authServiceClient.getAllUsers(internalSecret);
     }
 
     @Override
     public UserResponse getUserById(Long id) {
-        return authServiceClient.getUserById(id);
+        return authServiceClient.getUserById(id,internalSecret);
     }
 
     @Override
     public void deleteUser(Long id) {
 
         // Step 1: Get user details to check role
-        UserResponse user = authServiceClient.getUserById(id);
+        UserResponse user = authServiceClient.getUserById(id,internalSecret);
 
         // Step 2: Delete all applications of this user
         applicationServiceClient.deleteUserApplications(id);
@@ -48,7 +54,7 @@ public class AdminServiceImpl implements AdminService {
         }
 
         // Step 4: Delete user from Auth Service
-        authServiceClient.deleteUser(id);
+        authServiceClient.deleteUser(id,internalSecret);
     }
 
     // =====================================================
@@ -72,7 +78,7 @@ public class AdminServiceImpl implements AdminService {
 
         // Get all users from Auth Service
         List<UserResponse> users =
-                authServiceClient.getAllUsers();
+                authServiceClient.getAllUsers(internalSecret);
 
         // Count users by role
         long totalUsers = users.size();

@@ -8,6 +8,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class JobServiceApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(JobServiceApplication.class, args);
-		System.out.println("Job Service Started on http://localhost:8082");
+		System.out.println("Job Service Started...");
 	}
 }

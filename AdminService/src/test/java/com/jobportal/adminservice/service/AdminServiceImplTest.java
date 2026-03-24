@@ -6,13 +6,13 @@ import com.jobportal.adminservice.client.JobServiceClient;
 import com.jobportal.adminservice.dto.response.JobResponse;
 import com.jobportal.adminservice.dto.response.PageResponse;
 import com.jobportal.adminservice.dto.response.UserResponse;
-import com.jobportal.adminservice.exception.UnauthorizedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,7 +25,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class AdminServiceImplTest {
 
-    // Mocks
     @Mock
     private AuthServiceClient authServiceClient;
 
@@ -35,13 +34,9 @@ class AdminServiceImplTest {
     @Mock
     private ApplicationServiceClient applicationServiceClient;
 
-   
-    // InjectMocks — class we are testing
     @InjectMocks
     private AdminServiceImpl adminService;
 
-   
-    // Test Data
     private UserResponse jobSeeker;
     private UserResponse recruiter;
     private UserResponse admin;
@@ -49,21 +44,31 @@ class AdminServiceImplTest {
     private PageResponse pageResponse;
     private List<UserResponse> users;
 
+    // Internal secret for testing
+    private static final String INTERNAL_SECRET =
+            "jobportal-internal-secret-2024";
+
     @BeforeEach
     void setUp() {
+
+        // Inject internal secret value
+        ReflectionTestUtils.setField(
+                adminService,
+                "internalSecret",
+                INTERNAL_SECRET);
 
         // Job Seeker
         jobSeeker = new UserResponse();
         jobSeeker.setId(1L);
         jobSeeker.setName("Priya Singh");
-        jobSeeker.setEmail("priya@gmail.com");
+        jobSeeker.setEmail("priya2@gmail.com");
         jobSeeker.setRole("JOB_SEEKER");
 
         // Recruiter
         recruiter = new UserResponse();
         recruiter.setId(2L);
         recruiter.setName("Rahul Sharma");
-        recruiter.setEmail("rahul@gmail.com");
+        recruiter.setEmail("rahul1@gmail.com");
         recruiter.setRole("RECRUITER");
 
         // Admin
@@ -94,7 +99,7 @@ class AdminServiceImplTest {
     @Test
     void getAllUsers_Success() {
         // Arrange
-        when(authServiceClient.getAllUsers())
+        when(authServiceClient.getAllUsers(anyString()))
                 .thenReturn(users);
 
         // Act
@@ -111,16 +116,16 @@ class AdminServiceImplTest {
 
         // Verify
         verify(authServiceClient, times(1))
-                .getAllUsers();
+                .getAllUsers(INTERNAL_SECRET);
     }
 
-    
     // GET USER BY ID TESTS
 
     @Test
     void getUserById_Success() {
         // Arrange
-        when(authServiceClient.getUserById(anyLong()))
+        when(authServiceClient.getUserById(
+                anyLong(), anyString()))
                 .thenReturn(jobSeeker);
 
         // Act
@@ -137,7 +142,7 @@ class AdminServiceImplTest {
 
         // Verify
         verify(authServiceClient, times(1))
-                .getUserById(1L);
+                .getUserById(1L, INTERNAL_SECRET);
     }
 
     // DELETE USER TESTS
@@ -145,7 +150,8 @@ class AdminServiceImplTest {
     @Test
     void deleteUser_JobSeeker_Success() {
         // Arrange
-        when(authServiceClient.getUserById(anyLong()))
+        when(authServiceClient.getUserById(
+                anyLong(), anyString()))
                 .thenReturn(jobSeeker);
 
         // Act
@@ -155,19 +161,20 @@ class AdminServiceImplTest {
         verify(applicationServiceClient, times(1))
                 .deleteUserApplications(1L);
 
-        // Verify jobs NOT deleted (job seeker has no jobs)
+        // Verify jobs NOT deleted
         verify(jobServiceClient, never())
                 .deleteRecruiterJobs(anyLong());
 
         // Verify user deleted
         verify(authServiceClient, times(1))
-                .deleteUser(1L);
+                .deleteUser(1L, INTERNAL_SECRET);
     }
 
     @Test
     void deleteUser_Recruiter_Success() {
         // Arrange
-        when(authServiceClient.getUserById(anyLong()))
+        when(authServiceClient.getUserById(
+                anyLong(), anyString()))
                 .thenReturn(recruiter);
 
         // Act
@@ -177,16 +184,15 @@ class AdminServiceImplTest {
         verify(applicationServiceClient, times(1))
                 .deleteUserApplications(2L);
 
-        // Verify jobs deleted (recruiter has jobs)
+        // Verify jobs deleted
         verify(jobServiceClient, times(1))
                 .deleteRecruiterJobs(2L);
 
         // Verify user deleted
         verify(authServiceClient, times(1))
-                .deleteUser(2L);
+                .deleteUser(2L, INTERNAL_SECRET);
     }
 
-    
     // GET ALL JOBS TESTS
 
     @Test
@@ -207,7 +213,6 @@ class AdminServiceImplTest {
         verify(jobServiceClient, times(1)).getAllJobs();
     }
 
-  
     // GET JOB BY ID TESTS
 
     @Test
@@ -232,13 +237,12 @@ class AdminServiceImplTest {
                 .getJobById(1L);
     }
 
-   
     // GET REPORTS TESTS
 
     @Test
     void getReports_Success() {
         // Arrange
-        when(authServiceClient.getAllUsers())
+        when(authServiceClient.getAllUsers(anyString()))
                 .thenReturn(users);
         when(jobServiceClient.getAllJobs())
                 .thenReturn(pageResponse);
@@ -264,7 +268,7 @@ class AdminServiceImplTest {
 
         // Verify
         verify(authServiceClient, times(1))
-                .getAllUsers();
+                .getAllUsers(INTERNAL_SECRET);
         verify(jobServiceClient, times(1))
                 .getAllJobs();
         verify(applicationServiceClient, times(1))

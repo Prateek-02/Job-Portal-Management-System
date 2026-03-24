@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.jobportal.applicationservice.client.JobClient;
@@ -36,10 +37,14 @@ public class ApplicationServiceImpl implements ApplicationService {
     private final JobClient jobClient;
     private final RabbitTemplate rabbitTemplate;
 
+    @Value("${internal.secret}")
+    private String internalSecret;
+
     @Override
     public ApplicationResponse applyForJob(
             ApplicationRequest request, Long userId,
             String role, String resumeUrl) {
+    	
 
         if (!role.equalsIgnoreCase("JOB_SEEKER")) {
             throw new UnauthorizedException(
@@ -51,7 +56,8 @@ public class ApplicationServiceImpl implements ApplicationService {
             job = jobClient.getJobById(request.getJobId());
         } catch (Exception e) {
             throw new RuntimeException(
-                    "Job not found with id: " + request.getJobId());
+                    "Job not found with id: "
+                            + request.getJobId());
         }
 
         if (applicationRepository.existsByUserIdAndJobId(
@@ -72,12 +78,14 @@ public class ApplicationServiceImpl implements ApplicationService {
                 modelMapper.map(saved, ApplicationResponse.class);
         response.setJob(job);
 
-        // Publish event
+        // Publish Job Applied event
         try {
             UserResponse applicant =
-                    userClient.getUserById(userId);
+                    userClient.getUserById(
+                            userId, internalSecret);
             UserResponse recruiter =
-                    userClient.getUserById(job.getRecruiterId());
+                    userClient.getUserById(
+                            job.getRecruiterId(), internalSecret);
 
             JobAppliedEvent event = new JobAppliedEvent(
                     recruiter.getEmail(),
@@ -89,16 +97,17 @@ public class ApplicationServiceImpl implements ApplicationService {
 
             rabbitTemplate.convertAndSend(
                     RabbitMQConfig.JOB_APPLIED_QUEUE, event);
+            System.out.println("Job Applied event published!");
 
         } catch (Exception e) {
             System.out.println(
-                    "Failed to publish event: " + e.getMessage());
+                    "Failed to publish event: "
+                            + e.getMessage());
         }
 
         return response;
     }
-    
-    // GET USER APPLICATIONS
+
     @Override
     public List<ApplicationResponse> getUserApplications(
             Long userId, String role) {
@@ -116,7 +125,8 @@ public class ApplicationServiceImpl implements ApplicationService {
                                     ApplicationResponse.class);
                     try {
                         JobResponse job =
-                                jobClient.getJobById(app.getJobId());
+                                jobClient.getJobById(
+                                        app.getJobId());
                         response.setJob(job);
                     } catch (Exception e) {
                         JobResponse job = new JobResponse();
@@ -130,7 +140,6 @@ public class ApplicationServiceImpl implements ApplicationService {
                 .collect(Collectors.toList());
     }
 
-    // GET JOB APPLICATIONS
     @Override
     public List<JobApplicationResponse> getJobApplications(
             Long jobId, String role) {
@@ -154,9 +163,12 @@ public class ApplicationServiceImpl implements ApplicationService {
                     try {
                         UserResponse user =
                                 userClient.getUserById(
-                                        app.getUserId());
-                        response.setApplicantName(user.getName());
-                        response.setApplicantEmail(user.getEmail());
+                                        app.getUserId(),
+                                        internalSecret);
+                        response.setApplicantName(
+                                user.getName());
+                        response.setApplicantEmail(
+                                user.getEmail());
                     } catch (Exception e) {
                         response.setApplicantName("N/A");
                         response.setApplicantEmail("N/A");
@@ -166,11 +178,10 @@ public class ApplicationServiceImpl implements ApplicationService {
                 .collect(Collectors.toList());
     }
 
-    // UPDATE APPLICATION STATUS
     @Override
-    public ApplicationResponse updateStatus(Long applicationId,
-            ApplicationStatus status, Long recruiterId,
-            String role) {
+    public ApplicationResponse updateStatus(
+            Long applicationId, ApplicationStatus status,
+            Long recruiterId, String role) {
 
         if (!role.equalsIgnoreCase("RECRUITER")) {
             throw new UnauthorizedException(
@@ -179,9 +190,10 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         JobApplication application = applicationRepository
                 .findById(applicationId)
-                .orElseThrow(() -> new ApplicationNotFoundException(
-                        "Application not found with id: "
-                                + applicationId));
+                .orElseThrow(() ->
+                        new ApplicationNotFoundException(
+                                "Application not found with id: "
+                                        + applicationId));
 
         application.setStatus(status);
         JobApplication updated =
@@ -189,22 +201,29 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         // Map response and set job details
         ApplicationResponse response =
-                modelMapper.map(updated, ApplicationResponse.class);
+                modelMapper.map(updated,
+                        ApplicationResponse.class);
 
         try {
-            JobResponse job = jobClient.getJobById(updated.getJobId());
-            response.setJob(job); 
-        } 
-        catch (Exception e) {
-           
+            JobResponse job =
+                    jobClient.getJobById(updated.getJobId());
+            response.setJob(job);
+        } catch (Exception e) {
+            System.out.println(
+                    "Failed to fetch job details: "
+                            + e.getMessage());
         }
 
         // Publish Application Status event
         try {
-            UserResponse applicant = userClient.getUserById(updated.getUserId());
-            JobResponse job = jobClient.getJobById(updated.getJobId());
+            UserResponse applicant =
+                    userClient.getUserById(
+                            updated.getUserId(), internalSecret);
+            JobResponse job =
+                    jobClient.getJobById(updated.getJobId());
 
-            ApplicationStatusEvent event = new ApplicationStatusEvent(
+            ApplicationStatusEvent event =
+                    new ApplicationStatusEvent(
                             applicant.getEmail(),
                             applicant.getName(),
                             job.getTitle(),
@@ -212,30 +231,31 @@ public class ApplicationServiceImpl implements ApplicationService {
                             status.name()
                     );
 
-            rabbitTemplate.convertAndSend(RabbitMQConfig.APPLICATION_STATUS_QUEUE,event);
-            System.out.println("Application Status event published!");
+            rabbitTemplate.convertAndSend(
+                    RabbitMQConfig.APPLICATION_STATUS_QUEUE,
+                    event);
+            System.out.println(
+                    "Application Status event published!");
 
-        } 
-        catch (Exception e) {
-            System.out.println("Failed to publish status event: "+ e.getMessage());
+        } catch (Exception e) {
+            System.out.println(
+                    "Failed to publish status event: "
+                            + e.getMessage());
         }
 
         return response;
     }
-    
-    // DELETE USER APPLICATIONS
+
     @Override
     public void deleteUserApplications(Long userId) {
         applicationRepository.deleteByUserId(userId);
     }
 
-    // DELETE JOB APPLICATIONS
     @Override
     public void deleteJobApplications(Long jobId) {
         applicationRepository.deleteByJobId(jobId);
     }
 
-    // GET ALL APPLICATIONS
     @Override
     public Long getTotalApplications() {
         return applicationRepository.count();
