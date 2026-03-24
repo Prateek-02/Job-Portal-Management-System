@@ -37,6 +37,12 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/register").permitAll()
                 .requestMatchers("/api/auth/login").permitAll()
                 
+                .requestMatchers(
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html"
+                    ).permitAll()
+                
                 // Allow internal service calls
                 // Security handled by X-Internal-Secret in JwtAuthFilter
                 .requestMatchers("/api/auth/users/**").permitAll()

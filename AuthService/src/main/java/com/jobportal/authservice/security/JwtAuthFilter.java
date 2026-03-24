@@ -9,7 +9,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;  // ← correct import
+import java.io.IOException;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -29,16 +29,31 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private String internalSecret;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,HttpServletResponse response,FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
 
-        // Allow internal service-to-service calls
-        String internalHeader = request.getHeader("X-Internal-Secret");
-        if (internalSecret.equals(internalHeader)) {
+        String path = request.getRequestURI();
+
+        // ✅ 1. Allow Swagger without authentication
+        if (path.startsWith("/swagger-ui") ||
+            path.startsWith("/v3/api-docs") ||
+            path.startsWith("/swagger-ui.html") ||
+            path.startsWith("/webjars")) {
+
             filterChain.doFilter(request, response);
             return;
         }
 
-        // Normal JWT validation for external calls
+        // ✅ 2. Allow internal service-to-service calls
+        String internalHeader = request.getHeader("X-Internal-Secret");
+        if (internalHeader != null && internalHeader.equals(internalSecret)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // ✅ 3. Normal JWT validation
         String authHeader = request.getHeader("Authorization");
         String token = null;
         String email = null;
@@ -50,22 +65,28 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (email != null && SecurityContextHolder
                 .getContext().getAuthentication() == null) {
+
             UserDetails userDetails =
-                    userDetailsService
-                            .loadUserByUsername(email);
-            if (jwtUtil.validateToken(token,
-                    userDetails.getUsername())) {
+                    userDetailsService.loadUserByUsername(email);
+
+            if (jwtUtil.validateToken(token, userDetails.getUsername())) {
+
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(
-                                userDetails, null,
+                                userDetails,
+                                null,
                                 userDetails.getAuthorities());
+
                 authToken.setDetails(
                         new WebAuthenticationDetailsSource()
                                 .buildDetails(request));
+
                 SecurityContextHolder.getContext()
                         .setAuthentication(authToken);
             }
         }
+
         filterChain.doFilter(request, response);
     }
 }
+
