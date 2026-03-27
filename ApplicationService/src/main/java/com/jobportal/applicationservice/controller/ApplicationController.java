@@ -26,7 +26,9 @@ import com.jobportal.applicationservice.service.ApplicationService;
 import com.jobportal.applicationservice.service.CloudinaryService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/applications")
 @RequiredArgsConstructor
@@ -36,9 +38,8 @@ public class ApplicationController {
     private final ApplicationService service;
     private final CloudinaryService cloudinaryService;
 
-    // POST /api/applications/apply
-    // Job Seeker applies for a job
-    @PostMapping(value = "/apply",consumes = "multipart/form-data")
+    // APPLY FOR JOB
+    @PostMapping(value = "/apply", consumes = "multipart/form-data")
     public ResponseEntity<ApplicationResponse> applyForJobs(
             @RequestParam("jobId") Long jobId,
             @RequestParam("resume") MultipartFile resume,
@@ -46,50 +47,62 @@ public class ApplicationController {
             @RequestHeader("X-User-Role") String role)
             throws IOException {
 
-        // Upload resume to Cloudinary
-        String resumeUrl =
-                cloudinaryService.uploadResume(resume);
+        log.info("Apply job API called | jobId: {} | userId: {} | role: {} | fileName: {}",
+                jobId, userId, role, resume.getOriginalFilename());
 
-        // Create request object
+        String resumeUrl = cloudinaryService.uploadResume(resume);
+
+        log.debug("Resume uploaded to Cloudinary | userId: {} | url: {}", userId, resumeUrl);
+
         ApplicationRequest request = new ApplicationRequest();
         request.setJobId(jobId);
 
         ApplicationResponse response =
-                service.applyForJob(
-                        request, userId, role, resumeUrl);
+                service.applyForJob(request, userId, role, resumeUrl);
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(response);
+        log.info("Application submitted successfully | jobId: {} | userId: {}",
+                jobId, userId);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // GET /api/applications/user/viewApplications
-    // Job Seeker views their own applications
+    // VIEW USER APPLICATIONS
     @GetMapping("/user/viewApplications")
     public ResponseEntity<List<ApplicationResponse>> getUserApplications(
             @RequestHeader("X-User-Id") Long userId,
             @RequestHeader("X-User-Role") String role) {
 
+        log.info("Fetch user applications API called | userId: {} | role: {}", userId, role);
+
         List<ApplicationResponse> applications =
                 service.getUserApplications(userId, role);
+
+        log.debug("User applications fetched | userId: {} | count: {}",
+                userId, applications.size());
+
         return ResponseEntity.ok(applications);
     }
 
-    // GET /api/applications/jobApplications/{jobId}
-    // Recruiter views all applicants for a job
+    // VIEW JOB APPLICATIONS (Recruiter)
     @GetMapping("/jobApplications/{jobId}")
     public ResponseEntity<List<JobApplicationResponse>> getJobApplications(
             @PathVariable Long jobId,
             @RequestHeader("X-User-Id") Long recruiterId,
             @RequestHeader("X-User-Role") String role) {
 
+        log.info("Fetch job applications API called | jobId: {} | recruiterId: {} | role: {}",
+                jobId, recruiterId, role);
+
         List<JobApplicationResponse> applications =
-                service.getJobApplications(jobId, role,recruiterId);
+                service.getJobApplications(jobId, role, recruiterId);
+
+        log.debug("Job applications fetched | jobId: {} | count: {}",
+                jobId, applications.size());
+
         return ResponseEntity.ok(applications);
     }
 
-    // PATCH /api/applications/jobApplication/{id}/status
-    // Recruiter updates application status
+    // UPDATE APPLICATION STATUS
     @PatchMapping("/jobApplication/{id}/status")
     public ResponseEntity<ApplicationResponse> updatedStatus(
             @PathVariable Long id,
@@ -97,38 +110,43 @@ public class ApplicationController {
             @RequestHeader("X-User-Id") Long recruiterId,
             @RequestHeader("X-User-Role") String role) {
 
+        log.info("Update application status API called | applicationId: {} | status: {} | recruiterId: {}",
+                id, status, recruiterId);
+
         ApplicationResponse response =
-                service.updateStatus(
-                        id, status, recruiterId, role);
+                service.updateStatus(id, status, recruiterId, role);
+
+        log.info("Application status updated | applicationId: {} | status: {}",
+                id, status);
+
         return ResponseEntity.ok(response);
     }
 
-    // DELETE /api/applications/user/{userId}
-    // Called by Admin Service when deleting a user
-    @DeleteMapping("/user/{userId}")
-    public ResponseEntity<Map<String, String>> deleteUserApplications(
-            @PathVariable Long userId) {
-        service.deleteUserApplications(userId);
-        return ResponseEntity.ok(
-                Map.of("message",
-                        "All applications of user deleted successfully!"));
-    }
-
-    // DELETE /api/applications/job/{jobId}
-    // Called by Admin Service when deleting a job
+    // DELETE JOB APPLICATIONS (still needed when job is deleted)
     @DeleteMapping("/job/{jobId}")
     public ResponseEntity<Map<String, String>> deleteJobApplications(
             @PathVariable Long jobId) {
+
+        log.info("Delete job applications API called | jobId: {}", jobId);
+
         service.deleteJobApplications(jobId);
+
+        log.info("All applications deleted for jobId: {}", jobId);
+
         return ResponseEntity.ok(
-                Map.of("message",
-                        "All applications for job deleted successfully!"));
+                Map.of("message", "All applications for job deleted successfully!"));
     }
 
-    // GET /api/applications/count
+    // GET TOTAL APPLICATION COUNT
     @GetMapping("/count")
     public ResponseEntity<Long> getTotalApplications() {
-        return ResponseEntity.ok(
-                service.getTotalApplications());
+
+        log.info("Get total applications count API called");
+
+        Long count = service.getTotalApplications();
+
+        log.debug("Total applications count: {}", count);
+
+        return ResponseEntity.ok(count);
     }
 }

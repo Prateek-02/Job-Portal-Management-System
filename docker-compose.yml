@@ -1,0 +1,241 @@
+version: "3.8"
+
+services:
+
+  # ===============================
+  # EUREKA SERVER
+  # ===============================
+  eureka-server:
+    build: ./EurekaServer
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - jobportal-network
+
+  # ===============================
+  # API GATEWAY
+  # ===============================
+  api-gateway:
+    build: ./ApiGateway
+    container_name: api-gateway
+    ports:
+      - "8085:8085"
+    env_file:
+      - .env
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      - eureka-server
+    networks:
+      - jobportal-network
+
+  # ===============================
+  # MYSQL DATABASE
+  # ===============================
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    volumes:
+      - mysql-data:/var/lib/mysql
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    ports:
+      - "3307:3306"
+    networks:
+      - jobportal-network
+
+  # ===============================
+  # RABBITMQ
+  # ===============================
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    env_file:
+      - .env
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USERNAME}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - jobportal-network
+
+  # ===============================
+  # AUTH SERVICE
+  # ===============================
+  auth-service:
+    build: ./AuthService
+    container_name: auth-service
+    ports:
+      - "8081:8081"
+    env_file:
+      - .env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+
+      SPRING_RABBITMQ_HOST: rabbitmq
+
+      JWT_SECRET: ${JWT_SECRET}
+      INTERNAL_SECRET: ${INTERNAL_SECRET}
+
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      - mysql
+      - rabbitmq
+      - eureka-server
+    networks:
+      - jobportal-network
+
+  # ===============================
+  # JOB SERVICE
+  # ===============================
+  job-service:
+    build: ./JobService
+    container_name: job-service
+    ports:
+      - "8082:8082"
+    env_file:
+      - .env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+
+      SPRING_RABBITMQ_HOST: rabbitmq
+
+      INTERNAL_SECRET: ${INTERNAL_SECRET}
+
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      - mysql
+      - rabbitmq
+      - eureka-server
+    networks:
+      - jobportal-network
+
+  # ===============================
+  # APPLICATION SERVICE
+  # ===============================
+  application-service:
+    build: ./ApplicationService
+    container_name: application-service
+    ports:
+      - "8083:8083"
+    env_file:
+      - .env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+
+      SPRING_RABBITMQ_HOST: rabbitmq
+
+      INTERNAL_SECRET: ${INTERNAL_SECRET}
+
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      - mysql
+      - rabbitmq
+      - eureka-server
+    networks:
+      - jobportal-network
+
+  # ===============================
+  # ADMIN SERVICE
+  # ===============================
+  admin-service:
+    build: ./AdminService
+    container_name: admin-service
+    ports:
+      - "8084:8084"
+    env_file:
+      - .env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+
+      INTERNAL_SECRET: ${INTERNAL_SECRET}
+
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      - mysql
+      - eureka-server
+    networks:
+      - jobportal-network
+
+  # ===============================
+  # NOTIFICATION SERVICE
+  # ===============================
+  notification-service:
+    build: ./NotificationService
+    container_name: notification-service
+    ports:
+      - "8086:8086"
+    env_file:
+      - .env
+    environment:
+      SPRING_RABBITMQ_HOST: rabbitmq
+
+      INTERNAL_SECRET: ${INTERNAL_SECRET}
+
+      SPRING_MAIL_USERNAME: ${MAIL_USERNAME}
+      SPRING_MAIL_PASSWORD: ${MAIL_PASSWORD}
+
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      - rabbitmq
+      - eureka-server
+    networks:
+      - jobportal-network
+
+  # ===============================
+  # ZOOKEEPER
+  # ===============================
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    ports:
+      - "2181:2181"
+    networks:
+      - jobportal-network
+
+  # ===============================
+  # KAFKA
+  # ===============================
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - jobportal-network
+
+networks:
+  jobportal-network:
+    driver: bridge
+
+volumes:
+  mysql-data:

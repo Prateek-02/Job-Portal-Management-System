@@ -24,6 +24,9 @@ import com.jobportal.authservice.exception.UserNotFoundException;
 import com.jobportal.authservice.repository.UserRepository;
 import com.jobportal.authservice.security.JwtUtil;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class AuthServiceImpl implements AuthService {
 
@@ -32,7 +35,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-    
+
     @Autowired
     private CloudinaryService cloudinaryService;
 
@@ -46,37 +49,36 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthResponse register(RegisterRequest request) {
 
-        // Prevent ADMIN registration
+        log.info("Register service called | email: {} | role: {}",
+                request.getEmail(), request.getRole());
+
         if (request.getRole() == UserRole.ADMIN) {
-            throw new UnauthorizedException(
-                    "Admin registration is not allowed!");
+            log.warn("Attempt to register ADMIN user | email: {}", request.getEmail());
+            throw new UnauthorizedException("Admin registration is not allowed!");
         }
 
         if (userRepository.existsByEmail(request.getEmail())) {
+            log.warn("Duplicate email registration attempt | email: {}", request.getEmail());
             throw new DuplicateEmailException(
-                    "Email already registered: "
-                            + request.getEmail());
+                    "Email already registered: " + request.getEmail());
         }
 
         User user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())
-                .password(passwordEncoder.encode(
-                        request.getPassword()))
+                .password(passwordEncoder.encode(request.getPassword()))
                 .phone(request.getPhone())
                 .role(request.getRole())
                 .build();
 
         User savedUser = userRepository.save(user);
 
-        String token = jwtUtil.generateToken(
-                savedUser.getEmail(),
-                savedUser.getId(),
-                savedUser.getRole().name()
-        );
+        log.info("User saved successfully | userId: {} | email: {}",
+                savedUser.getId(), savedUser.getEmail());
 
         return new AuthResponse(
-                token,
+                null,
+                savedUser.getId(),
                 savedUser.getName(),
                 savedUser.getEmail(),
                 savedUser.getRole(),
@@ -84,20 +86,22 @@ public class AuthServiceImpl implements AuthService {
         );
     }
 
-    
     // LOGIN
     @Override
     public AuthResponse login(LoginRequest request) {
 
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new UserNotFoundException(
-                        "User not found with email: "
-                                + request.getEmail()));
+        log.info("Login service called | email: {}", request.getEmail());
 
-        if (!passwordEncoder.matches(
-                request.getPassword(), user.getPassword())) {
-            throw new InvalidCredentialsException(
-                    "Invalid email or password!");
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> {
+                    log.error("User not found during login | email: {}", request.getEmail());
+                    return new UserNotFoundException(
+                            "User not found with email: " + request.getEmail());
+                });
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            log.warn("Invalid login attempt | email: {}", request.getEmail());
+            throw new InvalidCredentialsException("Invalid email or password!");
         }
 
         String token = jwtUtil.generateToken(
@@ -106,32 +110,40 @@ public class AuthServiceImpl implements AuthService {
                 user.getRole().name()
         );
 
+        log.info("Login successful | userId: {}", user.getId());
+        log.debug("JWT generated for user | userId: {}", user.getId());
+
         return new AuthResponse(
                 token,
+                user.getId(),
                 user.getName(),
                 user.getEmail(),
                 user.getRole(),
                 "Login successful!"
         );
     }
-    
+
     // UPLOAD PROFILE IMAGE
     @Override
     public UserResponse uploadProfileImage(Long userId,
-            MultipartFile file) throws IOException {
+                                           MultipartFile file) throws IOException {
 
-        // Find user
+        log.info("Uploading profile image | userId: {} | fileName: {}",
+                userId, file.getOriginalFilename());
+
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(
-                        "User not found with id: " + userId));
+                .orElseThrow(() -> {
+                    log.error("User not found for image upload | userId: {}", userId);
+                    return new UserNotFoundException(
+                            "User not found with id: " + userId);
+                });
 
-        // Upload image to Cloudinary
-        String imageUrl =
-                cloudinaryService.uploadProfileImage(file);
+        String imageUrl = cloudinaryService.uploadProfileImage(file);
 
-        // Update user profile image URL
         user.setProfileImageUrl(imageUrl);
         User updated = userRepository.save(user);
+
+        log.info("Profile image updated successfully | userId: {}", userId);
 
         return modelMapper.map(updated, UserResponse.class);
     }
@@ -139,8 +151,15 @@ public class AuthServiceImpl implements AuthService {
     // UPDATE PROFILE
     @Override
     public UserResponse updateProfile(Long userId, UpdateProfileRequest request) {
+
+        log.info("Update profile service called | userId: {}", userId);
+
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
+                .orElseThrow(() -> {
+                    log.error("User not found for profile update | userId: {}", userId);
+                    return new UserNotFoundException(
+                            "User not found with id: " + userId);
+                });
 
         if (request.getName() != null) user.setName(request.getName());
         if (request.getPhone() != null) user.setPhone(request.getPhone());
@@ -149,38 +168,60 @@ public class AuthServiceImpl implements AuthService {
         if (request.getSkills() != null) user.setSkills(request.getSkills());
 
         User updatedUser = userRepository.save(user);
+
+        log.info("Profile updated successfully | userId: {}", userId);
+
         return modelMapper.map(updatedUser, UserResponse.class);
     }
-    
+
     // GET ALL USERS
     @Override
     public List<UserResponse> getAllUsers() {
-        return userRepository.findAll()
+
+        log.info("Fetching all users");
+
+        List<UserResponse> users = userRepository.findAll()
                 .stream()
-                .map(user -> modelMapper.map(
-                        user, UserResponse.class))
+                .map(user -> modelMapper.map(user, UserResponse.class))
                 .collect(Collectors.toList());
+
+        log.debug("Total users fetched: {}", users.size());
+
+        return users;
     }
 
-   
     // GET USER BY ID
     @Override
     public UserResponse getUserById(Long id) {
+
+        log.info("Fetching user by ID | userId: {}", id);
+
         User user = userRepository.findById(id)
-                .orElseThrow(() ->
-                        new UserNotFoundException(
-                                "User not found with id: " + id));
+                .orElseThrow(() -> {
+                    log.error("User not found | userId: {}", id);
+                    return new UserNotFoundException(
+                            "User not found with id: " + id);
+                });
+
         return modelMapper.map(user, UserResponse.class);
     }
-
 
     // DELETE USER
     @Override
     public void deleteUser(Long id) {
+
+        log.info("Deleting user | userId: {}", id);
+
         User user = userRepository.findById(id)
-                .orElseThrow(() ->
-                        new UserNotFoundException(
-                                "User not found with id: " + id));
+                .orElseThrow(() -> {
+                    log.error("User not found for deletion | userId: {}", id);
+                    return new UserNotFoundException(
+                            "User not found with id: " + id);
+                });
+
         userRepository.delete(user);
+
+        log.info("User deleted successfully | userId: {}", id);
     }
 }
+

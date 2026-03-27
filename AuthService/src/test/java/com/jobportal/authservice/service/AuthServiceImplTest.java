@@ -89,9 +89,6 @@ class AuthServiceImplTest {
                 .thenReturn("hashedPassword");
         when(userRepository.save(any(User.class)))
                 .thenReturn(user);
-        when(jwtUtil.generateToken(anyString(),
-                anyLong(), anyString()))
-                .thenReturn("mockToken");
 
         // Act
         AuthResponse response =
@@ -99,8 +96,8 @@ class AuthServiceImplTest {
 
         // Assert
         assertThat(response).isNotNull();
-        assertThat(response.getToken())
-                .isEqualTo("mockToken");
+        assertThat(response.getUserId())
+                .isEqualTo(1L);
         assertThat(response.getEmail())
                 .isEqualTo("priya@gmail.com");
         assertThat(response.getRole())
@@ -111,6 +108,9 @@ class AuthServiceImplTest {
         // Verify save was called once
         verify(userRepository, times(1))
                 .save(any(User.class));
+        verify(jwtUtil, never())
+                .generateToken(anyString(),
+                        anyLong(), anyString());
     }
 
     @Test
@@ -168,8 +168,8 @@ class AuthServiceImplTest {
 
         // Assert
         assertThat(response).isNotNull();
-        assertThat(response.getToken())
-                .isEqualTo("mockToken");
+        assertThat(response.getUserId())
+                .isEqualTo(1L);
         assertThat(response.getEmail())
                 .isEqualTo("priya@gmail.com");
         assertThat(response.getMessage())

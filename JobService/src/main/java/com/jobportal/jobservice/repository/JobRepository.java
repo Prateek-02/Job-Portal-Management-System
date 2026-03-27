@@ -9,6 +9,9 @@ import org.springframework.stereotype.Repository;
 public interface JobRepository extends JpaRepository<Job, Long>,
         JpaSpecificationExecutor<Job> {
 
+    // ✅ Check if jobs exist for recruiter (required for Saga idempotency)
+    boolean existsByRecruiterId(Long recruiterId);
+
     // Delete all jobs by recruiterId
     void deleteByRecruiterId(Long recruiterId);
 }

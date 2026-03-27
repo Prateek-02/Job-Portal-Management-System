@@ -1,0 +1,46 @@
+package com.jobportal.jobservice.consumer;
+
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.jobportal.jobservice.event.UserDeleteEvent;
+import com.jobportal.jobservice.repository.JobRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class UserDeleteConsumer {
+
+    private final JobRepository jobRepository;
+    private final KafkaTemplate<String, UserDeleteEvent> kafkaTemplate;
+
+    @KafkaListener(
+            topics = "application-deleted",
+            groupId = "job-group"
+    )
+    @Transactional
+    public void handle(UserDeleteEvent event) {
+
+        log.info("Received APPLICATION_DELETED | userId: {}", event.getUserId());
+
+        if ("RECRUITER".equalsIgnoreCase(event.getRole())) {
+            if (!jobRepository.existsByRecruiterId(event.getUserId())) {
+                log.warn("No jobs found for recruiterId: {}", event.getUserId());
+            } else {
+                jobRepository.deleteByRecruiterId(event.getUserId());
+                log.info("Jobs deleted | recruiterId: {}", event.getUserId());
+            }
+        }
+
+        event.setStatus("JOBS_DELETED");
+
+        kafkaTemplate.send("jobs-deleted", event);
+
+        log.info("Published JOBS_DELETED event | userId: {}", event.getUserId());
+    }
+}

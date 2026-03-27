@@ -1,5 +1,7 @@
 package com.jobportal.authservice.security;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -9,13 +11,13 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
@@ -35,8 +37,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String path = request.getRequestURI();
+        log.debug("Incoming request: {}", path);
 
-        // ✅ 1. Allow Swagger without authentication
+        //Allow Swagger without authentication
         if (path.startsWith("/swagger-ui") ||
             path.startsWith("/v3/api-docs") ||
             path.startsWith("/swagger-ui.html") ||
@@ -46,14 +49,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        // ✅ 2. Allow internal service-to-service calls
+        // Allow internal service-to-service calls
         String internalHeader = request.getHeader("X-Internal-Secret");
         if (internalHeader != null && internalHeader.equals(internalSecret)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // ✅ 3. Normal JWT validation
+        // Normal JWT validation
         String authHeader = request.getHeader("Authorization");
         String token = null;
         String email = null;
@@ -85,7 +88,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         .setAuthentication(authToken);
             }
         }
-
+        
+        log.debug("JWT validation processing");
         filterChain.doFilter(request, response);
     }
 }

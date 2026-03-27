@@ -12,9 +12,13 @@ import com.jobportal.adminservice.client.JobServiceClient;
 import com.jobportal.adminservice.dto.response.JobResponse;
 import com.jobportal.adminservice.dto.response.PageResponse;
 import com.jobportal.adminservice.dto.response.UserResponse;
+import com.jobportal.adminservice.event.UserDeleteEvent;
+import com.jobportal.adminservice.producer.UserDeleteProducer;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AdminServiceImpl implements AdminService {
@@ -22,82 +26,110 @@ public class AdminServiceImpl implements AdminService {
     private final AuthServiceClient authServiceClient;
     private final JobServiceClient jobServiceClient;
     private final ApplicationServiceClient applicationServiceClient;
-    
+    private final UserDeleteProducer userDeleteProducer;
+
     @Value("${internal.secret}")
     private String internalSecret;
 
-    // =====================================================
-    // USER MANAGEMENT
-    // =====================================================
     @Override
     public List<UserResponse> getAllUsers() {
-        return authServiceClient.getAllUsers(internalSecret);
+
+        log.info("Fetching all users from AuthService");
+
+        List<UserResponse> users =
+                authServiceClient.getAllUsers(internalSecret);
+
+        log.debug("Users fetched | count: {}", users.size());
+
+        return users;
     }
 
     @Override
     public UserResponse getUserById(Long id) {
-        return authServiceClient.getUserById(id,internalSecret);
+
+        log.info("Fetching user by ID | userId: {}", id);
+
+        UserResponse user =
+                authServiceClient.getUserById(id, internalSecret);
+
+        log.info("User fetched successfully | userId: {}", id);
+
+        return user;
     }
 
     @Override
     public void deleteUser(Long id) {
 
-        // Step 1: Get user details to check role
-        UserResponse user = authServiceClient.getUserById(id,internalSecret);
+        log.info("Starting USER DELETE SAGA | userId: {}", id);
 
-        // Step 2: Delete all applications of this user
-        applicationServiceClient.deleteUserApplications(id);
+        UserResponse user =
+                authServiceClient.getUserById(id, internalSecret);
 
-        // Step 3: If recruiter → delete all their jobs too
-        if (user.getRole().equalsIgnoreCase("RECRUITER")) {
-            jobServiceClient.deleteRecruiterJobs(id);
-        }
+        log.debug("User role identified | userId: {} | role: {}",
+                id, user.getRole());
 
-        // Step 4: Delete user from Auth Service
-        authServiceClient.deleteUser(id,internalSecret);
+        UserDeleteEvent event = new UserDeleteEvent(
+                id,
+                user.getRole(),
+                "STARTED",
+                null
+        );
+
+        userDeleteProducer.startSaga(event);
+
+        log.info("User delete saga triggered | userId: {}", id);
     }
 
-    // =====================================================
-    // JOB MANAGEMENT
-    // =====================================================
     @Override
     public PageResponse getAllJobs() {
-        return jobServiceClient.getAllJobs();
+
+        log.info("Fetching all jobs from JobService");
+
+        PageResponse jobs =
+                jobServiceClient.getAllJobs();
+
+        log.debug("Jobs fetched successfully");
+
+        return jobs;
     }
 
     @Override
     public JobResponse getJobById(Long id) {
-        return jobServiceClient.getJobById(id);
+
+        log.info("Fetching job by ID | jobId: {}", id);
+
+        JobResponse job =
+                jobServiceClient.getJobById(id);
+
+        log.info("Job fetched successfully | jobId: {}", id);
+
+        return job;
     }
 
-    // =====================================================
-    // PLATFORM ANALYTICS
-    // =====================================================
     @Override
     public Map<String, Object> getReports() {
 
-        // Get all users from Auth Service
+        log.info("Generating platform reports");
+
         List<UserResponse> users =
                 authServiceClient.getAllUsers(internalSecret);
 
-        // Count users by role
         long totalUsers = users.size();
         long jobSeekers = users.stream()
-                .filter(u -> u.getRole()
-                        .equalsIgnoreCase("JOB_SEEKER"))
+                .filter(u -> u.getRole().equalsIgnoreCase("JOB_SEEKER"))
                 .count();
         long recruiters = users.stream()
-                .filter(u -> u.getRole()
-                        .equalsIgnoreCase("RECRUITER"))
+                .filter(u -> u.getRole().equalsIgnoreCase("RECRUITER"))
                 .count();
 
-        // Get total jobs from Job Service
         PageResponse jobsPage = jobServiceClient.getAllJobs();
         long totalJobs = jobsPage.getTotalElements();
 
-        // Get total applications from Application Service
         Long totalApplications =
                 applicationServiceClient.getTotalApplications();
+
+        log.info("Reports generated | users: {} | jobSeekers: {} | recruiters: {} | jobs: {} | applications: {}",
+                totalUsers, jobSeekers, recruiters, totalJobs, totalApplications);
 
         return Map.of(
                 "totalUsers", totalUsers,

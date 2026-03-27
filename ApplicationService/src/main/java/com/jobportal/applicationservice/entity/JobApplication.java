@@ -36,6 +36,12 @@ public class JobApplication {
 	
 	@Column(name = "job_id",nullable = false)
 	private Long jobId;
+
+	@Column(name = "user_name", nullable = false)
+	private String userName;
+
+	@Column(name = "user_email", nullable = false)
+	private String userEmail;
 	
 	private String resumeUrl;
 	

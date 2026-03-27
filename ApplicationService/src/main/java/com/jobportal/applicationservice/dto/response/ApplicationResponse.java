@@ -10,6 +10,8 @@ import lombok.Data;
 public class ApplicationResponse {
 	private Long id;
 	private Long userId;
+	private String userName;
+	private String userEmail;
 	private String resumeUrl;
 	private ApplicationStatus status;
 	private LocalDateTime appliedAt;

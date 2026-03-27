@@ -1,5 +1,29 @@
 package com.jobportal.applicationservice.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.test.util.ReflectionTestUtils;
+
 import com.jobportal.applicationservice.client.JobClient;
 import com.jobportal.applicationservice.client.UserClient;
 import com.jobportal.applicationservice.dto.request.ApplicationRequest;
@@ -12,22 +36,6 @@ import com.jobportal.applicationservice.exception.ApplicationNotFoundException;
 import com.jobportal.applicationservice.exception.DuplicateApplicationException;
 import com.jobportal.applicationservice.exception.UnauthorizedException;
 import com.jobportal.applicationservice.repository.ApplicationRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.test.util.ReflectionTestUtils;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ApplicationServiceImplTest {
@@ -78,6 +86,8 @@ class ApplicationServiceImplTest {
         jobApplication.setId(1L);
         jobApplication.setUserId(1L);
         jobApplication.setJobId(1L);
+        jobApplication.setUserName("Priya Singh");
+        jobApplication.setUserEmail("priya@gmail.com");
         jobApplication.setResumeUrl(RESUME_URL);
         jobApplication.setStatus(ApplicationStatus.APPLIED);
         jobApplication.setAppliedAt(LocalDateTime.now());
@@ -129,6 +139,8 @@ class ApplicationServiceImplTest {
                 .isEqualTo(ApplicationStatus.APPLIED);
         assertThat(response.getUserId()).isEqualTo(1L);
         assertThat(response.getId()).isEqualTo(1L);
+        assertThat(response.getUserName()).isEqualTo("Priya Singh");
+        assertThat(response.getUserEmail()).isEqualTo("priya@gmail.com");
 
         verify(applicationRepository, times(1))
                 .save(any(JobApplication.class));
