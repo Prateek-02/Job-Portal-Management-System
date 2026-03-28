@@ -19,31 +19,49 @@ A scalable and distributed **Job Portal Application** built using **Spring Boot 
 ## 🏗️ Architecture Overview
 
 
-Client (Frontend / Postman)
-│
-▼
-API Gateway
-│
-┌──────┼────────┬────────────┐
-▼ ▼ ▼ ▼
-Auth Job Application Admin
-Service Service Service Service
-│ │
-▼ ▼
-MySQL MySQL
-│
-▼
-RabbitMQ
-│
-▼
-Notification Service
-│
-▼
-Redis
+                    ┌───────────────────────────────┐
+                    │   Client (Frontend/Postman)   │
+                    └───────────────┬───────────────┘
+                                    │
+                                    ▼
+                    ┌───────────────────────────────┐
+                    │         API Gateway           │
+                    │   (Routing + JWT Security)    │
+                    └───────────────┬───────────────┘
+                                    │
+        ┌───────────────┬───────────────┬───────────────┬───────────────┐
+        ▼               ▼               ▼               ▼
+┌────────────┐  ┌────────────┐  ┌──────────────┐  ┌────────────┐
+│ Auth       │  │ Job        │  │ Application  │  │ Admin      │
+│ Service    │  │ Service    │  │ Service      │  │ Service    │
+└─────┬──────┘  └─────┬──────┘  └──────┬───────┘  └─────┬──────┘
+      │               │               │                │
+      ▼               ▼               ▼                ▼
+ ┌──────────┐   ┌──────────┐   ┌──────────┐     ┌──────────┐
+ │  MySQL   │   │  MySQL   │   │  MySQL   │     │  MySQL   │
+ └──────────┘   └──────────┘   └──────────┘     └──────────┘
+                          │
+                          ▼
+                  ┌──────────────┐
+                  │   RabbitMQ   │
+                  └──────┬───────┘
+                         │
+                         ▼
+              ┌──────────────────────┐
+              │ Notification Service │
+              └─────────┬────────────┘
+                        │
+                        ▼
+                  ┌──────────┐
+                  │  Redis   │
+                  │ (Cache)  │
+                  └──────────┘
 
-    │
-    ▼
-Eureka Server
+                        
+                ┌────────────────────────┐
+                │     Eureka Server      │
+                │   (Service Registry)   │
+                └────────────────────────┘
 
 ---
 
