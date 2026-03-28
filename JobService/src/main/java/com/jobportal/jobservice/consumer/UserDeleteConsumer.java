@@ -1,10 +1,11 @@
 package com.jobportal.jobservice.consumer;
 
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.jobportal.jobservice.config.RabbitMQConfig;
 import com.jobportal.jobservice.event.UserDeleteEvent;
 import com.jobportal.jobservice.repository.JobRepository;
 
@@ -17,12 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 public class UserDeleteConsumer {
 
     private final JobRepository jobRepository;
-    private final KafkaTemplate<String, UserDeleteEvent> kafkaTemplate;
+    private final RabbitTemplate rabbitTemplate;
 
-    @KafkaListener(
-            topics = "application-deleted",
-            groupId = "job-group"
-    )
+    @RabbitListener(queues = RabbitMQConfig.APPLICATION_DELETED_QUEUE)
     @Transactional
     public void handle(UserDeleteEvent event) {
 
@@ -39,7 +37,8 @@ public class UserDeleteConsumer {
 
         event.setStatus("JOBS_DELETED");
 
-        kafkaTemplate.send("jobs-deleted", event);
+        rabbitTemplate.convertAndSend(
+                RabbitMQConfig.JOBS_DELETED_QUEUE, event);
 
         log.info("Published JOBS_DELETED event | userId: {}", event.getUserId());
     }

@@ -2,6 +2,8 @@ package com.jobportal.jobservice.service;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +34,7 @@ public class JobServiceImpl implements JobService {
     private final RabbitTemplate rabbitTemplate;
 
     @Override
+    @CacheEvict(value = "jobs", allEntries = true)
     public JobResponseDto createJob(JobRequestDto dto,
                                    Long recruiterId, String role) {
 
@@ -94,6 +97,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    @Cacheable(value = "jobs", key = "#id")
     public JobResponseDto getJobById(Long id) {
 
         log.info("Get job | jobId: {}", id);
@@ -108,6 +112,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    @CacheEvict(value = "jobs", key = "#id")
     public JobResponseDto updateJob(Long id,
                                    JobRequestDto dto, Long recruiterId) {
 
@@ -134,6 +139,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    @CacheEvict(value = "jobs", key = "#id")
     public void deleteJob(Long id, Long recruiterId) {
 
         log.info("Delete job | jobId: {} | recruiterId: {}", id, recruiterId);
@@ -179,6 +185,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    @CacheEvict(value = "jobs", allEntries = true)
     public void deleteRecruiterJobs(Long recruiterId) {
 
         log.info("Delete recruiter jobs | recruiterId: {}", recruiterId);

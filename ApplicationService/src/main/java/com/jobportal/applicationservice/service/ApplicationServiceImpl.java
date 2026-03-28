@@ -6,6 +6,10 @@ import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.stereotype.Service;
 
 import com.jobportal.applicationservice.client.JobClient;
@@ -32,11 +36,16 @@ public class ApplicationServiceImpl implements ApplicationService {
     private final UserClient userClient;
     private final JobClient jobClient;
     private final RabbitTemplate rabbitTemplate;
+    private final CircuitBreakerFactory<?, ?> circuitBreakerFactory;
 
     @Value("${internal.secret}")
     private String internalSecret;
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "userApplications", key = "#userId"),
+            @CacheEvict(value = "jobApplications", key = "#request.jobId")
+    })
     public ApplicationResponse applyForJob(
             ApplicationRequest request, Long userId,
             String role, String resumeUrl) {
@@ -52,12 +61,11 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         JobResponse job;
         try {
-            job = jobClient.getJobById(request.getJobId());
+            job = fetchJobByIdWithCircuitBreaker(request.getJobId());
             log.debug("Fetched job details | jobId: {}", request.getJobId());
-        } catch (Exception e) {
-            log.error("Job not found | jobId: {}", request.getJobId(), e);
-            throw new RuntimeException(
-                    "Job not found with id: " + request.getJobId());
+        } catch (RuntimeException e) {
+            log.warn("Failed to fetch job | jobId: {} | reason: {}", request.getJobId(), e.getMessage());
+            throw e;
         }
 
         if (applicationRepository.existsByUserIdAndJobId(
@@ -70,11 +78,10 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         UserResponse applicant;
         try {
-                applicant = userClient.getUserById(userId, internalSecret);
-        } 
-        catch (Exception e) {
-                log.error("Failed to fetch user details | userId: {}", userId, e);
-                throw new RuntimeException("Failed to fetch user details");
+            applicant = fetchUserByIdWithCircuitBreaker(userId);
+        } catch (RuntimeException e) {
+            log.warn("Failed to fetch user | userId: {} | reason: {}", userId, e.getMessage());
+            throw e;
         }
 
         JobApplication application = new JobApplication();
@@ -96,7 +103,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         // Publish Job Applied event
         try {
-            UserResponse recruiter = userClient.getUserById(job.getRecruiterId(), internalSecret);
+            UserResponse recruiter = fetchUserByIdWithCircuitBreaker(job.getRecruiterId());
 
             JobAppliedEvent event = new JobAppliedEvent(
                     recruiter.getEmail(),
@@ -120,6 +127,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
+    @Cacheable(value = "userApplications", key = "#userId")
     public List<ApplicationResponse> getUserApplications(
             Long userId, String role) {
 
@@ -137,7 +145,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                     ApplicationResponse response =
                             modelMapper.map(app, ApplicationResponse.class);
                     try {
-                        JobResponse job = jobClient.getJobById(app.getJobId());
+                        JobResponse job = fetchJobByIdWithCircuitBreaker(app.getJobId());
                         response.setJob(job);
                     } catch (Exception e) {
                         log.warn("Job not available | jobId: {}", app.getJobId());
@@ -157,6 +165,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
+    @Cacheable(value = "jobApplications", key = "#jobId")
     public List<JobApplicationResponse> getJobApplications(
             Long jobId, String role, Long recruiterId) {
 
@@ -168,7 +177,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                     "Access Denied! Only Recruiters can view job applicants.");
         }
 
-        JobResponse job = jobClient.getJobById(jobId);
+        JobResponse job = fetchJobByIdWithCircuitBreaker(jobId);
 
         if (!job.getRecruiterId().equals(recruiterId)) {
             log.warn("Unauthorized job access | jobId: {} | recruiterId: {}", jobId, recruiterId);
@@ -190,7 +199,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
                             try {
                                 UserResponse user =
-                                        userClient.getUserById(app.getUserId(), internalSecret);
+                                        fetchUserByIdWithCircuitBreaker(app.getUserId());
                                 response.setApplicantName(user.getName());
                                 response.setApplicantEmail(user.getEmail());
                             } catch (Exception e) {
@@ -208,6 +217,10 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "userApplications", allEntries = true),
+            @CacheEvict(value = "jobApplications", key = "#result.job.id", condition = "#result != null")
+    })
     public ApplicationResponse updateStatus(
             Long applicationId, ApplicationStatus status,
             Long recruiterId, String role) {
@@ -228,7 +241,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                             "Application not found with id: " + applicationId);
                 });
 
-        JobResponse job = jobClient.getJobById(application.getJobId());
+        JobResponse job = fetchJobByIdWithCircuitBreaker(application.getJobId());
 
         if (!job.getRecruiterId().equals(recruiterId)) {
             log.warn("Unauthorized status update | applicationId: {} | recruiterId: {}",
@@ -247,7 +260,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                 modelMapper.map(updated, ApplicationResponse.class);
 
         try {
-            JobResponse job1 = jobClient.getJobById(updated.getJobId());
+            JobResponse job1 = fetchJobByIdWithCircuitBreaker(updated.getJobId());
             response.setJob(job1);
         } catch (Exception e) {
             log.warn("Failed to fetch job details | jobId: {}", updated.getJobId());
@@ -256,9 +269,9 @@ public class ApplicationServiceImpl implements ApplicationService {
         // Publish status event
         try {
             UserResponse applicant =
-                    userClient.getUserById(updated.getUserId(), internalSecret);
+                    fetchUserByIdWithCircuitBreaker(updated.getUserId());
             JobResponse job1 =
-                    jobClient.getJobById(updated.getJobId());
+                    fetchJobByIdWithCircuitBreaker(updated.getJobId());
 
             ApplicationStatusEvent event =
                     new ApplicationStatusEvent(
@@ -282,12 +295,14 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
+    @CacheEvict(value = "userApplications", key = "#userId")
     public void deleteUserApplications(Long userId) {
         log.info("Deleting applications for userId: {}", userId);
         applicationRepository.deleteByUserId(userId);
     }
 
     @Override
+    @CacheEvict(value = "jobApplications", key = "#jobId")
     public void deleteJobApplications(Long jobId) {
         log.info("Deleting applications for jobId: {}", jobId);
         applicationRepository.deleteByJobId(jobId);
@@ -298,6 +313,36 @@ public class ApplicationServiceImpl implements ApplicationService {
         Long count = applicationRepository.count();
         log.debug("Total applications count: {}", count);
         return count;
+    }
+
+    private UserResponse fetchUserByIdWithCircuitBreaker(Long userId) {
+        return circuitBreakerFactory.create("applicationAuthService")
+                .run(() -> userClient.getUserById(userId, internalSecret),
+                        throwable -> {
+                            if (throwable instanceof feign.FeignException fe) {
+                                if (fe.status() == 404) {
+                                    log.warn("User not found | userId: {}", userId);
+                                    throw new RuntimeException("User not found with id: " + userId);
+                                }
+                            }
+                            log.error("AuthService unavailable | userId: {}", userId, throwable);
+                            throw new RuntimeException("AuthService unavailable. Please try again.");
+                        });
+    }
+
+    private JobResponse fetchJobByIdWithCircuitBreaker(Long jobId) {
+        return circuitBreakerFactory.create("applicationJobService")
+                .run(() -> jobClient.getJobById(jobId),
+                        throwable -> {
+                            if (throwable instanceof feign.FeignException fe) {
+                                if (fe.status() == 404) {
+                                    log.warn("Job not found | jobId: {}", jobId);
+                                    throw new RuntimeException("Job not found with id: " + jobId);
+                                }
+                            }
+                            log.error("JobService unavailable | jobId: {}", jobId, throwable);
+                            throw new RuntimeException("JobService unavailable. Please try again.");
+                        });
     }
 }
 

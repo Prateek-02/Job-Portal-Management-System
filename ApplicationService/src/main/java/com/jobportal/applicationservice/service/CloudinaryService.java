@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 public class CloudinaryService {
 
     private final Cloudinary cloudinary;
-
+    
     public String uploadResume(MultipartFile file) throws IOException {
 
         
@@ -32,7 +32,9 @@ public class CloudinaryService {
 
        
         File tempFile = File.createTempFile("resume-", ".pdf");
+        tempFile.deleteOnExit(); 
         file.transferTo(tempFile);
+
 
         try {
         	Map<?, ?> uploadResult = cloudinary.uploader().upload(
@@ -46,7 +48,12 @@ public class CloudinaryService {
             
             return uploadResult.get("secure_url").toString();
 
-        } finally {
+        } 
+        catch (Exception e) {
+            throw new RuntimeException("Failed to upload file: " + e.getMessage());
+        }
+
+        finally {
            
             if (tempFile.exists()) {
                 tempFile.delete();

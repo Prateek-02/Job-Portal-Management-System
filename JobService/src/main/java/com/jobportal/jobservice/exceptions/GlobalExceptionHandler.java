@@ -35,8 +35,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGeneral(Exception ex) {
-        return buildError("Something went wrong: " + ex.getMessage(),
-                HttpStatus.INTERNAL_SERVER_ERROR);
+        return buildError(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private ResponseEntity<Map<String, String>> buildError(

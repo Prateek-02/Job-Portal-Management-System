@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
     private final UserClient userClient;
+    private final CircuitBreakerFactory<?, ?> circuitBreakerFactory;
 
     @Value("${internal.secret}")
     private String internalSecret;
@@ -34,7 +36,12 @@ public class EmailService {
 
         try {
             List<UserResponse> users =
-                    userClient.getAllUsers(internalSecret);
+                    circuitBreakerFactory.create("notificationAuthService")
+                            .run(() -> userClient.getAllUsers(internalSecret),
+                                    throwable -> {
+                                        log.error("AuthService unavailable while fetching users for email blast", throwable);
+                                        return List.of();
+                                    });
 
             log.debug("Fetched users from AuthService | totalUsers: {}", users.size());
 

@@ -2,11 +2,14 @@ package com.jobportal.applicationservice.exception;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import feign.FeignException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -29,6 +32,22 @@ public class GlobalExceptionHandler {
         return buildError(ex.getMessage(), HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(FeignException.NotFound.class)
+    public ResponseEntity<Map<String, String>> handleFeignNotFound(
+            FeignException.NotFound ex) {
+        return buildError(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Map<String, String>> handleRuntime(
+            RuntimeException ex) {
+        String msg = ex.getMessage();
+        if (msg != null && msg.toLowerCase().contains("not found")) {
+            return buildError(msg, HttpStatus.NOT_FOUND);
+        }
+        return buildError(msg, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidation(
             MethodArgumentNotValidException ex) {
@@ -42,14 +61,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGeneral(
             Exception ex) {
-        return buildError("Something went wrong: " + ex.getMessage(),
-                HttpStatus.INTERNAL_SERVER_ERROR);
+        return buildError(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private ResponseEntity<Map<String, String>> buildError(
             String message, HttpStatus status) {
         Map<String, String> error = new HashMap<>();
-        error.put("error", message); // ← fix was here!
+        error.put("error", message);
         return ResponseEntity.status(status).body(error);
     }
 }

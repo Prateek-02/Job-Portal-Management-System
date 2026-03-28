@@ -1,4 +1,4 @@
-package com.jobportal.applicationservice.config;
+package com.jobportal.authservice.config;
 
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
@@ -11,34 +11,19 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
-    public static final String JOB_APPLIED_QUEUE =
-            "email.job-applied";
-
-    public static final String APPLICATION_STATUS_QUEUE =
-            "email.application-status";
-    public static final String USER_DELETE_REQUESTED_QUEUE =
-            "saga.user-delete-requested";
-    public static final String APPLICATION_DELETED_QUEUE =
-            "saga.application-deleted";
+    public static final String JOBS_DELETED_QUEUE =
+            "saga.jobs-deleted";
+    public static final String USER_DELETED_QUEUE =
+            "saga.user-deleted";
 
     @Bean
-    public Queue jobAppliedQueue() {
-        return new Queue(JOB_APPLIED_QUEUE, true);
+    public Queue jobsDeletedQueue() {
+        return new Queue(JOBS_DELETED_QUEUE, true);
     }
 
     @Bean
-    public Queue applicationStatusQueue() {
-        return new Queue(APPLICATION_STATUS_QUEUE, true);
-    }
-
-    @Bean
-    public Queue userDeleteRequestedQueue() {
-        return new Queue(USER_DELETE_REQUESTED_QUEUE, true);
-    }
-
-    @Bean
-    public Queue applicationDeletedQueue() {
-        return new Queue(APPLICATION_DELETED_QUEUE, true);
+    public Queue userDeletedQueue() {
+        return new Queue(USER_DELETED_QUEUE, true);
     }
 
     @Bean

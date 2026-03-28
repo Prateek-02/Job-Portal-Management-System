@@ -6,7 +6,6 @@ import com.jobportal.jobservice.entity.Job;
 import com.jobportal.jobservice.exceptions.JobNotFoundException;
 import com.jobportal.jobservice.exceptions.UnauthorizedException;
 import com.jobportal.jobservice.repository.JobRepository;
-import com.jobportal.jobservice.specification.JobSpecification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

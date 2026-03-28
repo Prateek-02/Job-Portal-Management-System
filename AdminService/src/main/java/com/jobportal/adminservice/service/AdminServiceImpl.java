@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.stereotype.Service;
 
 import com.jobportal.adminservice.client.ApplicationServiceClient;
@@ -27,6 +28,7 @@ public class AdminServiceImpl implements AdminService {
     private final JobServiceClient jobServiceClient;
     private final ApplicationServiceClient applicationServiceClient;
     private final UserDeleteProducer userDeleteProducer;
+    private final CircuitBreakerFactory<?, ?> circuitBreakerFactory;
 
     @Value("${internal.secret}")
     private String internalSecret;
@@ -37,7 +39,12 @@ public class AdminServiceImpl implements AdminService {
         log.info("Fetching all users from AuthService");
 
         List<UserResponse> users =
-                authServiceClient.getAllUsers(internalSecret);
+                circuitBreakerFactory.create("adminAuthService")
+                        .run(() -> authServiceClient.getAllUsers(internalSecret),
+                                throwable -> {
+                                    log.error("AuthService unavailable while fetching users", throwable);
+                                    throw new RuntimeException("AuthService is unavailable. Please try again.");
+                                });
 
         log.debug("Users fetched | count: {}", users.size());
 
@@ -50,7 +57,16 @@ public class AdminServiceImpl implements AdminService {
         log.info("Fetching user by ID | userId: {}", id);
 
         UserResponse user =
-                authServiceClient.getUserById(id, internalSecret);
+                circuitBreakerFactory.create("adminAuthService")
+                        .run(() -> authServiceClient.getUserById(id, internalSecret),
+                                throwable -> {
+                                    if (throwable instanceof feign.FeignException fe && fe.status() == 404) {
+                                        log.warn("User not found | userId: {}", id);
+                                        throw new RuntimeException("User not found with id: " + id);
+                                    }
+                                    log.error("AuthService unavailable while fetching userId: {}", id, throwable);
+                                    throw new RuntimeException("AuthService is unavailable. Please try again.");
+                                });
 
         log.info("User fetched successfully | userId: {}", id);
 
@@ -63,7 +79,16 @@ public class AdminServiceImpl implements AdminService {
         log.info("Starting USER DELETE SAGA | userId: {}", id);
 
         UserResponse user =
-                authServiceClient.getUserById(id, internalSecret);
+                circuitBreakerFactory.create("adminAuthService")
+                        .run(() -> authServiceClient.getUserById(id, internalSecret),
+                                throwable -> {
+                                    if (throwable instanceof feign.FeignException fe && fe.status() == 404) {
+                                        log.warn("User not found | userId: {}", id);
+                                        throw new RuntimeException("User not found with id: " + id);
+                                    }
+                                    log.error("AuthService unavailable while starting delete saga for userId: {}", id, throwable);
+                                    throw new RuntimeException("AuthService is unavailable. Please try again.");
+                                });
 
         log.debug("User role identified | userId: {} | role: {}",
                 id, user.getRole());
@@ -86,7 +111,12 @@ public class AdminServiceImpl implements AdminService {
         log.info("Fetching all jobs from JobService");
 
         PageResponse jobs =
-                jobServiceClient.getAllJobs();
+                circuitBreakerFactory.create("adminJobService")
+                        .run(jobServiceClient::getAllJobs,
+                                throwable -> {
+                                    log.error("JobService unavailable while fetching jobs", throwable);
+                                    throw new RuntimeException("JobService is unavailable. Please try again.");
+                                });
 
         log.debug("Jobs fetched successfully");
 
@@ -99,7 +129,16 @@ public class AdminServiceImpl implements AdminService {
         log.info("Fetching job by ID | jobId: {}", id);
 
         JobResponse job =
-                jobServiceClient.getJobById(id);
+                circuitBreakerFactory.create("adminJobService")
+                        .run(() -> jobServiceClient.getJobById(id),
+                                throwable -> {
+                                    if (throwable instanceof feign.FeignException fe && fe.status() == 404) {
+                                        log.warn("Job not found | jobId: {}", id);
+                                        throw new RuntimeException("Job not found with id: " + id);
+                                    }
+                                    log.error("JobService unavailable while fetching jobId: {}", id, throwable);
+                                    throw new RuntimeException("JobService is unavailable. Please try again.");
+                                });
 
         log.info("Job fetched successfully | jobId: {}", id);
 
@@ -112,7 +151,12 @@ public class AdminServiceImpl implements AdminService {
         log.info("Generating platform reports");
 
         List<UserResponse> users =
-                authServiceClient.getAllUsers(internalSecret);
+                circuitBreakerFactory.create("adminAuthService")
+                        .run(() -> authServiceClient.getAllUsers(internalSecret),
+                                throwable -> {
+                                    log.error("AuthService unavailable while building reports", throwable);
+                                    throw new RuntimeException("AuthService is unavailable. Cannot build reports.");
+                                });
 
         long totalUsers = users.size();
         long jobSeekers = users.stream()
@@ -122,11 +166,21 @@ public class AdminServiceImpl implements AdminService {
                 .filter(u -> u.getRole().equalsIgnoreCase("RECRUITER"))
                 .count();
 
-        PageResponse jobsPage = jobServiceClient.getAllJobs();
+        PageResponse jobsPage = circuitBreakerFactory.create("adminJobService")
+                .run(jobServiceClient::getAllJobs,
+                        throwable -> {
+                            log.error("JobService unavailable while building reports", throwable);
+                            throw new RuntimeException("JobService is unavailable. Cannot build reports.");
+                        });
         long totalJobs = jobsPage.getTotalElements();
 
         Long totalApplications =
-                applicationServiceClient.getTotalApplications();
+                circuitBreakerFactory.create("adminApplicationService")
+                        .run(applicationServiceClient::getTotalApplications,
+                                throwable -> {
+                                    log.error("ApplicationService unavailable while building reports", throwable);
+                                    throw new RuntimeException("ApplicationService is unavailable. Cannot build reports.");
+                                });
 
         log.info("Reports generated | users: {} | jobSeekers: {} | recruiters: {} | jobs: {} | applications: {}",
                 totalUsers, jobSeekers, recruiters, totalJobs, totalApplications);
