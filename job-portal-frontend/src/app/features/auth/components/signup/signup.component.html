@@ -1,0 +1,94 @@
+<div class="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+  
+  <!-- Decorative background elements -->
+  <div class="absolute top-0 right-0 w-80 h-80 bg-secondary-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float" style="animation-delay: 1s;"></div>
+  <div class="absolute bottom-0 left-0 w-72 h-72 bg-primary-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float" style="animation-delay: 3s;"></div>
+
+  <div class="w-full max-w-lg animate-slide-up z-10 my-8">
+    <div class="glass-card p-8 md:p-10">
+      
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-400 to-secondary-400 mb-2">
+          Join Us Today
+        </h1>
+        <p class="text-gray-400 text-sm">Create your account to unlock premium tech opportunities</p>
+      </div>
+
+      <div *ngIf="errorMessage" class="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-200 text-sm flex items-start">
+        <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="space-y-5">
+        
+        <!-- Role Selection Tabs -->
+        <div class="flex justify-center mb-6">
+          <div class="bg-surface p-1 rounded-xl shadow-inner inline-flex border border-white/5">
+            <button type="button" 
+                    (click)="signupForm.patchValue({role: 'APPLICANT'})"
+                    [class]="signupForm.get('role')?.value === 'APPLICANT' ? 'bg-primary-500 text-white shadow-lg' : 'text-gray-400 hover:text-gray-200'"
+                    class="px-6 py-2 rounded-lg text-sm font-medium transition-all duration-200 focus:outline-none">
+              Job Seeker
+            </button>
+            <button type="button"
+                    (click)="signupForm.patchValue({role: 'RECRUITER'})" 
+                    [class]="signupForm.get('role')?.value === 'RECRUITER' ? 'bg-secondary-500 text-white shadow-lg' : 'text-gray-400 hover:text-gray-200'"
+                    class="px-6 py-2 rounded-lg text-sm font-medium transition-all duration-200 focus:outline-none ml-1">
+              Recruiter
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label class="input-label" for="name">Full Name</label>
+            <input id="name" type="text" formControlName="name" class="input-field" placeholder="John Doe">
+            <div *ngIf="signupForm.get('name')?.touched && signupForm.get('name')?.invalid" class="text-xs text-red-400 mt-1">
+              Name is required.
+            </div>
+          </div>
+
+          <div>
+            <label class="input-label" for="phone">Phone Number</label>
+            <input id="phone" type="text" formControlName="phone" class="input-field" placeholder="1234567890">
+            <div *ngIf="signupForm.get('phone')?.touched && signupForm.get('phone')?.invalid" class="text-xs text-red-400 mt-1">
+              Valid phone format required.
+            </div>
+          </div>
+        </div>
+
+        <div>
+           <label class="input-label" for="email">Email Address</label>
+           <input id="email" type="email" formControlName="email" class="input-field" placeholder="you@example.com">
+           <div *ngIf="signupForm.get('email')?.touched && signupForm.get('email')?.invalid" class="text-xs text-red-400 mt-1">
+             Valid email is required.
+           </div>
+        </div>
+
+        <div>
+           <label class="input-label" for="password">Password</label>
+           <input id="password" type="password" formControlName="password" class="input-field" placeholder="••••••••">
+           <div *ngIf="signupForm.get('password')?.touched && signupForm.get('password')?.invalid" class="text-xs text-red-400 mt-1">
+             Password must be at least 6 characters.
+           </div>
+        </div>
+
+        <button type="submit" [disabled]="isLoading" class="btn-primary w-full mt-8">
+          <span *ngIf="!isLoading">Create Account</span>
+          <span *ngIf="isLoading" class="flex items-center">
+            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Registering...
+          </span>
+        </button>
+        
+        <div class="text-center mt-6 text-gray-400 text-sm">
+          Already have an account? 
+          <a routerLink="/auth/login" class="text-primary-400 font-semibold hover:text-primary-300 transition-colors">Sign in</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

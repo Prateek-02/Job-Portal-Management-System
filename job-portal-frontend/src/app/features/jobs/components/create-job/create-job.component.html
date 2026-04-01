@@ -1,0 +1,101 @@
+<div class="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto z-10 relative">
+  
+  <div class="glass-card p-8 md:p-12 animate-slide-up relative overflow-hidden">
+    <!-- Decorative element -->
+    <div class="absolute top-0 right-0 w-80 h-80 bg-secondary-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+
+    <div class="mb-10 text-center relative z-10">
+      <h1 class="text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-400 to-secondary-400 mb-2">
+        Post a New Job
+      </h1>
+      <p class="text-gray-400">Reach thousands of premium tech candidates.</p>
+    </div>
+
+    <!-- Alert Messages -->
+    <div *ngIf="successMessage" class="mb-8 p-4 rounded-xl bg-green-500/20 border border-green-500/50 text-green-200 flex items-center shadow-[0_0_15px_rgba(34,197,94,0.2)]">
+      <svg class="w-6 h-6 mr-3 text-green-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      <span>{{ successMessage }}</span>
+    </div>
+
+    <div *ngIf="errorMessage" class="mb-8 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-200 flex items-start">
+      <svg class="w-5 h-5 mr-3 mt-0.5 text-red-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <form [formGroup]="jobForm" (ngSubmit)="onSubmit()" class="space-y-6 relative z-10">
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 space-y-0">
+        <!-- Title -->
+        <div>
+          <label class="input-label" for="title">Job Title</label>
+          <input id="title" type="text" formControlName="title" class="input-field" placeholder="e.g. Senior Frontend Developer">
+          <div *ngIf="jobForm.get('title')?.touched && jobForm.get('title')?.invalid" class="text-xs text-red-400 mt-1">
+            Job title is required.
+          </div>
+        </div>
+
+        <!-- Company Name -->
+        <div>
+          <label class="input-label" for="companyName">Company Name</label>
+          <input id="companyName" type="text" formControlName="companyName" class="input-field" placeholder="e.g. Acme Corp">
+          <div *ngIf="jobForm.get('companyName')?.touched && jobForm.get('companyName')?.invalid" class="text-xs text-red-400 mt-1">
+            Company name is required.
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 space-y-0">
+        <!-- Location -->
+        <div>
+          <label class="input-label" for="location">Location</label>
+          <input id="location" type="text" formControlName="location" class="input-field" placeholder="e.g. Remote">
+          <div *ngIf="jobForm.get('location')?.touched && jobForm.get('location')?.invalid" class="text-xs text-red-400 mt-1">
+            Location is required.
+          </div>
+        </div>
+
+        <!-- Base Salary -->
+        <div>
+          <label class="input-label" for="salary">Base Salary (USD)</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">$</div>
+            <input id="salary" type="number" formControlName="salary" class="input-field pl-8" placeholder="120000">
+          </div>
+          <div *ngIf="jobForm.get('salary')?.touched && jobForm.get('salary')?.invalid" class="text-xs text-red-400 mt-1">
+            Valid salary amount required.
+          </div>
+        </div>
+
+        <!-- Experience Required -->
+        <div>
+          <label class="input-label" for="experience">Experience (Years)</label>
+          <input id="experience" type="number" formControlName="experience" class="input-field" placeholder="e.g. 5">
+          <div *ngIf="jobForm.get('experience')?.touched && jobForm.get('experience')?.invalid" class="text-xs text-red-400 mt-1">
+            Valid experience required.
+          </div>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div>
+        <label class="input-label" for="description">Job Description & Requirements</label>
+        <textarea id="description" formControlName="description" rows="8" class="input-field resize-none leading-relaxed" placeholder="Describe the role, responsibilities, and qualifications..."></textarea>
+        <div *ngIf="jobForm.get('description')?.touched && jobForm.get('description')?.invalid" class="text-xs text-red-400 mt-1">
+          Description must be at least 20 characters.
+        </div>
+      </div>
+
+      <div class="pt-6 border-t border-white/10 flex flex-col sm:flex-row justify-end gap-4">
+        <a routerLink="/jobs" class="btn-outline">Cancel</a>
+        <button type="submit" [disabled]="isSubmitting" class="btn-primary w-full sm:w-auto px-10 shadow-glow">
+          <span *ngIf="!isSubmitting">Post Job</span>
+          <span *ngIf="isSubmitting" class="flex items-center">
+            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            Publishing...
+          </span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

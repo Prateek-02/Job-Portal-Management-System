@@ -1,0 +1,110 @@
+<div class="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto z-10 relative">
+
+  <a routerLink="/jobs" class="inline-flex items-center text-primary-400 hover:text-primary-300 font-medium mb-6 transition-colors">
+    <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+    Back to Jobs
+  </a>
+
+  <div class="mb-10 flex border-b border-white/10 pb-6 items-center justify-between flex-wrap gap-4">
+    <div>
+      <h1 class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-400 to-secondary-400 mb-2">
+        Manage Candidates
+      </h1>
+      <p class="text-gray-400 text-lg">
+        Reviewing {{ applications.length }} applicant(s) for 
+        <span class="text-white font-semibold">{{ jobDetails?.title || 'Job ID: ' + jobId }}</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="errorMessage" class="glass-card mb-8 p-6 text-red-200 border-red-500/20 flex items-center">
+    <svg class="w-6 h-6 mr-3 text-red-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+    {{ errorMessage }}
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div *ngFor="let i of [1,2,3,4]" class="glass-card p-6 border-transparent animate-pulse">
+      <div class="flex gap-4 mb-4">
+        <div class="w-16 h-16 bg-surface-hover rounded-full"></div>
+        <div class="flex-grow space-y-3 py-2">
+          <div class="h-5 bg-surface-hover rounded w-1/2"></div>
+          <div class="h-4 bg-surface-hover rounded w-1/3"></div>
+        </div>
+      </div>
+      <div class="h-10 bg-surface-hover rounded-xl w-full"></div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && applications.length === 0" class="glass-card p-16 text-center shadow-lg border-dashed border-white/10">
+    <div class="w-24 h-24 bg-surface rounded-full flex items-center justify-center mx-auto mb-6">
+      <svg class="w-12 h-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+    </div>
+    <h3 class="text-2xl font-bold text-white mb-2">No Candidates Yet</h3>
+    <p class="text-gray-400 max-w-md mx-auto">This job posting hasn't received any applications yet. We'll notify you when someone applies.</p>
+  </div>
+
+  <!-- Candidates Grid -->
+  <div *ngIf="!isLoading && applications.length > 0" class="grid grid-cols-1 lg:grid-cols-2 lg:gap-8 gap-6 animate-fade-in relative z-10">
+    
+    <div *ngFor="let candidate of applications" class="glass-card hover:border-white/20 transition-all duration-300 relative group overflow-visible">
+      
+      <div class="p-6 md:p-8">
+        <div class="flex items-start justify-between mb-6">
+          <div class="flex items-center gap-4">
+            <!-- Candidate Avatar -->
+            <div class="w-16 h-16 rounded-full bg-gradient-to-r from-primary-600 to-secondary-600 flex items-center justify-center text-xl font-bold text-white shadow-glow flex-shrink-0 border-2 border-background object-cover overflow-hidden">
+              <img *ngIf="candidate.user?.profileImageUrl" [src]="candidate.user.profileImageUrl" class="w-full h-full object-cover">
+              <span *ngIf="!candidate.user?.profileImageUrl">{{ candidate.user?.name ? candidate.user.name.charAt(0).toUpperCase() : 'U' }}</span>
+            </div>
+            
+            <div>
+              <h2 class="text-xl font-bold text-white">{{ candidate.user?.name || 'Unknown Candidate' }}</h2>
+              <a [href]="'mailto:' + candidate.user?.email" class="text-gray-400 text-sm hover:text-primary-300 transition-colors">{{ candidate.user?.email || 'No email provided' }}</a>
+            </div>
+          </div>
+          
+          <span [class]="getStatusBadgeClass(candidate.status)" class="px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase border text-center">
+            {{ candidate.status || 'APPLIED' }}
+          </span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-6 pt-4 border-t border-white/5">
+          <div>
+            <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Applied Date</div>
+            <div class="text-sm text-gray-300 font-medium">{{ candidate.createdAt | date:'mediumDate' }}</div>
+          </div>
+          <div class="text-right">
+            <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Contact</div>
+            <div class="text-sm text-gray-300 font-medium">{{ candidate.user?.phone || 'N/A' }}</div>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-3 mt-6">
+          <a *ngIf="candidate.resumeUrl" [href]="candidate.resumeUrl" target="_blank" class="btn-outline flex-1 py-2 text-sm">
+            <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+            Review Resume
+          </a>
+
+          <!-- Action Dropdown for Status Update -->
+          <div class="relative flex-1 group/dropdown">
+            <button class="w-full btn-primary py-2 text-sm justify-between flex border border-primary-500/50">
+              Update Status
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+            <div class="absolute right-0 top-full mt-2 w-full glass-card border-white/10 p-2 shadow-xl opacity-0 invisible group-hover/dropdown:opacity-100 group-hover/dropdown:visible transition-all duration-200 z-50">
+              <button (click)="updateStatus(candidate.id, 'SHORTLISTED')" class="w-full text-left px-4 py-2 hover:bg-surface-hover text-sm text-yellow-300 rounded-lg font-medium transition-colors">Shortlist</button>
+              <button (click)="updateStatus(candidate.id, 'HIRED')" class="w-full text-left px-4 py-2 hover:bg-surface-hover text-sm text-green-400 rounded-lg font-medium transition-colors">Hire Candidate</button>
+              <button (click)="updateStatus(candidate.id, 'REJECTED')" class="w-full text-left px-4 py-2 hover:bg-surface-hover text-sm text-red-400 rounded-lg font-medium transition-colors">Reject</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>

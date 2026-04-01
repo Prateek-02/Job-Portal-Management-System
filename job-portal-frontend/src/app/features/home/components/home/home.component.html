@@ -1,0 +1,88 @@
+<div class="min-h-screen pt-16 pb-24 lg:pb-32 overflow-hidden relative">
+  <!-- Decorative background elements -->
+  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] opacity-30 pointer-events-none blur-3xl">
+    <div class="absolute inset-0 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full mix-blend-screen animate-float"></div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    
+    <!-- Hero Section -->
+    <div class="text-center mt-12 mb-20 animate-slide-up">
+      <h1 class="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary-400 via-white to-secondary-400 mb-8 tracking-tight drop-shadow-lg">
+        Find Your Dream Career
+      </h1>
+      <p class="mt-4 max-w-2xl mx-auto text-xl text-gray-300 mb-10">
+        Connect with top employers, discover premium opportunities, and land the job you've always wanted with our intelligent matching platform.
+      </p>
+      
+      <div class="flex flex-col sm:flex-row justify-center gap-4 mt-8">
+        <a *ngIf="!isAuthenticated" routerLink="/auth/signup" class="btn-primary text-lg px-8 py-4">
+          Get Started For Free
+        </a>
+        <a *ngIf="!isAuthenticated" routerLink="/auth/login" class="btn-outline text-lg px-8 py-4">
+          Login to Account
+        </a>
+        <a *ngIf="isAuthenticated" routerLink="/jobs" class="btn-primary text-lg px-8 py-4">
+          Browse Jobs Now
+        </a>
+      </div>
+    </div>
+
+    <!-- Features Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-24">
+      
+      <!-- Feature 1 -->
+      <div class="glass-card glass-card-hover p-8 animate-fade-in" style="animation-delay: 0.1s">
+        <div class="h-14 w-14 rounded-2xl bg-gradient-to-br from-primary-500/20 to-primary-500/5 flex items-center justify-center border border-primary-500/20 mb-6 text-primary-400">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+             <path stroke-linecap="round" stroke-linejoin="round" d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zm-7.518-.267A8.25 8.25 0 1120.25 10.5M8.288 14.212A5.25 5.25 0 1117.25 10.5" />
+          </svg>
+        </div>
+        <h3 class="text-2xl font-semibold text-white mb-3">AI-Matched Jobs</h3>
+        <p class="text-gray-400 leading-relaxed">
+          Our intelligent algorithm analyzes your profile and skills to deliver highly relevant job opportunities straight to your dashboard.
+        </p>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="glass-card glass-card-hover p-8 animate-fade-in" style="animation-delay: 0.2s">
+        <div class="h-14 w-14 rounded-2xl bg-gradient-to-br from-secondary-500/20 to-secondary-500/5 flex items-center justify-center border border-secondary-500/20 mb-6 text-secondary-400">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+          </svg>
+        </div>
+        <h3 class="text-2xl font-semibold text-white mb-3">Seamless Tracking</h3>
+        <p class="text-gray-400 leading-relaxed">
+          Manage all your applications in one place. Receive real-time updates and notifications on your application statuses.
+        </p>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="glass-card glass-card-hover p-8 animate-fade-in" style="animation-delay: 0.3s">
+        <div class="h-14 w-14 rounded-2xl bg-gradient-to-br from-blue-400/20 to-blue-400/5 flex items-center justify-center border border-blue-400/20 mb-6 text-blue-400">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.83M11.42 15.17l-.24-1.77q-.034-.236-.183-.4l-5.06-5.06a2.65 2.65 0 00-3.748 3.747l5.06 5.06q.163.149.4.183l1.77.24zM11.42 15.17l-1.06 1.06a1.5 1.5 0 01-2.12 0l-2.83-2.83a1.5 1.5 0 010-2.12l1.06-1.06" />
+          </svg>
+        </div>
+        <h3 class="text-2xl font-semibold text-white mb-3">Premium Employers</h3>
+        <p class="text-gray-400 leading-relaxed">
+          Connect directly with verified recruiters and companies looking for talent just like yours. Avoid the noise of generic job boards.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- CTA Section -->
+    <div class="mt-32 glass-card p-12 text-center rounded-3xl border border-white/10 relative overflow-hidden animate-slide-up" style="animation-delay: 0.4s">
+      <div class="absolute inset-0 bg-gradient-to-br from-primary-900/40 to-secondary-900/40 z-0"></div>
+      <div class="relative z-10">
+        <h2 class="text-3xl md:text-5xl font-bold text-white mb-6">Ready to accelerate your career?</h2>
+        <p class="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">Join thousands of professionals finding their next big opportunity on our platform.</p>
+        <a *ngIf="!isAuthenticated" routerLink="/auth/signup" class="btn-secondary text-lg px-10 py-4 shadow-glow-secondary">
+          Create Your Profile
+        </a>
+      </div>
+    </div>
+    
+  </div>
+</div>

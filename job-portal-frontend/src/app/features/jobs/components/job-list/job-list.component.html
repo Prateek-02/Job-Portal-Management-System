@@ -1,0 +1,142 @@
+<div class="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto z-10 relative">
+  
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
+    <div>
+      <h1 class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-400 to-secondary-400 mb-2">
+        Find Your Dream Job
+      </h1>
+      <p class="text-gray-400">Discover premium opportunities across top tech companies.</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+    
+    <!-- Sidebar Filters -->
+    <div class="lg:col-span-1">
+      <div class="glass-card p-6 sticky top-24">
+        <h2 class="text-xl font-semibold mb-6 flex items-center">
+          <svg class="w-5 h-5 mr-2 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+          </svg>
+          Filters
+        </h2>
+
+        <form [formGroup]="filterForm" class="space-y-4">
+          <div>
+            <label class="input-label text-xs">Job Title / Keywords</label>
+            <input type="text" formControlName="title" placeholder="e.g. Software Engineer" class="input-field py-2 text-sm">
+          </div>
+          <div>
+            <label class="input-label text-xs">Location</label>
+            <input type="text" formControlName="location" placeholder="e.g. Remote, New York" class="input-field py-2 text-sm">
+          </div>
+          <div>
+            <label class="input-label text-xs">Company</label>
+            <input type="text" formControlName="companyName" placeholder="e.g. Google" class="input-field py-2 text-sm">
+          </div>
+          
+          <button type="button" (click)="clearFilters()" class="text-sm text-gray-400 hover:text-white transition-colors mt-4 w-full text-center">
+            Clear all filters
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Main Content: Job List -->
+    <div class="lg:col-span-3">
+      
+      <!-- Error State -->
+      <div *ngIf="errorMessage" class="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-200">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="space-y-4">
+        <div *ngFor="let i of [1,2,3,4]" class="glass-card p-6 border-transparent animate-pulse flex flex-col sm:flex-row gap-4">
+          <div class="w-16 h-16 bg-surface-hover rounded-xl flex-shrink-0"></div>
+          <div class="flex-grow space-y-3 py-1">
+            <div class="h-5 bg-surface-hover rounded w-3/4"></div>
+            <div class="h-4 bg-surface-hover rounded w-1/2"></div>
+            <div class="flex gap-2 mt-2">
+              <div class="h-6 w-20 bg-surface-hover rounded-full"></div>
+              <div class="h-6 w-24 bg-surface-hover rounded-full"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!isLoading && jobs.length === 0" class="glass-card p-12 text-center flex flex-col items-center justify-center border-dashed border-gray-600">
+        <div class="w-20 h-20 bg-surface rounded-full flex items-center justify-center mb-4">
+          <svg class="w-10 h-10 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-white mb-2">No jobs found</h3>
+        <p class="text-gray-400 max-w-sm mx-auto">We couldn't find any jobs matching your current filters. Try adjusting your search criteria.</p>
+        <button (click)="clearFilters()" class="btn-primary mt-6 tracking-wide px-8 text-sm">Clear Filters</button>
+      </div>
+
+      <!-- Job List -->
+      <div *ngIf="!isLoading && jobs.length > 0" class="space-y-4 animate-fade-in">
+        
+        <div class="text-sm tracking-wider text-gray-400 mb-4 font-medium uppercase">
+          Showing {{ jobs.length }} of {{ totalElements }} jobs
+        </div>
+
+        <div *ngFor="let job of jobs" [routerLink]="['/jobs', job.id]" class="glass-card glass-card-hover p-6 cursor-pointer flex flex-col sm:flex-row gap-5 items-start sm:items-center relative group">
+          
+          <!-- Company Logo Placeholder -->
+          <div class="w-14 h-14 bg-gradient-to-br from-surface to-surface-hover border border-white/5 rounded-2xl shadow-inner flex items-center justify-center flex-shrink-0 text-white font-bold text-xl uppercase overflow-hidden">
+            {{ job.companyName ? job.companyName.charAt(0) : 'J' }}
+          </div>
+
+          <div class="flex-grow">
+            <h2 class="text-xl font-bold text-white mb-1 group-hover:text-primary-400 transition-colors">{{ job.title }}</h2>
+            <div class="text-gray-400 text-sm font-medium mb-3 flex items-center">
+              {{ job.companyName }}
+              <span class="mx-2 text-gray-600">•</span>
+              <span class="flex items-center text-gray-300">
+                <svg class="w-4 h-4 mr-1 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                {{ job.location }}
+              </span>
+            </div>
+            
+            <div class="flex flex-wrap gap-2">
+              <span class="px-3 py-1 bg-surface-hover/80 border border-white/5 text-xs rounded-full text-gray-300 font-medium">
+                ${{ job.salary | number }}
+              </span>
+              <span class="px-3 py-1 bg-surface-hover/80 border border-white/5 text-xs rounded-full text-gray-300 font-medium">
+                {{ job.experience }} yrs exp
+              </span>
+              <span class="px-3 py-1 bg-primary-500/10 text-primary-400 border border-primary-500/20 text-xs rounded-full font-medium">
+                Posted {{ job.createdAt | date:'mediumDate' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- View Details Button -->
+          <div class="sm:absolute sm:right-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-x-4 group-hover:translate-x-0 hidden sm:block">
+            <button class="bg-primary-500 hover:bg-primary-400 text-white rounded-full p-3 shadow-glow z-10">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div *ngIf="totalPages > 1" class="flex justify-center mt-10 space-x-2">
+          <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 0" class="p-2 rounded-lg bg-surface hover:bg-surface-hover border border-white/5 disabled:opacity-50 disabled:pointer-events-none transition-colors">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+          </button>
+          <div class="px-4 py-2 rounded-lg bg-surface/50 border border-white/5 text-sm font-medium">
+            Page {{ currentPage + 1 }} of {{ totalPages }}
+          </div>
+          <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage >= totalPages - 1" class="p-2 rounded-lg bg-surface hover:bg-surface-hover border border-white/5 disabled:opacity-50 disabled:pointer-events-none transition-colors">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
