@@ -1,0 +1,28 @@
+# Eclipse
+.metadata/
+*.log
+
+# Maven
+target/
+!**/src/main/**
+!**/src/test/**
+
+# Node (if any frontend later)
+node_modules/
+
+# Environment variables
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Docker
+*.tar
+
+# IDE
+.vscode/
+.idea/
