@@ -1,25 +1,18 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { StorageService } from '../services/storage.service';
 
+// NOTE: 401 handling (token refresh + logout) is fully managed by authInterceptor.
+// This interceptor only handles non-401 errors for logging/formatting purposes.
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
-  const router = inject(Router);
-  const storageService = inject(StorageService);
-
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401) {
-        // Auto logout if 401 response returned from api
-        storageService.clear();
-        router.navigate(['/auth/login']);
+      // Only log non-401 errors here; 401s are handled by authInterceptor
+      if (error.status !== 401) {
+        const errorMessage = error.error?.message || error.statusText || 'An error occurred';
+        console.error(`[HTTP ${error.status}] ${req.url}:`, errorMessage);
       }
-
-      const errorMessage = error.error?.message || error.statusText;
-      console.error(errorMessage);
-      return throwError(() => new Error(errorMessage));
+      return throwError(() => error);
     })
   );
 };

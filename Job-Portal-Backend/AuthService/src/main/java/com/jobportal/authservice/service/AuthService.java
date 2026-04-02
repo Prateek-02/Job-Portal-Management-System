@@ -8,16 +8,21 @@ import org.springframework.web.multipart.MultipartFile;
 import com.jobportal.authservice.dto.request.LoginRequest;
 import com.jobportal.authservice.dto.request.RegisterRequest;
 import com.jobportal.authservice.dto.request.UpdateProfileRequest;
-import com.jobportal.authservice.dto.response.AuthResponse;
+
+import com.jobportal.authservice.dto.response.LoginResponse;
+import com.jobportal.authservice.dto.response.RegisterResponse;
 import com.jobportal.authservice.dto.response.UserResponse;
 
 public interface AuthService {
 
     // Register new user
-    AuthResponse register(RegisterRequest request);
+    RegisterResponse register(RegisterRequest request);
 
     // Login user
-    AuthResponse login(LoginRequest request);
+    LoginResponse login(LoginRequest request);
+    
+    // Refresh token
+    LoginResponse refreshToken(com.jobportal.authservice.dto.request.RefreshTokenRequest request);
     
     // Upload profile image
     UserResponse uploadProfileImage(Long userId,MultipartFile file) throws IOException;

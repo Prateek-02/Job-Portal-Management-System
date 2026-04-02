@@ -2,57 +2,39 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../../../core/services/api.service';
+import { ApplicationResponse, ApplicationStatus } from '../../../../models/application.model';
 
 @Component({
   selector: 'app-my-applications',
   standalone: true,
   imports: [CommonModule, RouterLink, DatePipe],
-  templateUrl: './my-applications.component.html',
-  styleUrls: ['./my-applications.component.css']
+  templateUrl: './my-applications.component.html'
 })
 export class MyApplicationsComponent implements OnInit {
-  applications: any[] = [];
+  applications: ApplicationResponse[] = [];
   isLoading = true;
   errorMessage = '';
 
   constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
-    this.loadApplications();
-  }
-
-  loadApplications(): void {
-    this.isLoading = true;
-    this.errorMessage = '';
-    
     this.apiService.getMyApplications().subscribe({
-      next: (res) => {
-        this.applications = res || [];
-        this.isLoading = false;
-      },
-      error: (err) => {
-        this.errorMessage = 'Failed to load your applications. Please try again.';
-        this.isLoading = false;
-        console.error(err);
-      }
+      next: (res) => { this.applications = res || []; this.isLoading = false; },
+      error: (err) => { this.errorMessage = err.message || 'Failed to load applications.'; this.isLoading = false; }
     });
   }
 
-  getStatusBadgeClass(status: string): string {
-    switch (status?.toUpperCase()) {
-      case 'APPLIED':
-      case 'PENDING':
-        return 'bg-blue-500/20 text-blue-400 border border-blue-500/30';
-      case 'REVIEWING':
-      case 'SHORTLISTED':
-        return 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30';
-      case 'ACCEPTED':
-      case 'HIRED':
-        return 'bg-green-500/20 text-green-400 border border-green-500/30';
-      case 'REJECTED':
-        return 'bg-red-500/20 text-red-400 border border-red-500/30';
-      default:
-        return 'bg-gray-500/20 text-gray-400 border border-gray-500/30';
-    }
+  statusClass(status: ApplicationStatus): string {
+    const map: Record<ApplicationStatus, string> = {
+      APPLIED: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+      UNDER_REVIEW: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+      SHORTLISTED: 'bg-green-500/20 text-green-400 border-green-500/30',
+      REJECTED: 'bg-red-500/20 text-red-400 border-red-500/30'
+    };
+    return map[status] || 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+  }
+
+  statusLabel(status: ApplicationStatus): string {
+    return status?.replace('_', ' ') || 'APPLIED';
   }
 }

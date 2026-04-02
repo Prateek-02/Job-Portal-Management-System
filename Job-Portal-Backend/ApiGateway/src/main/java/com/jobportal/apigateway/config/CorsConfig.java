@@ -1,5 +1,6 @@
 package com.jobportal.apigateway.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -12,20 +13,22 @@ import java.util.List;
 @Configuration
 public class CorsConfig {
 
+    // Injected from application.properties → frontend.url=${FRONTEND_URL}
+    @Value("${frontend.url}")
+    private String frontendUrl;
+
     @Bean
     public CorsWebFilter corsWebFilter() {
 
         CorsConfiguration config = new CorsConfiguration();
 
-        // Allow requests from Angular frontend
-        config.setAllowedOriginPatterns(List.of("*"));
+        // Reads from .env → FRONTEND_URL via Spring property binding
+        config.setAllowedOrigins(List.of(frontendUrl));
 
-        // Allow these HTTP methods
         config.setAllowedMethods(Arrays.asList(
                 "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"
         ));
 
-        // Allow these headers
         config.setAllowedHeaders(Arrays.asList(
                 "Authorization",
                 "Content-Type",

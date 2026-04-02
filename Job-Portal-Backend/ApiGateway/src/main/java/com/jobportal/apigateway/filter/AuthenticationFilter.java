@@ -47,6 +47,19 @@ public class AuthenticationFilter extends
 
             ServerHttpRequest request = exchange.getRequest();
 
+            String path = request.getURI().getPath();
+            String method = request.getMethod().name();
+
+            // Publicly accessible endpoints that don't need authentication
+            if (path.startsWith("/api/jobs")) {
+                if (method.equals("GET") || (method.equals("POST") && path.endsWith("/search"))) {
+                    return chain.filter(exchange);
+                }
+            }
+            if (path.equals("/api/auth/refresh")) {
+                return chain.filter(exchange);
+            }
+
             // Step 1: Check Authorization header exists
             if (!request.getHeaders()
                     .containsKey(HttpHeaders.AUTHORIZATION)) {

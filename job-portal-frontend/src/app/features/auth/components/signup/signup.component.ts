@@ -1,33 +1,45 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
+import { UserRole } from '../../../../models/user.model';
 
 @Component({
   selector: 'app-signup',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
-  templateUrl: './signup.component.html',
-  styleUrls: ['./signup.component.css']
+  templateUrl: './signup.component.html'
 })
-export class SignupComponent {
-  signupForm: FormGroup;
+export class SignupComponent implements OnInit {
+  signupForm!: FormGroup;
   isLoading = false;
   errorMessage = '';
+  showPassword = false;
+  selectedRole: UserRole = 'JOB_SEEKER';
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router
-  ) {
+  ) {}
+
+  ngOnInit(): void {
+    if (this.authService.isAuthenticated()) {
+      this.router.navigate(['/jobs']);
+      return;
+    }
+
     this.signupForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      phone: ['', [Validators.required, Validators.pattern('^[0-9]{10,15}$')]],
-      role: ['APPLICANT', Validators.required]
+      phone: ['', [Validators.required, Validators.pattern('^[0-9]{10,15}$')]]
     });
+  }
+
+  selectRole(role: UserRole): void {
+    this.selectedRole = role;
   }
 
   onSubmit(): void {
@@ -35,28 +47,19 @@ export class SignupComponent {
       this.signupForm.markAllAsTouched();
       return;
     }
-
     this.isLoading = true;
     this.errorMessage = '';
 
-    const userData = this.signupForm.value;
+    const payload = {
+      ...this.signupForm.value,
+      role: this.selectedRole
+    };
 
-    this.authService.signup(userData).subscribe({
-      next: (res) => {
+    this.authService.register(payload).subscribe({
+      next: () => {
         this.isLoading = false;
-        const role = this.authService.getCurrentUser()?.role;
-        // Verify response contains expected structure
-        const token = this.authService.getToken();
-        if (token) {
-          if (role === 'RECRUITER') {
-             this.router.navigate(['/applications/manage']);
-          } else {
-             this.router.navigate(['/jobs']);
-          }
-        } else {
-           // Fallback if API doesn't auto-login after signup
-           this.router.navigate(['/auth/login']);
-        }
+        // Registration successful. No tokens are returned, so user must log in manually.
+        this.router.navigate(['/auth/login']);
       },
       error: (err) => {
         this.isLoading = false;
@@ -64,4 +67,9 @@ export class SignupComponent {
       }
     });
   }
+
+  get name() { return this.signupForm.get('name'); }
+  get email() { return this.signupForm.get('email'); }
+  get password() { return this.signupForm.get('password'); }
+  get phone() { return this.signupForm.get('phone'); }
 }

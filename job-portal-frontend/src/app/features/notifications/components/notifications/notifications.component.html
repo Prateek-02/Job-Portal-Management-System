@@ -1,0 +1,108 @@
+<div class="max-w-3xl mx-auto px-4 sm:px-6 py-12">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="text-3xl font-bold text-white mb-1">Notifications</h1>
+      <p class="text-gray-400 text-sm">
+        @if (notifications.length > 0) {
+          {{ notificationService.unreadCount }} unread · {{ notifications.length }} total
+        } @else {
+          Stay updated on your applications and activity
+        }
+      </p>
+    </div>
+
+    @if (notifications.length > 0) {
+      <div class="flex items-center gap-2">
+        @if (notificationService.unreadCount > 0) {
+          <button (click)="markAllRead()"
+                  class="text-xs px-3 py-1.5 rounded-lg bg-primary-500/15 text-primary-400 border border-primary-500/30 hover:bg-primary-500/25 transition-colors">
+            Mark all read
+          </button>
+        }
+        <button (click)="clearAll()"
+                class="text-xs px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-colors">
+          Clear all
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- Empty state -->
+  @if (notifications.length === 0) {
+    <div class="glass-card p-16 text-center">
+      <div class="w-20 h-20 bg-surface rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-10 h-10 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+        </svg>
+      </div>
+      <h3 class="text-xl font-bold text-white mb-2">No Notifications Yet</h3>
+      <p class="text-gray-400 text-sm max-w-sm mx-auto">
+        Notifications will appear here when you apply for jobs, when your application status changes, or when new jobs are posted.
+      </p>
+    </div>
+  }
+
+  <!-- Notification list -->
+  @if (notifications.length > 0) {
+    <div class="space-y-3">
+      @for (n of notifications; track n.id) {
+        <div (click)="handleClick(n)"
+             class="glass-card p-4 flex items-start gap-4 transition-all duration-200 cursor-pointer hover:border-white/20"
+             [class.border-primary-500\/20]="!n.read"
+             [class.bg-primary-500\/5]="!n.read">
+
+          <!-- Icon -->
+          <div class="flex-shrink-0 mt-0.5">
+            @if (getIcon(n.type) === 'status') {
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center"
+                   style="background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3);">
+                <svg class="w-5 h-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </div>
+            }
+            @if (getIcon(n.type) === 'applied') {
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center"
+                   style="background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3);">
+                <svg class="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                </svg>
+              </div>
+            }
+            @if (getIcon(n.type) === 'posted') {
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center"
+                   style="background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.3);">
+                <svg class="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+              </div>
+            }
+          </div>
+
+          <!-- Content -->
+          <div class="flex-1 min-w-0">
+            <div class="flex items-start justify-between gap-2">
+              <p class="text-sm font-semibold text-white leading-snug">{{ n.title }}</p>
+              <div class="flex items-center gap-2 flex-shrink-0">
+                <span class="text-xs text-gray-500">{{ timeAgo(n.timestamp) }}</span>
+                @if (!n.read) {
+                  <div class="w-2 h-2 rounded-full bg-primary-400 flex-shrink-0"></div>
+                }
+              </div>
+            </div>
+            <p class="text-xs text-gray-400 mt-0.5 leading-relaxed">{{ n.message }}</p>
+            @if (n.link) {
+              <p class="text-xs text-primary-400 mt-1 hover:text-primary-300">
+                View details →
+              </p>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+</div>

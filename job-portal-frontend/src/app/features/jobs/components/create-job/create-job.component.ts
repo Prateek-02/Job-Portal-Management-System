@@ -3,14 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { ApiService } from '../../../../core/services/api.service';
-import { AuthService } from '../../../../core/services/auth.service';
+import { JobRequest } from '../../../../models/job.model';
 
 @Component({
   selector: 'app-create-job',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
-  templateUrl: './create-job.component.html',
-  styleUrls: ['./create-job.component.css']
+  templateUrl: './create-job.component.html'
 })
 export class CreateJobComponent {
   jobForm: FormGroup;
@@ -21,40 +20,29 @@ export class CreateJobComponent {
   constructor(
     private fb: FormBuilder,
     private apiService: ApiService,
-    private authService: AuthService,
     private router: Router
   ) {
     this.jobForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
       companyName: ['', Validators.required],
       location: ['', Validators.required],
-      salary: [0, [Validators.required, Validators.min(0)]],
-      experience: [0, [Validators.required, Validators.min(0)]],
-      description: ['', [Validators.required, Validators.minLength(20)]]
+      salary: [null, [Validators.required, Validators.min(0)]],
+      experience: [null, [Validators.required, Validators.min(0)]],
+      description: ['', [Validators.required, Validators.minLength(30)]]
     });
   }
 
   onSubmit(): void {
-    if (this.jobForm.invalid) {
-      this.jobForm.markAllAsTouched();
-      return;
-    }
-
-    const role = this.authService.getCurrentUser()?.role;
-    if (role !== 'RECRUITER') {
-       this.errorMessage = 'Only recruiters can post jobs.';
-       return;
-    }
-
+    if (this.jobForm.invalid) { this.jobForm.markAllAsTouched(); return; }
     this.isSubmitting = true;
     this.errorMessage = '';
-    this.successMessage = '';
 
-    this.apiService.createJob(this.jobForm.value).subscribe({
-      next: (res) => {
+    const payload: JobRequest = this.jobForm.value;
+    this.apiService.createJob(payload).subscribe({
+      next: (job) => {
         this.isSubmitting = false;
-        this.successMessage = 'Job posted successfully!';
-        setTimeout(() => this.router.navigate(['/jobs', res.id]), 1500);
+        this.successMessage = 'Job posted successfully! Redirecting...';
+        setTimeout(() => this.router.navigate(['/jobs', job.id]), 1500);
       },
       error: (err) => {
         this.isSubmitting = false;

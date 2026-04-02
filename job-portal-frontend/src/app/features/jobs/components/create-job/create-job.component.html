@@ -1,101 +1,141 @@
-<div class="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto z-10 relative">
-  
-  <div class="glass-card p-8 md:p-12 animate-slide-up relative overflow-hidden">
-    <!-- Decorative element -->
-    <div class="absolute top-0 right-0 w-80 h-80 bg-secondary-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-10 animate-fade-in relative z-20">
 
-    <div class="mb-10 text-center relative z-10">
-      <h1 class="text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-400 to-secondary-400 mb-2">
-        Post a New Job
-      </h1>
-      <p class="text-gray-400">Reach thousands of premium tech candidates.</p>
-    </div>
+  <!-- Back -->
+  <a routerLink="/dashboard" class="inline-flex items-center text-sm font-bold text-[#4A4A4A] hover:text-[#1A1A1A] transition-colors mb-8 group bg-white/40 px-4 py-2 rounded-[12px] backdrop-blur-sm border border-white/50 shadow-sm">
+    <svg class="w-4 h-4 mr-2 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+    Back to Dashboard
+  </a>
 
-    <!-- Alert Messages -->
-    <div *ngIf="successMessage" class="mb-8 p-4 rounded-xl bg-green-500/20 border border-green-500/50 text-green-200 flex items-center shadow-[0_0_15px_rgba(34,197,94,0.2)]">
-      <svg class="w-6 h-6 mr-3 text-green-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-      <span>{{ successMessage }}</span>
-    </div>
+  <div class="mb-10 text-center animate-fade-in-up">
+    <h1 class="text-4xl sm:text-5xl font-extrabold text-[#1A1A1A] tracking-tight">Post a New Job</h1>
+    <p class="text-[#4A4A4A] font-medium text-lg mt-3 max-w-2xl mx-auto">Publish your open role to attract the best talent on our premium network.</p>
+  </div>
 
-    <div *ngIf="errorMessage" class="mb-8 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-200 flex items-start">
-      <svg class="w-5 h-5 mr-3 mt-0.5 text-red-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-      <span>{{ errorMessage }}</span>
-    </div>
+  <div class="glass-card p-8 md:p-12 relative overflow-hidden shadow-2xl animate-fade-in-up" style="animation-delay: 0.1s">
+    <div class="absolute top-0 right-0 w-80 h-80 bg-white/40 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
 
-    <form [formGroup]="jobForm" (ngSubmit)="onSubmit()" class="space-y-6 relative z-10">
+    @if (successMessage) {
+      <div class="mb-8 p-5 rounded-[12px] badge-glass-success flex items-center shadow-sm">
+        <svg class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span class="font-bold text-base">{{ successMessage }}</span>
+      </div>
+    }
+    @if (errorMessage) {
+      <div class="mb-8 p-5 rounded-[12px] badge-glass-error flex items-center shadow-sm">
+        <svg class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        <span class="font-bold text-base">{{ errorMessage }}</span>
+      </div>
+    }
+
+    <form [formGroup]="jobForm" (ngSubmit)="onSubmit()" class="space-y-8 relative z-10">
       
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 space-y-0">
-        <!-- Title -->
-        <div>
-          <label class="input-label" for="title">Job Title</label>
-          <input id="title" type="text" formControlName="title" class="input-field" placeholder="e.g. Senior Frontend Developer">
-          <div *ngIf="jobForm.get('title')?.touched && jobForm.get('title')?.invalid" class="text-xs text-red-400 mt-1">
-            Job title is required.
-          </div>
-        </div>
-
-        <!-- Company Name -->
-        <div>
-          <label class="input-label" for="companyName">Company Name</label>
-          <input id="companyName" type="text" formControlName="companyName" class="input-field" placeholder="e.g. Acme Corp">
-          <div *ngIf="jobForm.get('companyName')?.touched && jobForm.get('companyName')?.invalid" class="text-xs text-red-400 mt-1">
-            Company name is required.
-          </div>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 space-y-0">
-        <!-- Location -->
-        <div>
-          <label class="input-label" for="location">Location</label>
-          <input id="location" type="text" formControlName="location" class="input-field" placeholder="e.g. Remote">
-          <div *ngIf="jobForm.get('location')?.touched && jobForm.get('location')?.invalid" class="text-xs text-red-400 mt-1">
-            Location is required.
-          </div>
-        </div>
-
-        <!-- Base Salary -->
-        <div>
-          <label class="input-label" for="salary">Base Salary (USD)</label>
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">$</div>
-            <input id="salary" type="number" formControlName="salary" class="input-field pl-8" placeholder="120000">
-          </div>
-          <div *ngIf="jobForm.get('salary')?.touched && jobForm.get('salary')?.invalid" class="text-xs text-red-400 mt-1">
-            Valid salary amount required.
-          </div>
-        </div>
-
-        <!-- Experience Required -->
-        <div>
-          <label class="input-label" for="experience">Experience (Years)</label>
-          <input id="experience" type="number" formControlName="experience" class="input-field" placeholder="e.g. 5">
-          <div *ngIf="jobForm.get('experience')?.touched && jobForm.get('experience')?.invalid" class="text-xs text-red-400 mt-1">
-            Valid experience required.
-          </div>
-        </div>
-      </div>
-
-      <!-- Description -->
+      <!-- General Info Section -->
       <div>
-        <label class="input-label" for="description">Job Description & Requirements</label>
-        <textarea id="description" formControlName="description" rows="8" class="input-field resize-none leading-relaxed" placeholder="Describe the role, responsibilities, and qualifications..."></textarea>
-        <div *ngIf="jobForm.get('description')?.touched && jobForm.get('description')?.invalid" class="text-xs text-red-400 mt-1">
-          Description must be at least 20 characters.
+        <h3 class="text-xl font-extrabold text-[#1A1A1A] border-b-2 border-white/50 pb-3 mb-6">General Information</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div>
+            <label class="input-label" for="title">Job Title <span class="text-red-500">*</span></label>
+            <input id="title" type="text" formControlName="title" class="glass-input" placeholder="e.g. Senior Frontend Engineer">
+            @if (jobForm.get('title')?.touched && jobForm.get('title')?.invalid) {
+              <p class="mt-2 text-xs font-bold text-red-500 flex items-center">
+                Title must be at least 3 characters.
+              </p>
+            }
+          </div>
+
+          <div>
+            <label class="input-label" for="companyName">Company Name <span class="text-red-500">*</span></label>
+            <input id="companyName" type="text" formControlName="companyName" class="glass-input" placeholder="e.g. Acme Corp">
+            @if (jobForm.get('companyName')?.touched && jobForm.get('companyName')?.invalid) {
+              <p class="mt-2 text-xs font-bold text-red-500 flex items-center">
+                Company name is required.
+              </p>
+            }
+          </div>
         </div>
       </div>
 
-      <div class="pt-6 border-t border-white/10 flex flex-col sm:flex-row justify-end gap-4">
-        <a routerLink="/jobs" class="btn-outline">Cancel</a>
-        <button type="submit" [disabled]="isSubmitting" class="btn-primary w-full sm:w-auto px-10 shadow-glow">
-          <span *ngIf="!isSubmitting">Post Job</span>
-          <span *ngIf="isSubmitting" class="flex items-center">
-            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+      <!-- Job Details Section -->
+      <div>
+        <h3 class="text-xl font-extrabold text-[#1A1A1A] border-b-2 border-white/50 pb-3 mb-6 mt-10">Job Specifications</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div>
+            <label class="input-label" for="location">Location <span class="text-red-500">*</span></label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-4 flex items-center text-[#4A4A4A]">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+              </span>
+              <input id="location" type="text" formControlName="location" class="glass-input pl-11" placeholder="e.g. Remote">
+            </div>
+            @if (jobForm.get('location')?.touched && jobForm.get('location')?.invalid) {
+              <p class="mt-2 text-xs font-bold text-red-500 flex items-center">
+                Location is required.
+              </p>
+            }
+          </div>
+
+          <div>
+            <label class="input-label" for="salary">Annual Salary (₹) <span class="text-red-500">*</span></label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-4 flex items-center text-[#4A4A4A] font-extrabold text-[16px]">₹</span>
+              <input id="salary" type="number" formControlName="salary" class="glass-input pl-10" placeholder="1500000">
+            </div>
+            @if (jobForm.get('salary')?.touched && jobForm.get('salary')?.invalid) {
+              <p class="mt-2 text-xs font-bold text-red-500 flex items-center">
+                Valid positive salary required.
+              </p>
+            }
+          </div>
+
+          <div>
+            <label class="input-label" for="experience">Experience (Yrs) <span class="text-red-500">*</span></label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-4 flex items-center text-[#4A4A4A]">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              </span>
+              <input id="experience" type="number" formControlName="experience" class="glass-input pl-11" placeholder="e.g. 5">
+            </div>
+            @if (jobForm.get('experience')?.touched && jobForm.get('experience')?.invalid) {
+              <p class="mt-2 text-xs font-bold text-red-500 flex items-center">
+                Valid experience required.
+              </p>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Detail Description Section -->
+      <div>
+        <h3 class="text-xl font-extrabold text-[#1A1A1A] border-b-2 border-white/50 pb-3 mb-6 mt-10">Description</h3>
+        <div>
+          <label class="input-label" for="description">Full Role Description & Requirements <span class="text-red-500">*</span></label>
+          <textarea id="description" formControlName="description" rows="8"
+                    class="glass-input resize-y leading-[1.8]"
+                    placeholder="Provide a comprehensive description of the role, team context, daily responsibilities, mandatory skills, and what makes working at your company great..."></textarea>
+          @if (jobForm.get('description')?.touched && jobForm.get('description')?.invalid) {
+            <p class="mt-2 text-xs font-bold text-red-500 flex items-center">
+              Detailed description required (min 30 chars).
+            </p>
+          }
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex flex-col sm:flex-row gap-4 pt-4 mt-8">
+        <a routerLink="/dashboard" class="btn-secondary px-8 py-4 text-base justify-center order-2 sm:order-1">Cancel</a>
+        <button type="submit" [disabled]="isSubmitting" class="btn-primary flex-1 py-4 text-base justify-center order-1 sm:order-2 shadow-xl flex items-center gap-2">
+          @if (isSubmitting) {
+            <svg class="animate-spin -ml-1 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
             Publishing...
-          </span>
+          } @else { 
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Publish Job Listing 
+          }
         </button>
       </div>
-
     </form>
   </div>
 </div>

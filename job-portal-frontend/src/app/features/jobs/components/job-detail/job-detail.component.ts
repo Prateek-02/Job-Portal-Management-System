@@ -1,69 +1,53 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ApiService } from '../../../../core/services/api.service';
 import { AuthService } from '../../../../core/services/auth.service';
+import { Job } from '../../../../models/job.model';
 
 @Component({
   selector: 'app-job-detail',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink, DatePipe],
-  templateUrl: './job-detail.component.html',
-  styleUrls: ['./job-detail.component.css']
+  templateUrl: './job-detail.component.html'
 })
 export class JobDetailComponent implements OnInit {
-  job: any = null;
+  job: Job | null = null;
   isLoading = true;
   errorMessage = '';
 
-  // Application Modal state
+  // Apply modal
   showApplyModal = false;
-  applyForm: FormGroup;
+  applyForm!: FormGroup;
+  selectedFile: File | null = null;
   isApplying = false;
   applyError = '';
   applySuccess = false;
-  selectedFile: File | null = null;
-  
-  isApplicant = false;
-  isRecruiter = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private apiService: ApiService,
     public authService: AuthService,
-    private fb: FormBuilder
-  ) {
-    this.applyForm = this.fb.group({
-      resume: [null, Validators.required]
-    });
-  }
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
-    const userRole = this.authService.getCurrentUser()?.role;
-    this.isApplicant = userRole === 'APPLICANT';
-    this.isRecruiter = userRole === 'RECRUITER';
+    this.applyForm = this.fb.group({ resume: [null, Validators.required] });
 
     this.route.paramMap.subscribe(params => {
-      const id = params.get('id');
-      if (id) {
-        this.loadJobDetails(id);
-      }
+      const id = Number(params.get('id'));
+      if (id) this.loadJob(id);
     });
   }
 
-  loadJobDetails(id: string): void {
+  loadJob(id: number): void {
     this.isLoading = true;
     this.apiService.getJobById(id).subscribe({
-      next: (data) => {
-        this.job = data;
-        this.isLoading = false;
-      },
-      error: (err) => {
-        this.errorMessage = 'Failed to load job details. It may have been removed.';
-        this.isLoading = false;
-      }
+      next: (job) => { this.job = job; this.isLoading = false; this.cdr.detectChanges(); },
+      error: () => { this.errorMessage = 'Job not found or has been removed.'; this.isLoading = false; this.cdr.detectChanges(); }
     });
   }
 
@@ -79,33 +63,28 @@ export class JobDetailComponent implements OnInit {
     this.applyForm.reset();
   }
 
-  closeApplyModal(): void {
-    this.showApplyModal = false;
-  }
-
-  onFileChange(event: any): void {
-    if (event.target.files && event.target.files.length > 0) {
-      this.selectedFile = event.target.files[0];
+  onFileChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files?.length) {
+      this.selectedFile = input.files[0];
       this.applyForm.patchValue({ resume: this.selectedFile });
-      this.applyForm.get('resume')?.updateValueAndValidity();
     }
   }
 
   submitApplication(): void {
     if (!this.selectedFile || !this.job?.id) return;
-
     this.isApplying = true;
     this.applyError = '';
 
     this.apiService.applyForJob(this.job.id, this.selectedFile).subscribe({
-      next: (res) => {
+      next: () => {
         this.isApplying = false;
         this.applySuccess = true;
-        setTimeout(() => this.closeApplyModal(), 2000);
+        setTimeout(() => { this.showApplyModal = false; }, 2500);
       },
       error: (err) => {
         this.isApplying = false;
-        this.applyError = err.message || 'Failed to submit application.';
+        this.applyError = err.message || 'Failed to submit application. Please try again.';
       }
     });
   }

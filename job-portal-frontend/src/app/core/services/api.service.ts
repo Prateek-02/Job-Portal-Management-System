@@ -1,142 +1,147 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { LoginResponse, LoginRequest, RegisterRequest, UpdateProfileRequest, User, RegisterResponse } from '../../models/user.model';
+import { Job, JobFilter, JobRequest, PageResponse } from '../../models/job.model';
+import { ApplicationResponse, ApplicationStatus, JobApplicationResponse } from '../../models/application.model';
+import { AdminJobResponse, AdminPageResponse, AdminReports, AdminUserResponse } from '../../models/api-response.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  private apiUrl = 'http://localhost:8085/api';
+  private readonly apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   // ============ AUTH ENDPOINTS ============
-  login(credentials: { email: string; password: string }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/auth/login`, credentials);
+
+  login(credentials: LoginRequest): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.apiUrl}/auth/login`, credentials);
   }
 
-  signup(userData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/auth/register`, userData);
+  register(userData: RegisterRequest): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(`${this.apiUrl}/auth/register`, userData);
   }
 
-  logout(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/auth/logout`, {});
+  refreshToken(token: string): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.apiUrl}/auth/refresh`, { refreshToken: token });
   }
 
-  resetPassword(email: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/auth/reset-password`, { email });
+  getProfile(): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/auth/profile`);
   }
 
-  uploadProfileImage(userId: string | number, formData: FormData): Observable<any> {
-    return this.http.post(`${this.apiUrl}/auth/users/${userId}/profile-image`, formData);
+  updateProfile(request: UpdateProfileRequest): Observable<User> {
+    return this.http.put<User>(`${this.apiUrl}/auth/users/profile`, request);
   }
 
-  getProfile(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/auth/profile`);
+  uploadProfileImage(userId: number, formData: FormData): Observable<User> {
+    return this.http.post<User>(`${this.apiUrl}/auth/users/${userId}/profile-image`, formData);
   }
 
-  updateProfile(userData: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/auth/users/profile`, userData);
+  getAllUsers(): Observable<User[]> {
+    return this.http.get<User[]>(`${this.apiUrl}/auth/users`);
   }
 
-  getAllUsers(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/auth/users`);
-  }
-
-  getUserById(id: string | number): Observable<any> {
-    return this.http.get(`${this.apiUrl}/auth/users/${id}`);
+  getUserById(id: number): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/auth/users/${id}`);
   }
 
   // ============ JOB ENDPOINTS ============
-  getJobs(page: number = 0, size: number = 10, sortBy: string = 'createdAt', direction: string = 'desc'): Observable<any> {
+
+  getJobs(page = 0, size = 10, sortBy = 'createdAt', direction = 'desc'): Observable<PageResponse<Job>> {
     const params = new HttpParams()
-      .set('page', page.toString())
-      .set('size', size.toString())
+      .set('page', page)
+      .set('size', size)
       .set('sortBy', sortBy)
       .set('direction', direction);
-    return this.http.get(`${this.apiUrl}/jobs`, { params });
+    return this.http.get<PageResponse<Job>>(`${this.apiUrl}/jobs`, { params });
   }
 
-  searchJobs(filter: any, page: number = 0, size: number = 10, sortBy: string = 'createdAt', direction: string = 'desc'): Observable<any> {
+  getJobById(id: number): Observable<Job> {
+    return this.http.get<Job>(`${this.apiUrl}/jobs/${id}`);
+  }
+
+  createJob(jobData: JobRequest): Observable<Job> {
+    return this.http.post<Job>(`${this.apiUrl}/jobs`, jobData);
+  }
+
+  updateJob(id: number, jobData: JobRequest): Observable<Job> {
+    return this.http.put<Job>(`${this.apiUrl}/jobs/${id}`, jobData);
+  }
+
+  deleteJob(id: number): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.apiUrl}/jobs/${id}`);
+  }
+
+  searchJobs(filter: JobFilter, page = 0, size = 10, sortBy = 'createdAt', direction = 'desc'): Observable<PageResponse<Job>> {
     const params = new HttpParams()
-      .set('page', page.toString())
-      .set('size', size.toString())
+      .set('page', page)
+      .set('size', size)
       .set('sortBy', sortBy)
       .set('direction', direction);
-    return this.http.post(`${this.apiUrl}/jobs/search`, filter, { params });
-  }
-
-  getJobById(id: string | number): Observable<any> {
-    return this.http.get(`${this.apiUrl}/jobs/${id}`);
-  }
-
-  createJob(jobData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/jobs`, jobData);
-  }
-
-  updateJob(id: string | number, jobData: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/jobs/${id}`, jobData);
-  }
-
-  deleteJob(id: string | number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/jobs/${id}`);
-  }
-
-  deleteRecruiterJobs(recruiterId: string | number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/jobs/recruiter/${recruiterId}`);
+    return this.http.post<PageResponse<Job>>(`${this.apiUrl}/jobs/search`, filter, { params });
   }
 
   // ============ APPLICATION ENDPOINTS ============
-  applyForJob(jobId: string | number, resumeFile: File): Observable<any> {
+
+  applyForJob(jobId: number, resumeFile: File): Observable<ApplicationResponse> {
     const formData = new FormData();
     formData.append('jobId', jobId.toString());
     formData.append('resume', resumeFile);
-    return this.http.post(`${this.apiUrl}/applications/apply`, formData);
+    return this.http.post<ApplicationResponse>(`${this.apiUrl}/applications/apply`, formData);
   }
 
-  getMyApplications(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/applications/user/viewApplications`);
+  getMyApplications(): Observable<ApplicationResponse[]> {
+    return this.http.get<ApplicationResponse[]>(`${this.apiUrl}/applications/user/viewApplications`);
   }
 
-  getJobApplications(jobId: string | number): Observable<any> {
-    return this.http.get(`${this.apiUrl}/applications/jobApplications/${jobId}`);
+  getJobApplications(jobId: number): Observable<JobApplicationResponse[]> {
+    return this.http.get<JobApplicationResponse[]>(`${this.apiUrl}/applications/jobApplications/${jobId}`);
   }
 
-  updateApplicationStatus(id: string | number, status: string): Observable<any> {
+  updateApplicationStatus(appId: number, status: ApplicationStatus): Observable<ApplicationResponse> {
     const params = new HttpParams().set('status', status);
-    return this.http.patch(`${this.apiUrl}/applications/jobApplication/${id}/status`, null, { params });
+    return this.http.patch<ApplicationResponse>(
+      `${this.apiUrl}/applications/jobApplication/${appId}/status`,
+      null,
+      { params }
+    );
   }
 
-  deleteJobApplications(jobId: string | number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/applications/job/${jobId}`);
+  getTotalApplicationsCount(): Observable<number> {
+    return this.http.get<number>(`${this.apiUrl}/applications/count`);
   }
 
-  getTotalApplicationsCount(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/applications/count`);
+  deleteJobApplications(jobId: number): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.apiUrl}/applications/job/${jobId}`);
   }
 
   // ============ ADMIN ENDPOINTS ============
-  getAdminUsers(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/admin/users`);
+
+  getAdminUsers(): Observable<AdminUserResponse[]> {
+    return this.http.get<AdminUserResponse[]>(`${this.apiUrl}/admin/users`);
   }
 
-  getAdminUserById(id: string | number): Observable<any> {
-    return this.http.get(`${this.apiUrl}/admin/users/${id}`);
+  getAdminUserById(id: number): Observable<AdminUserResponse> {
+    return this.http.get<AdminUserResponse>(`${this.apiUrl}/admin/users/${id}`);
   }
 
-  deleteUser(id: string | number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/admin/users/${id}`);
+  deleteUser(id: number): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.apiUrl}/admin/users/${id}`);
   }
 
-  getAdminJobs(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/admin/jobs`);
+  getAdminJobs(): Observable<AdminPageResponse> {
+    return this.http.get<AdminPageResponse>(`${this.apiUrl}/admin/jobs`);
   }
 
-  getAdminJobById(id: string | number): Observable<any> {
-    return this.http.get(`${this.apiUrl}/admin/jobs/${id}`);
+  getAdminJobById(id: number): Observable<AdminJobResponse> {
+    return this.http.get<AdminJobResponse>(`${this.apiUrl}/admin/jobs/${id}`);
   }
 
-  getAdminReports(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/admin/reports`);
+  getAdminReports(): Observable<AdminReports> {
+    return this.http.get<AdminReports>(`${this.apiUrl}/admin/reports`);
   }
 }

@@ -83,7 +83,10 @@ public class RateLimitingService {
     private RateLimitStatus checkRateLimit(String key, int maxRequests, int timeWindowSeconds) {
         try {
             // Get current count from Redis
-            Long currentCount = (Long) redisTemplate.opsForValue().get(key);
+            // Redis may deserialize small integers as Integer even if stored as Long,
+            // so we use Number as the safe common supertype before calling longValue()
+            Object rawCount = redisTemplate.opsForValue().get(key);
+            Long currentCount = rawCount == null ? null : ((Number) rawCount).longValue();
             
             if (currentCount == null) {
                 // First request in the window - set counter to 1 with TTL

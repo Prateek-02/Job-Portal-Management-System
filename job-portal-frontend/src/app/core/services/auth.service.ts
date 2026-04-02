@@ -1,15 +1,16 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { tap, map, catchError } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
+import { Router } from '@angular/router';
 import { ApiService } from './api.service';
 import { StorageService } from './storage.service';
+import { LoginResponse, LoginRequest, RegisterRequest, User, UserRole, RegisterResponse } from '../../models/user.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private currentUserSubject = new BehaviorSubject<any>(null);
+  private currentUserSubject = new BehaviorSubject<Partial<User> | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
@@ -20,12 +21,12 @@ export class AuthService {
 
   constructor(
     private apiService: ApiService,
-    private storageService: StorageService
+    private storageService: StorageService,
+    private router: Router
   ) {
     this.initializeAuth();
   }
 
-  // Initialize authentication state from storage
   private initializeAuth(): void {
     const user = this.storageService.getUser();
     const token = this.storageService.getToken();
@@ -35,18 +36,12 @@ export class AuthService {
     }
   }
 
-  // Login user
-  login(email: string, password: string): Observable<any> {
+  login(email: string, password: string): Observable<LoginResponse> {
     this.isLoadingSubject.next(true);
-    return this.apiService.login({ email, password }).pipe(
-      tap(response => {
-        if (response && response.token && response.user) {
-          this.storageService.setToken(response.token);
-          this.storageService.setUser(response.user);
-          this.storageService.setUserRole(response.user.role);
-          this.currentUserSubject.next(response.user);
-          this.isAuthenticatedSubject.next(true);
-        }
+    const credentials: LoginRequest = { email, password };
+    return this.apiService.login(credentials).pipe(
+      tap((response: LoginResponse) => {
+        this.handleAuthSuccess(response);
         this.isLoadingSubject.next(false);
       }),
       catchError(error => {
@@ -56,18 +51,10 @@ export class AuthService {
     );
   }
 
-  // Register new user
-  signup(userData: any): Observable<any> {
+  register(userData: RegisterRequest): Observable<RegisterResponse> {
     this.isLoadingSubject.next(true);
-    return this.apiService.signup(userData).pipe(
-      tap(response => {
-        if (response && response.token && response.user) {
-          this.storageService.setToken(response.token);
-          this.storageService.setUser(response.user);
-          this.storageService.setUserRole(response.user.role);
-          this.currentUserSubject.next(response.user);
-          this.isAuthenticatedSubject.next(true);
-        }
+    return this.apiService.register(userData).pipe(
+      tap((response: RegisterResponse) => {
         this.isLoadingSubject.next(false);
       }),
       catchError(error => {
@@ -77,71 +64,93 @@ export class AuthService {
     );
   }
 
-  // Logout user
+  refreshToken(): Observable<LoginResponse> {
+    const rToken = this.storageService.getRefreshToken();
+    if (!rToken) {
+      return throwError(() => new Error("No refresh token available"));
+    }
+    return this.apiService.refreshToken(rToken).pipe(
+      tap((response: LoginResponse) => {
+        this.handleAuthSuccess(response);
+      })
+    );
+  }
+
+  private handleAuthSuccess(response: LoginResponse): void {
+    if (response && response.accessToken) {
+      this.storageService.setToken(response.accessToken);
+      
+      if (response.refreshToken) {
+        this.storageService.setRefreshToken(response.refreshToken);
+      }
+      
+      const user = {
+        id: response.userId,
+        name: response.name,
+        email: response.email,
+        role: response.role
+      };
+      this.storageService.setUser(user);
+      this.storageService.setUserRole(response.role);
+      this.currentUserSubject.next(user);
+      this.isAuthenticatedSubject.next(true);
+    }
+  }
+
   logout(): void {
-    this.apiService.logout().subscribe({
-      next: () => this.clearAuth(),
-      error: () => this.clearAuth()
-    });
+    this.clearAuth();
+    this.router.navigate(['/auth/login']);
   }
 
-  // Clear authentication
   private clearAuth(): void {
     this.storageService.clear();
     this.currentUserSubject.next(null);
     this.isAuthenticatedSubject.next(false);
   }
 
-  // Reset password
-  resetPassword(email: string): Observable<any> {
-    this.isLoadingSubject.next(true);
-    return this.apiService.resetPassword(email).pipe(
-      tap(() => this.isLoadingSubject.next(false)),
-      catchError(error => {
-        this.isLoadingSubject.next(false);
-        throw error;
-      })
-    );
-  }
-
-  // Check if user is authenticated
-  isAuthenticated(): boolean {
-    return this.isAuthenticatedSubject.value;
-  }
-
-  // Get current user
-  getCurrentUser(): any {
-    return this.currentUserSubject.value;
-  }
-
-  // Get auth token
-  getToken(): string | null {
-    return this.storageService.getToken();
-  }
-
-  // Check if user has specific role
-  hasRole(role: string): boolean {
-    const user = this.getCurrentUser();
-    return user && user.role === role;
-  }
-
-  // Check if user is admin
-  isAdmin(): boolean {
-    return this.hasRole('ADMIN');
-  }
-
-  // Check if user is recruiter
-  isRecruiter(): boolean {
-    return this.hasRole('RECRUITER');
-  }
-
-  // Refresh user profile from backend
-  refreshProfile(): Observable<any> {
+  refreshProfile(): Observable<User> {
     return this.apiService.getProfile().pipe(
       tap(user => {
         this.storageService.setUser(user);
         this.currentUserSubject.next(user);
       })
     );
+  }
+
+  isAuthenticated(): boolean {
+    return this.isAuthenticatedSubject.value;
+  }
+
+  getCurrentUser(): Partial<User> | null {
+    return this.currentUserSubject.value;
+  }
+
+  getToken(): string | null {
+    return this.storageService.getToken();
+  }
+
+  getRole(): UserRole | null {
+    return this.storageService.getUserRole() as UserRole | null;
+  }
+
+  isAdmin(): boolean {
+    return this.getRole() === 'ADMIN';
+  }
+
+  isRecruiter(): boolean {
+    return this.getRole() === 'RECRUITER';
+  }
+
+  isJobSeeker(): boolean {
+    return this.getRole() === 'JOB_SEEKER';
+  }
+
+  navigateByRole(): void {
+    const role = this.getRole();
+    if (role === 'ADMIN') {
+      this.router.navigate(['/admin/dashboard']);
+    } else {
+      this.router.navigate(['/dashboard']);
+    }
   }
 }

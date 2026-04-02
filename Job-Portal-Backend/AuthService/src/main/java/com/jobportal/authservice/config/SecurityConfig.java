@@ -36,6 +36,7 @@ public class SecurityConfig {
                 // PUBLIC — no token needed
                 .requestMatchers("/api/auth/register").permitAll()
                 .requestMatchers("/api/auth/login").permitAll()
+                .requestMatchers("/api/auth/refresh").permitAll()
                 
                 .requestMatchers(
                         "/v3/api-docs/**",

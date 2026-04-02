@@ -13,7 +13,9 @@ import org.springframework.web.multipart.MultipartFile;
 import com.jobportal.authservice.dto.request.LoginRequest;
 import com.jobportal.authservice.dto.request.RegisterRequest;
 import com.jobportal.authservice.dto.request.UpdateProfileRequest;
-import com.jobportal.authservice.dto.response.AuthResponse;
+import com.jobportal.authservice.dto.request.RefreshTokenRequest;
+import com.jobportal.authservice.dto.response.LoginResponse;
+import com.jobportal.authservice.dto.response.RegisterResponse;
 import com.jobportal.authservice.dto.response.UserResponse;
 import com.jobportal.authservice.entity.User;
 import com.jobportal.authservice.enums.UserRole;
@@ -47,7 +49,7 @@ public class AuthServiceImpl implements AuthService {
 
     // REGISTER
     @Override
-    public AuthResponse register(RegisterRequest request) {
+    public RegisterResponse register(RegisterRequest request) {
 
         log.info("Register service called | email: {} | role: {}",
                 request.getEmail(), request.getRole());
@@ -76,8 +78,7 @@ public class AuthServiceImpl implements AuthService {
         log.info("User saved successfully | userId: {} | email: {}",
                 savedUser.getId(), savedUser.getEmail());
 
-        return new AuthResponse(
-                null,
+        return new RegisterResponse(
                 savedUser.getId(),
                 savedUser.getName(),
                 savedUser.getEmail(),
@@ -88,7 +89,7 @@ public class AuthServiceImpl implements AuthService {
 
     // LOGIN
     @Override
-    public AuthResponse login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request) {
 
         log.info("Login service called | email: {}", request.getEmail());
 
@@ -110,17 +111,65 @@ public class AuthServiceImpl implements AuthService {
                 user.getRole().name()
         );
 
-        log.info("Login successful | userId: {}", user.getId());
-        log.debug("JWT generated for user | userId: {}", user.getId());
+        String refreshToken = jwtUtil.generateRefreshToken(user.getEmail());
 
-        return new AuthResponse(
+        log.info("Login successful | userId: {}", user.getId());
+        log.debug("JWT tokens generated for user | userId: {}", user.getId());
+
+        return new LoginResponse(
                 token,
+                refreshToken,
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
                 user.getRole(),
                 "Login successful!"
         );
+    }
+
+    // REFRESH TOKEN
+    @Override
+    public LoginResponse refreshToken(RefreshTokenRequest request) {
+        String requestRefreshToken = request.getRefreshToken();
+        
+        try {
+            // Validate refresh token and extract email
+            String email = jwtUtil.extractEmail(requestRefreshToken);
+            
+            // Check if token is strictly valid according to JwtUtil
+            if (!jwtUtil.validateToken(requestRefreshToken, email)) {
+                throw new UnauthorizedException("Invalid or expired refresh token");
+            }
+
+            // Look up user to ensure they still exist and get updated details
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
+
+            // Generate new token pair
+            String newAccessToken = jwtUtil.generateToken(
+                    user.getEmail(),
+                    user.getId(),
+                    user.getRole().name()
+            );
+            
+            String newRefreshToken = jwtUtil.generateRefreshToken(user.getEmail());
+
+            log.info("Token refreshed successfully | userId: {}", user.getId());
+
+            return new LoginResponse(
+                    newAccessToken,
+                    newRefreshToken,
+                    user.getId(),
+                    user.getName(),
+                    user.getEmail(),
+                    user.getRole(),
+                    "Token refreshed successfully!"
+            );
+
+        } catch (Exception e) {
+            log.warn("Failed to refresh token: {}", e.getMessage());
+            throw new UnauthorizedException("Invalid or expired refresh token!");
+        }
     }
 
     // UPLOAD PROFILE IMAGE

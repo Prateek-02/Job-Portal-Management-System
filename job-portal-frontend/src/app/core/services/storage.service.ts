@@ -5,6 +5,7 @@ import { Injectable } from '@angular/core';
 })
 export class StorageService {
   private readonly tokenKey = 'auth_token';
+  private readonly refreshTokenKey = 'refresh_token';
   private readonly userKey = 'current_user';
   private readonly userRoleKey = 'user_role';
 
@@ -25,6 +26,19 @@ export class StorageService {
 
   hasToken(): boolean {
     return !!this.getToken();
+  }
+
+  // Refresh Token Management
+  setRefreshToken(token: string): void {
+    localStorage.setItem(this.refreshTokenKey, token);
+  }
+
+  getRefreshToken(): string | null {
+    return localStorage.getItem(this.refreshTokenKey);
+  }
+
+  removeRefreshToken(): void {
+    localStorage.removeItem(this.refreshTokenKey);
   }
 
   // User Management
@@ -53,6 +67,7 @@ export class StorageService {
   // Clear All Storage
   clear(): void {
     localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem(this.refreshTokenKey);
     localStorage.removeItem(this.userKey);
     localStorage.removeItem(this.userRoleKey);
   }

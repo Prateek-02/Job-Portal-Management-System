@@ -1,3 +1,174 @@
-<div class="main-layout-container">
-  <!-- Component template -->
+<!-- Aurora Mesh Backgrounds -->
+<div class="blob-1"></div>
+<div class="blob-2"></div>
+<div class="blob-3"></div>
+<div class="blob-4"></div>
+
+<!-- Main Application Layout -->
+<div class="min-h-screen flex flex-col font-sans relative z-0">
+
+  <!-- Frosted Glass Navbar -->
+  <nav class="fixed top-0 w-full z-50 transition-all duration-300"
+       style="background: rgba(255,255,255,0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.4);">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        
+        <!-- Logo (Left) -->
+        <a routerLink="/dashboard" class="flex-shrink-0 flex items-center gap-2 group">
+          <div class="w-8 h-8 rounded-[8px] flex items-center justify-center transition-transform group-hover:scale-105 shadow-sm" style="background: linear-gradient(135deg, #667eea, #FF9A9E)">
+            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+          </div>
+          <span class="text-2xl font-extrabold text-[#1A1A1A] tracking-tight">JobPortal</span>
+        </a>
+
+        <!-- Navigation Links (Center) - Desktop -->
+        <div class="hidden md:flex flex-1 items-center justify-center space-x-8">
+          @if (authService.isJobSeeker() || authService.isRecruiter()) {
+            <a routerLink="/dashboard" 
+               routerLinkActive="text-[#1A1A1A] font-semibold border-b-2 border-transparent"
+               [routerLinkActiveOptions]="{exact: true}"
+               class="text-[15px] font-medium text-[#4A4A4A] transition-colors relative py-2 group">
+              Dashboard
+              <span class="absolute bottom-0 left-0 w-0 h-[2px] bg-gradient-to-r from-[#667eea] to-[#FF9A9E] transition-all duration-300 group-hover:w-full"></span>
+            </a>
+          }
+          <a routerLink="/jobs" 
+             routerLinkActive="text-[#1A1A1A] font-semibold"
+             class="text-[15px] font-medium text-[#4A4A4A] transition-colors relative py-2 group">
+            Browse Jobs
+            <span class="absolute bottom-0 left-0 w-0 h-[2px] bg-gradient-to-r from-[#667eea] to-[#FF9A9E] transition-all duration-300 group-hover:w-full"></span>
+          </a>
+          @if (authService.isJobSeeker()) {
+            <a routerLink="/applications/my-applications" 
+               routerLinkActive="text-[#1A1A1A] font-semibold"
+               class="text-[15px] font-medium text-[#4A4A4A] transition-colors relative py-2 group">
+              My Applications
+              <span class="absolute bottom-0 left-0 w-0 h-[2px] bg-gradient-to-r from-[#667eea] to-[#FF9A9E] transition-all duration-300 group-hover:w-full"></span>
+            </a>
+          }
+          @if (authService.isRecruiter()) {
+            <a routerLink="/jobs/create/new" 
+               routerLinkActive="text-[#1A1A1A] font-semibold"
+               class="text-[15px] font-medium text-[#4A4A4A] transition-colors relative py-2 group">
+              Post a Job
+              <span class="absolute bottom-0 left-0 w-0 h-[2px] bg-gradient-to-r from-[#667eea] to-[#FF9A9E] transition-all duration-300 group-hover:w-full"></span>
+            </a>
+          }
+          @if (authService.isAdmin()) {
+            <a routerLink="/admin/dashboard" 
+               routerLinkActive="text-[#1A1A1A] font-semibold"
+               class="text-[15px] font-medium text-[#4A4A4A] transition-colors relative py-2 group">
+              Admin Panel
+              <span class="absolute bottom-0 left-0 w-0 h-[2px] bg-gradient-to-r from-[#667eea] to-[#FF9A9E] transition-all duration-300 group-hover:w-full"></span>
+            </a>
+          }
+        </div>
+
+        <!-- Profile & Notifications (Right) -->
+        <div class="hidden md:flex items-center gap-4">
+          <!-- Notification Bell -->
+          <a routerLink="/notifications" class="relative p-2 text-[#4A4A4A] hover:text-[#1A1A1A] transition-colors rounded-full hover:bg-white/50">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+            @if (notificationService.unreadCount > 0) {
+              <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 border border-white"></span>
+            }
+          </a>
+
+          @if (currentUser) {
+            <div class="relative">
+              <button (click)="toggleDropdown()" class="flex items-center gap-2 p-1.5 pl-2 pr-3 rounded-full hover:bg-white/50 transition-colors focus:outline-none border border-white/40">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm" style="background: linear-gradient(135deg, #A18CD1, #FBC2EB)">
+                  {{ currentUser?.name?.charAt(0)?.toUpperCase() || 'U' }}
+                </div>
+                <svg class="w-4 h-4 text-[#4A4A4A]" [class.rotate-180]="isDropdownOpen" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+
+              <!-- Dropdown Menu -->
+              @if (isDropdownOpen) {
+                <div (click)="closeDropdown()" class="absolute right-0 mt-3 w-56 glass-card py-2 z-50 animate-fade-in-up">
+                  <div class="px-4 py-3 border-b border-white/30">
+                    <p class="text-[15px] font-bold text-[#1A1A1A] truncate">{{ currentUser?.name }}</p>
+                    <p class="text-xs font-medium text-[#4A4A4A] truncate mt-0.5">{{ currentUser?.email }}</p>
+                  </div>
+                  <a routerLink="/profile" class="flex items-center px-4 py-3 text-sm font-medium text-[#4A4A4A] hover:bg-white/50 hover:text-[#1A1A1A] transition-colors">
+                    <svg class="w-4 h-4 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    Profile Settings
+                  </a>
+                  <button (click)="logout()" class="w-full flex items-center px-4 py-3 text-sm text-red-500 hover:bg-red-500/10 transition-colors text-left font-semibold border-t border-white/30">
+                    <svg class="w-4 h-4 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    Log Out
+                  </button>
+                </div>
+              }
+            </div>
+          } @else {
+            <a routerLink="/login" class="btn-primary">Login</a>
+            <a routerLink="/register" class="btn-secondary">Register</a>
+          }
+        </div>
+
+        <!-- Mobile hamburger -->
+        <div class="flex items-center gap-4 md:hidden">
+          <a routerLink="/notifications" class="relative text-[#4A4A4A]">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+            @if (notificationService.unreadCount > 0) {
+              <span class="absolute top-0 right-0 w-2.5 h-2.5 rounded-full bg-red-500 border-2 border-white"></span>
+            }
+          </a>
+          <button (click)="toggleMenu()" class="text-[#1A1A1A] focus:outline-none bg-white/50 p-2 rounded-lg border border-white/50">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="isMenuOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Menu dropdown (Frosted Glass) -->
+    @if (isMenuOpen) {
+      <div class="md:hidden glass-card mx-4 mb-4 mt-2 px-2 pt-2 pb-4 space-y-1 animate-fade-in-up shadow-xl overflow-hidden backdrop-blur-3xl">
+        @if (authService.isJobSeeker() || authService.isRecruiter()) {
+          <a routerLink="/dashboard" (click)="toggleMenu()" class="block px-4 py-3 text-base font-semibold text-[#1A1A1A] rounded-lg hover:bg-white/50">Dashboard</a>
+        }
+        <a routerLink="/jobs" (click)="toggleMenu()" class="block px-4 py-3 text-base font-semibold text-[#1A1A1A] rounded-lg hover:bg-white/50">Browse Jobs</a>
+        @if (authService.isJobSeeker()) {
+          <a routerLink="/applications/my-applications" (click)="toggleMenu()" class="block px-4 py-3 text-base font-semibold text-[#1A1A1A] rounded-lg hover:bg-white/50">My Applications</a>
+        }
+        @if (authService.isRecruiter()) {
+          <a routerLink="/jobs/create/new" (click)="toggleMenu()" class="block px-4 py-3 text-base font-semibold text-[#1A1A1A] rounded-lg hover:bg-white/50">Post a Job</a>
+        }
+        
+        @if (currentUser) {
+          <div class="border-t border-white/40 mt-4 pt-4">
+            <div class="flex items-center px-4 mb-3">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shrink-0 shadow-sm" style="background: linear-gradient(135deg, #A18CD1, #FBC2EB)">
+                {{ currentUser?.name?.charAt(0)?.toUpperCase() || 'U' }}
+              </div>
+              <div class="ml-3">
+                <p class="text-base font-bold text-[#1A1A1A]">{{ currentUser?.name }}</p>
+                <p class="text-sm font-medium text-[#4A4A4A]">{{ currentUser?.email }}</p>
+              </div>
+            </div>
+            <a routerLink="/profile" (click)="toggleMenu()" class="block px-4 py-3 text-base font-semibold text-[#1A1A1A] rounded-lg hover:bg-white/50">Profile Settings</a>
+            <button (click)="logout()" class="block w-full text-left px-4 py-3 text-base font-bold text-red-500 rounded-lg hover:bg-red-500/10 transition-colors">Log Out</button>
+          </div>
+        } @else {
+          <div class="flex flex-col gap-3 mt-4 pt-4 border-t border-white/40 px-3">
+            <a routerLink="/login" (click)="toggleMenu()" class="btn-primary justify-center">Login</a>
+            <a routerLink="/register" (click)="toggleMenu()" class="btn-secondary justify-center">Register</a>
+          </div>
+        }
+      </div>
+    }
+  </nav>
+
+  <!-- Main Content Route Outlet (Pushed down by fixed navbar) -->
+  <main class="flex-1 w-full pt-20 relative z-10">
+    <router-outlet />
+  </main>
+
 </div>

@@ -1,88 +1,178 @@
-<div class="min-h-screen pt-16 pb-24 lg:pb-32 overflow-hidden relative">
-  <!-- Decorative background elements -->
-  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] opacity-30 pointer-events-none blur-3xl">
-    <div class="absolute inset-0 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full mix-blend-screen animate-float"></div>
-  </div>
+<div class="relative z-10 w-full">
 
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+  <!-- ── HERO SECTION ─────────────────────────────── -->
+  <section class="min-h-[90vh] flex flex-col items-center justify-center pt-24 pb-20 px-4 sm:px-6 lg:px-8 text-center relative">
     
-    <!-- Hero Section -->
-    <div class="text-center mt-12 mb-20 animate-slide-up">
-      <h1 class="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary-400 via-white to-secondary-400 mb-8 tracking-tight drop-shadow-lg">
-        Find Your Dream Career
+    <div class="max-w-5xl mx-auto w-full animate-fade-in-up">
+      <!-- Gradient Heading -->
+      <h1 class="text-5xl sm:text-[72px] font-extrabold text-[#1A1A1A] leading-[1.1] mb-6 tracking-tight">
+        Find Your <span class="text-gradient">Dream Job</span>
       </h1>
-      <p class="mt-4 max-w-2xl mx-auto text-xl text-gray-300 mb-10">
-        Connect with top employers, discover premium opportunities, and land the job you've always wanted with our intelligent matching platform.
+
+      <p class="text-lg md:text-[18px] text-[#4A4A4A] max-w-2xl mx-auto mb-14 leading-relaxed font-medium">
+        Experience the next generation of career networking. Discover premium opportunities and connect with top-tier companies on an ultra-modern platform.
       </p>
-      
-      <div class="flex flex-col sm:flex-row justify-center gap-4 mt-8">
-        <a *ngIf="!isAuthenticated" routerLink="/auth/signup" class="btn-primary text-lg px-8 py-4">
-          Get Started For Free
-        </a>
-        <a *ngIf="!isAuthenticated" routerLink="/auth/login" class="btn-outline text-lg px-8 py-4">
-          Login to Account
-        </a>
-        <a *ngIf="isAuthenticated" routerLink="/jobs" class="btn-primary text-lg px-8 py-4">
-          Browse Jobs Now
-        </a>
+
+      <!-- Glass Search Bar -->
+      <div class="w-full lg:w-[70%] mx-auto glass-card rounded-[24px] p-2 mb-16 shadow-2xl flex flex-col md:flex-row gap-2 relative z-20">
+        <div class="flex-1 relative flex items-center bg-white/40 rounded-t-[16px] md:rounded-l-[16px] md:rounded-tr-none hover:bg-white/60 transition-colors">
+          <svg class="w-5 h-5 text-[#4A4A4A] absolute left-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <input [formControl]="searchControl" (keyup.enter)="search()" type="text" class="w-full pl-14 pr-4 py-4 bg-transparent border-none text-[#1A1A1A] placeholder:text-[#4A4A4A] font-semibold focus:outline-none focus:ring-0 text-base" placeholder="Role, skill, or keyword...">
+        </div>
+
+        <div class="hidden md:block w-[1px] bg-white/50 my-3"></div>
+
+        <div class="flex-1 relative flex items-center bg-white/40 hover:bg-white/60 transition-colors">
+          <svg class="w-5 h-5 text-[#4A4A4A] absolute left-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+          <input type="text" class="w-full pl-14 pr-4 py-4 bg-transparent border-none text-[#1A1A1A] placeholder:text-[#4A4A4A] font-semibold focus:outline-none focus:ring-0 text-base" placeholder="Location">
+        </div>
+
+        <button (click)="search()" class="btn-primary py-4 px-8 md:rounded-[16px] rounded-b-[16px] md:mt-0 text-base shadow-xl flex items-center justify-center gap-2 m-1">
+          Search
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        </button>
+      </div>
+
+      <!-- Floating Stat Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
+        <div class="glass-card p-6 flex flex-col items-center justify-center relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent pointer-events-none"></div>
+          <div class="w-12 h-12 rounded-full mb-3 flex items-center justify-center text-white" style="background: linear-gradient(135deg, #FF9A9E, #FECFEF)">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          </div>
+          <div class="text-[32px] font-extrabold text-[#1A1A1A]">{{ stats.jobs || '1,500' }}+</div>
+          <div class="text-[#4A4A4A] font-semibold text-sm">Active Jobs</div>
+        </div>
+        
+        <div class="glass-card p-6 flex flex-col items-center justify-center relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent pointer-events-none"></div>
+          <div class="w-12 h-12 rounded-full mb-3 flex items-center justify-center text-white" style="background: linear-gradient(135deg, #A18CD1, #FBC2EB)">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+          </div>
+          <div class="text-[32px] font-extrabold text-[#1A1A1A]">450+</div>
+          <div class="text-[#4A4A4A] font-semibold text-sm">Top Companies</div>
+        </div>
+
+        <div class="glass-card p-6 flex flex-col items-center justify-center relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent pointer-events-none"></div>
+          <div class="w-12 h-12 rounded-full mb-3 flex items-center justify-center text-white" style="background: linear-gradient(135deg, #C2E9FB, #A1C4FD)">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          </div>
+          <div class="text-[32px] font-extrabold text-[#1A1A1A]">10k+</div>
+          <div class="text-[#4A4A4A] font-semibold text-sm">Job Seekers</div>
+        </div>
       </div>
     </div>
+  </section>
 
-    <!-- Features Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-24">
-      
-      <!-- Feature 1 -->
-      <div class="glass-card glass-card-hover p-8 animate-fade-in" style="animation-delay: 0.1s">
-        <div class="h-14 w-14 rounded-2xl bg-gradient-to-br from-primary-500/20 to-primary-500/5 flex items-center justify-center border border-primary-500/20 mb-6 text-primary-400">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
-             <path stroke-linecap="round" stroke-linejoin="round" d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zm-7.518-.267A8.25 8.25 0 1120.25 10.5M8.288 14.212A5.25 5.25 0 1117.25 10.5" />
-          </svg>
-        </div>
-        <h3 class="text-2xl font-semibold text-white mb-3">AI-Matched Jobs</h3>
-        <p class="text-gray-400 leading-relaxed">
-          Our intelligent algorithm analyzes your profile and skills to deliver highly relevant job opportunities straight to your dashboard.
-        </p>
-      </div>
-
-      <!-- Feature 2 -->
-      <div class="glass-card glass-card-hover p-8 animate-fade-in" style="animation-delay: 0.2s">
-        <div class="h-14 w-14 rounded-2xl bg-gradient-to-br from-secondary-500/20 to-secondary-500/5 flex items-center justify-center border border-secondary-500/20 mb-6 text-secondary-400">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
-          </svg>
-        </div>
-        <h3 class="text-2xl font-semibold text-white mb-3">Seamless Tracking</h3>
-        <p class="text-gray-400 leading-relaxed">
-          Manage all your applications in one place. Receive real-time updates and notifications on your application statuses.
-        </p>
-      </div>
-
-      <!-- Feature 3 -->
-      <div class="glass-card glass-card-hover p-8 animate-fade-in" style="animation-delay: 0.3s">
-        <div class="h-14 w-14 rounded-2xl bg-gradient-to-br from-blue-400/20 to-blue-400/5 flex items-center justify-center border border-blue-400/20 mb-6 text-blue-400">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.83M11.42 15.17l-.24-1.77q-.034-.236-.183-.4l-5.06-5.06a2.65 2.65 0 00-3.748 3.747l5.06 5.06q.163.149.4.183l1.77.24zM11.42 15.17l-1.06 1.06a1.5 1.5 0 01-2.12 0l-2.83-2.83a1.5 1.5 0 010-2.12l1.06-1.06" />
-          </svg>
-        </div>
-        <h3 class="text-2xl font-semibold text-white mb-3">Premium Employers</h3>
-        <p class="text-gray-400 leading-relaxed">
-          Connect directly with verified recruiters and companies looking for talent just like yours. Avoid the noise of generic job boards.
-        </p>
-      </div>
-
+  <!-- ── FEATURED JOBS SECTION ─────────────────────────────── -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-20">
+    <div class="text-center mb-16">
+      <h2 class="text-[#1A1A1A] mb-4">Featured Opportunities</h2>
+      <p class="text-[#4A4A4A] text-lg font-medium">Explore premium roles carefully curated for your career growth.</p>
     </div>
 
-    <!-- CTA Section -->
-    <div class="mt-32 glass-card p-12 text-center rounded-3xl border border-white/10 relative overflow-hidden animate-slide-up" style="animation-delay: 0.4s">
-      <div class="absolute inset-0 bg-gradient-to-br from-primary-900/40 to-secondary-900/40 z-0"></div>
-      <div class="relative z-10">
-        <h2 class="text-3xl md:text-5xl font-bold text-white mb-6">Ready to accelerate your career?</h2>
-        <p class="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">Join thousands of professionals finding their next big opportunity on our platform.</p>
-        <a *ngIf="!isAuthenticated" routerLink="/auth/signup" class="btn-secondary text-lg px-10 py-4 shadow-glow-secondary">
-          Create Your Profile
-        </a>
+    <!-- Loading skeleton -->
+    @if (isLoadingJobs) {
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        @for (i of [1,2,3,4,5,6]; track i) {
+          <div class="glass-card p-8 animate-pulse relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
+            <div class="flex items-center justify-between mb-6">
+              <div class="w-14 h-14 bg-white/60 rounded-full"></div>
+              <div class="w-8 h-8 bg-white/40 rounded-full"></div>
+            </div>
+            <div class="h-6 bg-white/60 rounded w-3/4 mb-3"></div>
+            <div class="h-4 bg-white/40 rounded w-1/2 mb-6"></div>
+            <div class="flex gap-2 mb-8">
+              <div class="h-8 bg-white/50 rounded-full w-1/4"></div>
+              <div class="h-8 bg-white/50 rounded-full w-1/4"></div>
+            </div>
+            <div class="h-12 bg-white/60 rounded-[8px] w-full mt-auto"></div>
+          </div>
+        }
       </div>
-    </div>
-    
-  </div>
+    }
+
+    <!-- Glass Jobs grid -->
+    @if (!isLoadingJobs) {
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in-up">
+        @for (job of featuredJobs; track job.id) {
+          <div class="glass-card p-8 flex flex-col group relative overflow-hidden">
+            <!-- Left Gradient Border overlay effect -->
+            <div class="absolute left-0 top-0 bottom-0 w-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style="background: linear-gradient(180deg, #FF9A9E, #A18CD1)"></div>
+            
+            <!-- Bookmark -->
+            <button class="absolute top-8 right-8 text-[#4A4A4A] hover:text-[#FF9A9E] transition-colors z-10">
+              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+            </button>
+
+            <!-- Header -->
+            <div class="flex flex-col mb-6">
+              <div class="w-14 h-14 flex-shrink-0 rounded-full flex items-center justify-center text-xl font-extrabold text-white uppercase mb-5 shadow-sm" style="background: linear-gradient(135deg, #1A1A1A, #4A4A4A)">
+                {{ job.companyName.charAt(0) }}
+              </div>
+              <h3 class="text-xl font-bold text-[#1A1A1A] group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#667eea] group-hover:to-[#A18CD1] transition-all line-clamp-1 pr-8">{{ job.title }}</h3>
+              <p class="text-[15px] font-semibold text-[#4A4A4A] mt-1">{{ job.companyName }}</p>
+            </div>
+
+            <!-- Skills/Tags Info as Glass Pills -->
+            <div class="flex flex-wrap gap-2 mb-6">
+              <span class="inline-flex items-center px-3 py-1.5 rounded-full text-[13px] font-bold text-[#1A1A1A] bg-white/50 border border-white/60 shadow-sm backdrop-blur-sm">
+                <svg class="w-3.5 h-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+                {{ job.location }}
+              </span>
+              <span class="inline-flex items-center px-3 py-1.5 rounded-full text-[13px] font-bold text-green-700 bg-green-400/20 border border-green-400/30 shadow-sm backdrop-blur-sm">
+                <svg class="w-3.5 h-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                {{ formatSalary(job.salary) || job.salary }}
+              </span>
+              <span class="inline-flex items-center px-3 py-1.5 rounded-full text-[13px] font-bold text-[#1A1A1A] bg-white/50 border border-white/60 shadow-sm backdrop-blur-sm">
+                <svg class="w-3.5 h-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                {{ job.experience }}+ yrs
+              </span>
+            </div>
+
+            <!-- Description -->
+            <p class="text-[15px] font-medium text-[#4A4A4A] line-clamp-2 mb-8 flex-1 leading-relaxed">{{ job.description }}</p>
+
+            <!-- Action -->
+            <div class="mt-auto">
+              <a [routerLink]="authService.isAuthenticated() ? ['/jobs', job.id] : ['/auth/login']" 
+                 class="btn-primary w-full shadow-lg">
+                <span class="relative z-10">Apply For Need</span>
+              </a>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="mt-16 text-center">
+        <a routerLink="/jobs" class="btn-secondary px-10 py-4 text-lg">Explore All Opportunities</a>
+      </div>
+    }
+  </section>
+
+  <!-- ── CTA SECTION ───────────────────────────────── -->
+  @if (!authService.isAuthenticated()) {
+    <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-24 relative z-20">
+      <div class="glass-card p-12 md:p-20 text-center relative overflow-hidden border-2 border-white/50 shadow-2xl">
+        <div class="absolute inset-0 bg-gradient-to-br from-white/60 to-transparent pointer-events-none"></div>
+        <div class="relative z-10">
+          <h2 class="text-[#1A1A1A] mb-5 text-[48px]">Ready to Elevate Your Career?</h2>
+          <p class="text-[#4A4A4A] text-[20px] mb-12 max-w-2xl mx-auto font-medium leading-relaxed">
+            Join the most sophisticated platform for modern professionals. Register today and gain access to thousands of premium roles.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-5 justify-center">
+            <a routerLink="/auth/signup" class="btn-primary px-12 py-4 text-lg">
+              Create an Account
+            </a>
+            <a routerLink="/auth/login" class="btn-secondary px-12 py-4 text-lg">
+              Sign In to JobPortal
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  }
+
 </div>
