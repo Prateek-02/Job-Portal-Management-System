@@ -1,5 +1,6 @@
 package com.jobportal.applicationservice.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -196,6 +197,8 @@ public class ApplicationServiceImpl implements ApplicationService {
                             response.setResumeUrl(app.getResumeUrl());
                             response.setStatus(app.getStatus());
                             response.setAppliedAt(app.getAppliedAt());
+                            response.setJobTitle(job.getTitle());
+                            response.setCompanyName(job.getCompanyName());
 
                             try {
                                 UserResponse user =
@@ -343,6 +346,37 @@ public class ApplicationServiceImpl implements ApplicationService {
                             log.error("JobService unavailable | jobId: {}", jobId, throwable);
                             throw new RuntimeException("JobService unavailable. Please try again.");
                         });
+    }
+
+    @Override
+    public List<JobApplicationResponse> getAllApplicationsForRecruiter(Long recruiterId, String role) {
+        log.info("Fetching all applications for recruiter | recruiterId: {}", recruiterId);
+
+        if (!role.equalsIgnoreCase("RECRUITER")) {
+            log.warn("Unauthorized access to recruiter applications | recruiterId: {} | role: {}", recruiterId, role);
+            throw new UnauthorizedException("Access Denied! Only Recruiters can view applications.");
+        }
+
+        // 1. Fetch all jobs posted by this recruiter from JobService
+        List<JobResponse> recruiterJobs = jobClient.getJobsByRecruiter(recruiterId);
+        
+        List<JobApplicationResponse> allApplications = new ArrayList<>();
+
+        // 2. For each job, fetch applications and map them using the existing getJobApplications method
+        for (JobResponse job : recruiterJobs) {
+            try {
+                List<JobApplicationResponse> jobApps = getJobApplications(job.getId(), role, recruiterId);
+                allApplications.addAll(jobApps);
+            } catch (Exception e) {
+                log.warn("Failed to fetch applications for jobId: {} | recruiterId: {}", job.getId(), recruiterId);
+            }
+        }
+
+        // 3. Sort by applied date descending
+        allApplications.sort((a, b) -> b.getAppliedAt().compareTo(a.getAppliedAt()));
+
+        log.info("Total applications fetched for recruiter: {} | count: {}", recruiterId, allApplications.size());
+        return allApplications;
     }
 }
 

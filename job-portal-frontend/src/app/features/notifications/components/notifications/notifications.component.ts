@@ -12,6 +12,7 @@ import { AppNotification } from '../../../../models/notification.model';
 })
 export class NotificationsComponent implements OnInit {
   notifications: AppNotification[] = [];
+  currentFilter: 'all' | 'read' | 'unread' = 'all';
 
   constructor(
     public notificationService: NotificationService,
@@ -24,6 +25,17 @@ export class NotificationsComponent implements OnInit {
       this.notifications = n;
       this.cdr.detectChanges();
     });
+  }
+
+  get filteredNotifications(): AppNotification[] {
+    if (this.currentFilter === 'read') return this.notifications.filter(n => n.read);
+    if (this.currentFilter === 'unread') return this.notifications.filter(n => !n.read);
+    return this.notifications;
+  }
+
+  setFilter(filter: 'all' | 'read' | 'unread'): void {
+    this.currentFilter = filter;
+    this.cdr.detectChanges();
   }
 
   handleClick(n: AppNotification): void {

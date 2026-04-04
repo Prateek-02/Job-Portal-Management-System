@@ -128,6 +128,19 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
     
-    
-    
+    @PostMapping("/forgot-password")
+    public ResponseEntity<java.util.Map<String, String>> forgotPassword(
+            @Valid @RequestBody com.jobportal.authservice.dto.request.ForgotPasswordRequest request) {
+        log.info("Forgot password API called | email: {}", request.getEmail());
+        authService.forgotPassword(request);
+        return ResponseEntity.ok(java.util.Map.of("message", "If your email is registered, you will receive a reset link."));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<java.util.Map<String, String>> resetPassword(
+            @Valid @RequestBody com.jobportal.authservice.dto.request.ResetPasswordRequest request) {
+        log.info("Reset password API called");
+        authService.resetPassword(request);
+        return ResponseEntity.ok(java.util.Map.of("message", "Password successfully reset. You can now login."));
+    }
 }

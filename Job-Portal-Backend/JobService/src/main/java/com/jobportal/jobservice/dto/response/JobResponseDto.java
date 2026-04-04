@@ -2,6 +2,7 @@ package com.jobportal.jobservice.dto.response;
 
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class JobResponseDto {
@@ -14,4 +15,6 @@ public class JobResponseDto {
     private String description;
     private Long recruiterId;
     private LocalDateTime createdAt;
+    private Boolean isSaved;
+    private List<String> skills;
 }

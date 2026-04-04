@@ -11,6 +11,7 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * AUTHENTICATION FILTER
@@ -30,6 +31,7 @@ import reactor.core.publisher.Mono;
  *   X-User-Role  → to know their role
  *   X-User-Email → to know their email
  */
+@Slf4j
 @Component
 public class AuthenticationFilter extends
         AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
@@ -50,19 +52,30 @@ public class AuthenticationFilter extends
             String path = request.getURI().getPath();
             String method = request.getMethod().name();
 
-            // Publicly accessible endpoints that don't need authentication
-            if (path.startsWith("/api/jobs")) {
-                if (method.equals("GET") || (method.equals("POST") && path.endsWith("/search"))) {
+            log.info("Auth Filter | Path: {} | Method: {}", path, method);
+
+            // Publicly accessible endpoints (GET jobs, SEARCH jobs)
+            if (path.startsWith("/api/jobs") && !path.contains("/saved")) {
+                if (method.equalsIgnoreCase("GET") || 
+                    (method.equalsIgnoreCase("POST") && path.toLowerCase().contains("search"))) {
+                    log.debug("Auth Filter | Bypassing public job route: {}", path);
                     return chain.filter(exchange);
                 }
             }
-            if (path.equals("/api/auth/refresh")) {
+            
+            if (path.contains("/api/auth/refresh") ||
+                path.contains("/api/auth/forgot-password") ||
+                path.contains("/api/auth/reset-password") ||
+                path.contains("/api/auth/register") ||
+                path.contains("/api/auth/login")) {
+                log.debug("Auth Filter | Bypassing public auth route: {}", path);
                 return chain.filter(exchange);
             }
 
             // Step 1: Check Authorization header exists
             if (!request.getHeaders()
                     .containsKey(HttpHeaders.AUTHORIZATION)) {
+                log.warn("Auth Filter | Unauthorized - Missing Header | Path: {}", path);
                 return onError(exchange,
                         "Missing Authorization header");
             }
@@ -73,6 +86,7 @@ public class AuthenticationFilter extends
 
             if (authHeader == null ||
                     !authHeader.startsWith("Bearer ")) {
+                log.warn("Auth Filter | Unauthorized - Invalid Header Format | Path: {}", path);
                 return onError(exchange,
                         "Invalid Authorization format");
             }
@@ -81,6 +95,7 @@ public class AuthenticationFilter extends
 
             // Step 3: Validate token
             if (!jwtUtil.validateToken(token)) {
+                log.warn("Auth Filter | Unauthorized - Invalid Token | Path: {}", path);
                 return onError(exchange,
                         "Invalid or expired token");
             }
@@ -89,6 +104,8 @@ public class AuthenticationFilter extends
             String email  = jwtUtil.extractEmail(token);
             String role   = jwtUtil.extractRole(token);
             Long   userId = jwtUtil.extractUserId(token);
+
+            log.debug("Auth Filter | Authenticated User: {} | Role: {}", email, role);
 
             // Step 5: Add user info as headers
             ServerHttpRequest modifiedRequest = request.mutate()

@@ -12,6 +12,11 @@ export const APPLICATIONS_ROUTES: Routes = [
       .then(m => m.ManageApplicationsComponent)
   },
   {
+    path: 'recruiter',
+    loadComponent: () => import('./components/all-applications/all-applications.component')
+      .then(m => m.AllApplicationsComponent)
+  },
+  {
     path: '',
     redirectTo: 'my-applications',
     pathMatch: 'full'

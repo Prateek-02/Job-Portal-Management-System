@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute, Params } from '@angular/router';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { ApiService } from '../../../../core/services/api.service';
@@ -27,15 +27,17 @@ export class JobListComponent implements OnInit, OnDestroy {
   filterForm!: FormGroup;
   private searchSubject = new Subject<JobFilter>();
   private destroy$ = new Subject<void>();
-  private activeFilter: JobFilter = {};
+  activeFilter: JobFilter = {};
+  selectedSkills: string[] = [];
 
   constructor(
     private apiService: ApiService,
     public authService: AuthService,
     private router: Router,
+    private route: ActivatedRoute,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.filterForm = this.fb.group({
@@ -48,6 +50,18 @@ export class JobListComponent implements OnInit, OnDestroy {
       maxExperience: [null]
     });
 
+    // Handle deep-linked skills from query params
+    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe((params: Params) => {
+      if (params['skill']) {
+        const skill = params['skill'];
+        if (!this.selectedSkills.includes(skill)) {
+          this.selectedSkills = [skill]; // Start fresh with this skill or add to list? User usually expects just one if coming from a detail page.
+          this.activeFilter = this.buildFilter(this.filterForm.value);
+          this.loadJobs(0);
+        }
+      }
+    });
+
     // Debounced search on filter changes
     this.filterForm.valueChanges.pipe(
       debounceTime(500),
@@ -58,8 +72,17 @@ export class JobListComponent implements OnInit, OnDestroy {
       this.loadJobs(0);
     });
 
-    this.loadJobs(0);
+
+
+    // Only load if not already triggered by query params
+    if (!this.route.snapshot.queryParams['skill']) {
+      this.loadJobs(0);
+    }
   }
+
+
+
+
 
   private buildFilter(values: any): JobFilter {
     const filter: JobFilter = {};
@@ -70,6 +93,7 @@ export class JobListComponent implements OnInit, OnDestroy {
     if (values.maxSalary) filter.maxSalary = +values.maxSalary;
     if (values.minExperience) filter.minExperience = +values.minExperience;
     if (values.maxExperience) filter.maxExperience = +values.maxExperience;
+    if (this.selectedSkills.length > 0) filter.skills = this.selectedSkills;
     return filter;
   }
 
@@ -100,7 +124,23 @@ export class JobListComponent implements OnInit, OnDestroy {
 
   clearFilters(): void {
     this.filterForm.reset();
+    this.selectedSkills = [];
     this.activeFilter = {};
+    this.loadJobs(0);
+  }
+
+  toggleSkill(skill: string, event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    const index = this.selectedSkills.indexOf(skill);
+    if (index > -1) {
+      this.selectedSkills.splice(index, 1);
+    } else {
+      this.selectedSkills.push(skill);
+    }
+    this.activeFilter = this.buildFilter(this.filterForm.value);
     this.loadJobs(0);
   }
 

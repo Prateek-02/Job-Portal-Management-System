@@ -54,7 +54,11 @@ public class JwtUtil {
 
     // Extract email from token
     public String extractEmail(String token) {
-        return getClaims(token).getSubject();
+        try {
+            return getClaims(token).getSubject();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     // Validate token

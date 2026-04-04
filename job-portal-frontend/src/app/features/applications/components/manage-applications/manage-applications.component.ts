@@ -4,6 +4,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ApiService } from '../../../../core/services/api.service';
 import { Job } from '../../../../models/job.model';
 import { ApplicationStatus, JobApplicationResponse } from '../../../../models/application.model';
+import { getFriendlyError } from '../../../../core/utils/error-handler.util';
 
 @Component({
   selector: 'app-manage-applications',
@@ -38,7 +39,7 @@ export class ManageApplicationsComponent implements OnInit {
     });
     this.apiService.getJobApplications(this.jobId).subscribe({
       next: (res) => { this.applications = res || []; this.isLoading = false; },
-      error: (err) => { this.errorMessage = err.message || 'Failed to load applications.'; this.isLoading = false; }
+      error: (err) => { this.errorMessage = getFriendlyError(err, 'load_applications'); this.isLoading = false; }
     });
   }
 
@@ -51,7 +52,7 @@ export class ManageApplicationsComponent implements OnInit {
       },
       error: (err) => {
         this.updatingId = null;
-        alert(err.message || 'Failed to update status.');
+        alert(getFriendlyError(err, 'update_status'));
       }
     });
   }

@@ -1,83 +1,97 @@
 <div class="p-8">
   <div class="mb-8">
-    <h1 class="text-3xl font-bold text-white">Dashboard Overview</h1>
-    <p class="text-gray-400 mt-1">System-wide statistics and metrics</p>
+    <h1 class="text-3xl font-bold text-[#1A1A1A]">Dashboard Overview</h1>
+    <p class="text-[#4A4A4A] mt-1">System-wide statistics and metrics</p>
   </div>
 
   @if (isLoading) {
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      @for (i of [1,2,3]; track i) {
-        <div class="glass-card p-6 animate-pulse">
-          <div class="h-4 bg-surface-hover rounded w-1/2 mb-4"></div>
-          <div class="h-10 bg-surface-hover rounded w-1/3"></div>
-        </div>
-      }
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    @for (i of [1,2,3]; track i) {
+    <div class="glass-card p-6 animate-pulse">
+      <div class="h-4 bg-surface-hover rounded w-1/2 mb-4"></div>
+      <div class="h-10 bg-surface-hover rounded w-1/3"></div>
     </div>
+    }
+  </div>
   }
 
   @if (!isLoading && reports) {
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
 
-      <!-- Total Users -->
-      <div class="glass-card p-6 hover:border-primary-500/30 transition-colors group">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-sm font-medium text-gray-400 uppercase tracking-wider">Total Users</h3>
-          <div class="w-10 h-10 rounded-xl bg-primary-500/20 flex items-center justify-center group-hover:bg-primary-500/30 transition-colors">
-            <svg class="w-5 h-5 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-          </div>
+    <!-- Total Users -->
+    <div class="glass-card p-6 hover:border-primary-500/30 transition-colors group">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-sm font-medium text-[#4A4A4A] uppercase tracking-wider">Total Users</h3>
+        <div
+          class="w-10 h-10 rounded-xl bg-primary-500/20 flex items-center justify-center group-hover:bg-primary-500/30 transition-colors">
+          <svg class="w-5 h-5 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
         </div>
-        <div class="text-4xl font-bold text-white">{{ reports.totalUsers ?? '—' }}</div>
-        <a routerLink="/admin/users" class="text-xs text-primary-400 hover:text-primary-300 mt-2 inline-block transition-colors">Manage users →</a>
       </div>
-
-      <!-- Total Jobs -->
-      <div class="glass-card p-6 hover:border-green-500/30 transition-colors group">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-sm font-medium text-gray-400 uppercase tracking-wider">Total Jobs</h3>
-          <div class="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
-            <svg class="w-5 h-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-          </div>
-        </div>
-        <div class="text-4xl font-bold text-white">{{ reports.totalJobs ?? '—' }}</div>
-        <a routerLink="/admin/jobs" class="text-xs text-green-400 hover:text-green-300 mt-2 inline-block transition-colors">Manage jobs →</a>
-      </div>
-
-      <!-- Total Applications -->
-      <div class="glass-card p-6 hover:border-secondary-500/30 transition-colors group">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-sm font-medium text-gray-400 uppercase tracking-wider">Total Applications</h3>
-          <div class="w-10 h-10 rounded-xl bg-secondary-500/20 flex items-center justify-center">
-            <svg class="w-5 h-5 text-secondary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-          </div>
-        </div>
-        <div class="text-4xl font-bold text-white">{{ reports.totalApplications ?? '—' }}</div>
-      </div>
-
+      <div class="text-4xl font-bold text-[#1A1A1A]">{{ reports.totalUsers ?? '—' }}</div>
+      <a routerLink="/admin/users"
+        class="text-xs text-[#4A4A4A] hover:text-primary-600 mt-2 inline-block transition-colors font-bold uppercase tracking-wider">Manage
+        users →</a>
     </div>
 
-    <!-- Extra report fields if any -->
-    @if (reports) {
-      <div class="mt-8 glass-card p-6">
-        <h2 class="text-lg font-bold text-white mb-4">System Report Details</h2>
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm text-left border-collapse">
-            <thead>
-              <tr class="border-b border-white/10">
-                <th class="pb-3 text-gray-400 font-medium">Metric</th>
-                <th class="pb-3 text-gray-400 font-medium text-right">Value</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (entry of reports | keyvalue; track entry.key) {
-                <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
-                  <td class="py-3 text-gray-300 capitalize">{{ entry.key.replace(/([A-Z])/g, ' $1') }}</td>
-                  <td class="py-3 text-white font-semibold text-right">{{ entry.value }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
+    <!-- Total Jobs -->
+    <div class="glass-card p-6 hover:border-green-500/30 transition-colors group">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-sm font-medium text-[#4A4A4A] uppercase tracking-wider">Total Jobs</h3>
+        <div class="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
+          <svg class="w-5 h-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
         </div>
       </div>
-    }
+      <div class="text-4xl font-bold text-[#1A1A1A]">{{ reports.totalJobs ?? '—' }}</div>
+      <a routerLink="/admin/jobs"
+        class="text-xs text-[#4A4A4A] hover:text-green-600 mt-2 inline-block transition-colors font-bold uppercase tracking-wider">Manage
+        jobs →</a>
+    </div>
+
+    <!-- Total Applications -->
+    <div class="glass-card p-6 hover:border-secondary-500/30 transition-colors group">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-sm font-medium text-[#4A4A4A] uppercase tracking-wider">Total Applications</h3>
+        <div class="w-10 h-10 rounded-xl bg-secondary-500/20 flex items-center justify-center">
+          <svg class="w-5 h-5 text-secondary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+        </div>
+      </div>
+      <div class="text-4xl font-bold text-[#1A1A1A]">{{ reports.totalApplications ?? '—' }}</div>
+    </div>
+
+  </div>
+
+  <!-- Extra report fields if any -->
+  @if (reports) {
+  <div class="mt-8 glass-card p-6">
+    <h2 class="text-lg font-bold text-[#1A1A1A] mb-4">System Report Details</h2>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm text-left border-collapse">
+        <thead>
+          <tr class="border-b border-white/10">
+            <th class="pb-3 text-[#4A4A4A] font-medium">Metric</th>
+            <th class="pb-3 text-[#4A4A4A] font-medium text-right">Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (entry of reports | keyvalue; track entry.key) {
+          <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+            <td class="py-3 text-[#4A4A4A] capitalize">{{ entry.key.replace(/([A-Z])/g, ' $1') }}</td>
+            <td class="py-3 text-[#1A1A1A] font-semibold text-right">{{ entry.value }}</td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+  }
   }
 </div>

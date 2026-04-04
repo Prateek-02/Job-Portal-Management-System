@@ -33,8 +33,7 @@ export const routes: Routes = [
       },
       {
         path: 'jobs',
-        loadChildren: () => import('./features/jobs/jobs.routes').then(m => m.JOBS_ROUTES),
-        canActivate: [authGuard]
+        loadChildren: () => import('./features/jobs/jobs.routes').then(m => m.JOBS_ROUTES)
       },
       {
         path: 'applications',

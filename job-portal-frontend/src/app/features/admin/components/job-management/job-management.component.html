@@ -1,8 +1,8 @@
 <div class="p-8">
   <div class="flex items-center justify-between mb-8">
     <div>
-      <h1 class="text-3xl font-bold text-white">Manage Jobs</h1>
-      <p class="text-gray-400 mt-1">{{ totalElements }} total job listings</p>
+      <h1 class="text-3xl font-bold text-[#1A1A1A]">Manage Jobs</h1>
+      <p class="text-[#4A4A4A] mt-1">{{ totalElements }} total job listings</p>
     </div>
   </div>
 
@@ -33,7 +33,7 @@
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="bg-surface/50 border-b border-white/10 text-xs text-gray-400 uppercase tracking-wider">
+            <tr class="bg-surface/50 border-b border-white/10 text-xs text-[#4A4A4A] uppercase tracking-wider">
               <th class="px-6 py-4 font-semibold">Job Title</th>
               <th class="px-6 py-4 font-semibold">Company</th>
               <th class="px-6 py-4 font-semibold">Location</th>
@@ -45,11 +45,11 @@
           <tbody>
             @for (job of jobs; track job.id) {
               <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
-                <td class="px-6 py-4 text-white font-medium text-sm max-w-xs truncate">{{ job.title }}</td>
-                <td class="px-6 py-4 text-gray-400 text-sm">{{ job.companyName }}</td>
-                <td class="px-6 py-4 text-gray-400 text-sm">{{ job.location }}</td>
+                <td class="px-6 py-4 text-[#1A1A1A] font-medium text-sm max-w-xs truncate">{{ job.title }}</td>
+                <td class="px-6 py-4 text-[#4A4A4A] text-sm">{{ job.companyName }}</td>
+                <td class="px-6 py-4 text-[#4A4A4A] text-sm">{{ job.location }}</td>
                 <td class="px-6 py-4 text-green-400 text-sm font-medium">₹{{ job.salary | number:'1.0-0' }}</td>
-                <td class="px-6 py-4 text-gray-400 text-sm">{{ job.createdAt | date:'mediumDate' }}</td>
+                <td class="px-6 py-4 text-[#4A4A4A] text-sm">{{ job.createdAt | date:'mediumDate' }}</td>
                 <td class="px-6 py-4 text-right">
                   <button (click)="deleteJob(job.id)"
                           [disabled]="deletingId === job.id"
@@ -65,7 +65,7 @@
               </tr>
             }
             @empty {
-              <tr><td colspan="6" class="px-6 py-12 text-center text-gray-400">No jobs found.</td></tr>
+              <tr><td colspan="6" class="px-6 py-12 text-center text-[#4A4A4A]">No jobs found.</td></tr>
             }
           </tbody>
         </table>

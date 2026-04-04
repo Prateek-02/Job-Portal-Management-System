@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { UserRole } from '../../../../models/user.model';
+import { getFriendlyError } from '../../../../core/utils/error-handler.util';
 
 @Component({
   selector: 'app-signup',
@@ -63,7 +64,7 @@ export class SignupComponent implements OnInit {
       },
       error: (err) => {
         this.isLoading = false;
-        this.errorMessage = err.message || 'Registration failed. Please try again.';
+        this.errorMessage = getFriendlyError(err, 'register');
       }
     });
   }

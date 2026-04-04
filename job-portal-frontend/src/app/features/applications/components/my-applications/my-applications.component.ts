@@ -3,6 +3,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../../../core/services/api.service';
 import { ApplicationResponse, ApplicationStatus } from '../../../../models/application.model';
+import { getFriendlyError } from '../../../../core/utils/error-handler.util';
 
 @Component({
   selector: 'app-my-applications',
@@ -20,7 +21,7 @@ export class MyApplicationsComponent implements OnInit {
   ngOnInit(): void {
     this.apiService.getMyApplications().subscribe({
       next: (res) => { this.applications = res || []; this.isLoading = false; },
-      error: (err) => { this.errorMessage = err.message || 'Failed to load applications.'; this.isLoading = false; }
+      error: (err) => { this.errorMessage = getFriendlyError(err, 'load_applications'); this.isLoading = false; }
     });
   }
 

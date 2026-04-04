@@ -15,7 +15,7 @@ export interface User {
 
 export interface LoginResponse {
   accessToken: string;
-  refreshToken: string; // Added for automatic background token refreshing
+  refreshToken: string;
   userId: number;
   name: string;
   email: string;

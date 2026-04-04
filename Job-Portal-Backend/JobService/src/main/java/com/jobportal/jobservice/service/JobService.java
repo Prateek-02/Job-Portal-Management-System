@@ -5,6 +5,8 @@ import com.jobportal.jobservice.dto.request.JobRequestDto;
 import com.jobportal.jobservice.dto.response.JobResponseDto;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 public interface JobService {
     JobResponseDto createJob(JobRequestDto dto, Long recruiterId, String role);
     
@@ -20,4 +22,6 @@ public interface JobService {
     
     // Delete all jobs by recruiterId
     void deleteRecruiterJobs(Long recruiterId);
+    
+    List<JobResponseDto> getJobsByRecruiter(Long recruiterId);
 }

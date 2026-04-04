@@ -32,4 +32,6 @@ export interface JobApplicationResponse {
   appliedAt: string;
   applicantName: string;
   applicantEmail: string;
+  jobTitle?: string;
+  companyName?: string;
 }

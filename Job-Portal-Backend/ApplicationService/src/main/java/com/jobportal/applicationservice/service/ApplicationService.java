@@ -22,4 +22,6 @@ public interface ApplicationService {
     void deleteJobApplications(Long jobId);
 
     Long getTotalApplications();
+
+    List<JobApplicationResponse> getAllApplicationsForRecruiter(Long recruiterId, String role);
 }

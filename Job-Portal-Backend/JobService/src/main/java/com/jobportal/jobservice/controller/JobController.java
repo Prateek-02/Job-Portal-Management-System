@@ -1,6 +1,7 @@
 package com.jobportal.jobservice.controller;
 
 import java.util.Map;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -144,6 +145,13 @@ public class JobController {
         log.info("Recruiter jobs deleted | recruiterId: {}", recruiterId);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/recruiter/{recruiterId}")
+    public ResponseEntity<List<JobResponseDto>> getJobsByRecruiter(
+            @PathVariable Long recruiterId) {
+        log.info("Get jobs by recruiter | recruiterId: {}", recruiterId);
+        return ResponseEntity.ok(jobService.getJobsByRecruiter(recruiterId));
     }
 }
 

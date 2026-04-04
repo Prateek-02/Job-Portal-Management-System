@@ -24,6 +24,9 @@ import com.jobportal.jobservice.specification.JobSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -193,6 +196,14 @@ public class JobServiceImpl implements JobService {
         jobRepository.deleteByRecruiterId(recruiterId);
 
         log.info("Recruiter jobs deleted | recruiterId: {}", recruiterId);
+    }
+
+    @Override
+    public List<JobResponseDto> getJobsByRecruiter(Long recruiterId) {
+        log.info("Fetching jobs for recruiter | recruiterId: {}", recruiterId);
+        return jobRepository.findByRecruiterId(recruiterId).stream()
+                .map(job -> modelMapper.map(job, JobResponseDto.class))
+                .collect(Collectors.toList());
     }
 }
 

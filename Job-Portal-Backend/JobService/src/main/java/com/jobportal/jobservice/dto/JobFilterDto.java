@@ -1,6 +1,7 @@
 package com.jobportal.jobservice.dto;
 
 import lombok.Data;
+import java.util.List;
 
 @Data
 public class JobFilterDto {
@@ -11,4 +12,5 @@ public class JobFilterDto {
     private Double maxSalary;
     private Integer minExperience;
     private Integer maxExperience;
+    private List<String> skills;
 }

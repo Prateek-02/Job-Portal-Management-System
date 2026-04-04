@@ -4,6 +4,7 @@ import { tap, catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { ApiService } from './api.service';
 import { StorageService } from './storage.service';
+import { NotificationService } from '../../features/notifications/services/notification.service';
 import { LoginResponse, LoginRequest, RegisterRequest, User, UserRole, RegisterResponse } from '../../models/user.model';
 
 @Injectable({
@@ -22,6 +23,7 @@ export class AuthService {
   constructor(
     private apiService: ApiService,
     private storageService: StorageService,
+    private notificationService: NotificationService,
     private router: Router
   ) {
     this.initializeAuth();
@@ -33,6 +35,7 @@ export class AuthService {
     if (user && token) {
       this.currentUserSubject.next(user);
       this.isAuthenticatedSubject.next(true);
+      this.notificationService.setUserId(user.id);
     }
   }
 
@@ -94,6 +97,7 @@ export class AuthService {
       this.storageService.setUserRole(response.role);
       this.currentUserSubject.next(user);
       this.isAuthenticatedSubject.next(true);
+      this.notificationService.setUserId(response.userId);
     }
   }
 
@@ -106,6 +110,7 @@ export class AuthService {
     this.storageService.clear();
     this.currentUserSubject.next(null);
     this.isAuthenticatedSubject.next(false);
+    this.notificationService.setUserId(null);
   }
 
   refreshProfile(): Observable<User> {

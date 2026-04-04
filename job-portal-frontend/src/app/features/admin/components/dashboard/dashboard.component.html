@@ -1,3 +1,84 @@
-<div class="dashboard-container">
-  <!-- Component template -->
+<div class="animate-fade-in-up">
+  <div class="mb-8">
+    <h1 class="text-[32px] font-black text-[#1A1A1A] tracking-tight">System Overview</h1>
+    <p class="text-[15px] font-medium text-[#4A4A4A] mt-1">Welcome back, Administrator. Here's what's happening today.</p>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="glass-card p-6 border-l-4 border-[#667eea]">
+      <div class="flex items-center justify-between mb-4">
+        <div class="p-2 bg-[#667eea]/10 rounded-lg text-[#667eea]">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        </div>
+        <span class="text-[11px] font-bold text-green-600 bg-green-500/10 px-2 py-0.5 rounded-full">+12%</span>
+      </div>
+      <p class="text-[13px] font-bold text-[#4A4A4A] uppercase tracking-wider">Total Users</p>
+      <p class="text-3xl font-black text-[#1A1A1A]">1,284</p>
+    </div>
+
+    <div class="glass-card p-6 border-l-4 border-[#FF9A9E]">
+      <div class="flex items-center justify-between mb-4">
+        <div class="p-2 bg-[#FF9A9E]/10 rounded-lg text-[#FF9A9E]">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        </div>
+        <span class="text-[11px] font-bold text-green-600 bg-green-500/10 px-2 py-0.5 rounded-full">+5%</span>
+      </div>
+      <p class="text-[13px] font-bold text-[#4A4A4A] uppercase tracking-wider">Active Jobs</p>
+      <p class="text-3xl font-black text-[#1A1A1A]">432</p>
+    </div>
+
+    <div class="glass-card p-6 border-l-4 border-[#A18CD1]">
+      <div class="flex items-center justify-between mb-4">
+        <div class="p-2 bg-[#A18CD1]/10 rounded-lg text-[#A18CD1]">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        </div>
+        <span class="text-[11px] font-bold text-blue-600 bg-blue-500/10 px-2 py-0.5 rounded-full">Secure</span>
+      </div>
+      <p class="text-[13px] font-bold text-[#4A4A4A] uppercase tracking-wider">System Health</p>
+      <p class="text-3xl font-black text-[#1A1A1A]">99.9%</p>
+    </div>
+  </div>
+
+  <!-- Recent Platform Insights -->
+  <div class="glass-card p-8">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-xl font-bold text-[#1A1A1A]">Platform Insights</h3>
+      <button class="text-sm font-bold text-[#667eea] hover:underline">View detailed logs</button>
+    </div>
+    <div class="space-y-6">
+        <div class="flex items-center gap-4 p-4 rounded-2xl hover:bg-white/40 transition-colors border border-transparent hover:border-white/60">
+          <div class="w-12 h-12 bg-white/60 rounded-xl flex items-center justify-center shadow-sm text-green-500">
+             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"/></svg>
+          </div>
+          <div class="flex-1">
+            <p class="text-[15px] font-bold text-[#1A1A1A]">Security audit completed successfully</p>
+            <p class="text-[13px] font-medium text-[#4A4A4A]">No vulnerabilities found in the latest scan of AuthService.</p>
+          </div>
+          <p class="text-xs font-bold text-[#4A4A4A]/40 uppercase tracking-widest">2h ago</p>
+        </div>
+
+        <div class="flex items-center gap-4 p-4 rounded-2xl hover:bg-white/40 transition-colors border border-transparent hover:border-white/60">
+          <div class="w-12 h-12 bg-white/60 rounded-xl flex items-center justify-center shadow-sm text-blue-500">
+             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          </div>
+          <div class="flex-1">
+            <p class="text-[15px] font-bold text-[#1A1A1A]">New users spikes detected</p>
+            <p class="text-[13px] font-medium text-[#4A4A4A]">+50 new recruiters joined this morning from North America region.</p>
+          </div>
+          <p class="text-xs font-bold text-[#4A4A4A]/40 uppercase tracking-widest">5h ago</p>
+        </div>
+
+        <div class="flex items-center gap-4 p-4 rounded-2xl hover:bg-white/40 transition-colors border border-transparent hover:border-white/60">
+          <div class="w-12 h-12 bg-white/60 rounded-xl flex items-center justify-center shadow-sm text-[#FF9A9E]">
+             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          </div>
+          <div class="flex-1">
+            <p class="text-[15px] font-bold text-[#1A1A1A]">Mail server performance optimized</p>
+            <p class="text-[13px] font-medium text-[#4A4A4A]">SMTP latency reduced by 150ms after upgrading the mail shard.</p>
+          </div>
+          <p class="text-xs font-bold text-[#4A4A4A]/40 uppercase tracking-widest">Yesterday</p>
+        </div>
+    </div>
+  </div>
 </div>

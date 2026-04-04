@@ -23,7 +23,14 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
       // If error is not 401, or it's a login/refresh request that failed with 401, don't intercept
-      if (error.status !== 401 || req.url.includes('/auth/login') || req.url.includes('/auth/refresh')) {
+      const isPublicAuthRoute = 
+        req.url.includes('/auth/login') || 
+        req.url.includes('/auth/refresh') ||
+        req.url.includes('/auth/forgot-password') ||
+        req.url.includes('/auth/reset-password') ||
+        req.url.includes('/auth/register');
+
+      if (error.status !== 401 || isPublicAuthRoute) {
         return throwError(() => error);
       }
 

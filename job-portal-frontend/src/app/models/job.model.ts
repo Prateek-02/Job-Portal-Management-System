@@ -8,6 +8,9 @@ export interface Job {
   description: string;
   recruiterId: number;
   createdAt: string;
+  jobType?: string;
+  skills?: string[];
+  status?: string;
 }
 
 export interface JobRequest {
@@ -17,6 +20,7 @@ export interface JobRequest {
   salary: number;
   experience: number;
   description: string;
+  skills?: string[];
 }
 
 export interface JobFilter {
@@ -27,6 +31,7 @@ export interface JobFilter {
   maxSalary?: number;
   minExperience?: number;
   maxExperience?: number;
+  skills?: string[];
 }
 
 export interface PageResponse<T> {

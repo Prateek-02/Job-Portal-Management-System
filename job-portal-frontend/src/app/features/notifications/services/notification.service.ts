@@ -2,12 +2,38 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { AppNotification, NotificationType } from '../../../models/notification.model';
 
-const STORAGE_KEY = 'jp_notifications';
+const BASE_STORAGE_KEY = 'jp_notifications';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
-  private notificationsSubject = new BehaviorSubject<AppNotification[]>(this.load());
+  private notificationsSubject = new BehaviorSubject<AppNotification[]>([]);
   public notifications$ = this.notificationsSubject.asObservable();
+  private currentUserId: number | null = null;
+
+  constructor() {
+    this.init();
+  }
+
+  private init(): void {
+    // We try to get user from localStorage directly to initialize early
+    try {
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        this.setUserId(user.id);
+      }
+    } catch {}
+  }
+
+  public setUserId(userId: number | null): void {
+    if (this.currentUserId === userId) return;
+    this.currentUserId = userId;
+    this.notificationsSubject.next(this.load());
+  }
+
+  private get storageKey(): string {
+    return this.currentUserId ? `${BASE_STORAGE_KEY}_${this.currentUserId}` : BASE_STORAGE_KEY;
+  }
 
   get unreadCount(): number {
     return this.notificationsSubject.value.filter(n => !n.read).length;
@@ -50,14 +76,17 @@ export class NotificationService {
 
   private save(notifications: AppNotification[]): void {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(notifications));
+      if (this.currentUserId) {
+        localStorage.setItem(this.storageKey, JSON.stringify(notifications));
+      }
     } catch {}
     this.notificationsSubject.next(notifications);
   }
 
   private load(): AppNotification[] {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!this.currentUserId) return [];
+      const raw = localStorage.getItem(this.storageKey);
       return raw ? JSON.parse(raw) : [];
     } catch {
       return [];

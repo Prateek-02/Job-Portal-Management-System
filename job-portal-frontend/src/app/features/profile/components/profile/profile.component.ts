@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ApiService } from '../../../../core/services/api.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { User } from '../../../../models/user.model';
+import { getFriendlyError } from '../../../../core/utils/error-handler.util';
 
 @Component({
   selector: 'app-profile',
@@ -53,7 +54,7 @@ export class ProfileComponent implements OnInit {
         });
         this.isLoading = false;
       },
-      error: () => { this.errorMessage = 'Failed to load profile.'; this.isLoading = false; }
+      error: (err) => { this.errorMessage = getFriendlyError(err, 'load_profile'); this.isLoading = false; }
     });
   }
 
@@ -79,7 +80,7 @@ export class ProfileComponent implements OnInit {
         this.authService.refreshProfile().subscribe();
         setTimeout(() => this.successMessage = '', 3000);
       },
-      error: (err: any) => { this.isSaving = false; this.errorMessage = err.message || 'Failed to update profile.'; }
+      error: (err: any) => { this.isSaving = false; this.errorMessage = getFriendlyError(err, 'update_profile'); }
     });
   }
 
@@ -98,7 +99,7 @@ export class ProfileComponent implements OnInit {
           this.authService.refreshProfile().subscribe();
           setTimeout(() => this.successMessage = '', 3000);
         },
-        error: (err: any) => { this.isUploadingImage = false; this.errorMessage = err.message || 'Image upload failed.'; }
+        error: (err: any) => { this.isUploadingImage = false; this.errorMessage = getFriendlyError(err, 'upload_image'); }
       });
     }
   }

@@ -16,4 +16,8 @@ public class JobApplicationResponse {
     // User details
     private String applicantName;
     private String applicantEmail;
+
+    // Job details
+    private String jobTitle;
+    private String companyName;
 }

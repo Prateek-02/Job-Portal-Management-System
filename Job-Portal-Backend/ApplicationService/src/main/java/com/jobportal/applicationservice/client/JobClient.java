@@ -10,4 +10,7 @@ public interface JobClient {
 
     @GetMapping("/api/jobs/{id}")
     JobResponse getJobById(@PathVariable Long id);
+
+    @GetMapping("/api/jobs/recruiter/{recruiterId}")
+    java.util.List<JobResponse> getJobsByRecruiter(@PathVariable Long recruiterId);
 }

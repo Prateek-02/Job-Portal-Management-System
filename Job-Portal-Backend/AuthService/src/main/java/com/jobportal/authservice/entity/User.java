@@ -41,6 +41,9 @@ public class User {
     
     private String profileImageUrl;
 
+    private String resetToken;
+    private LocalDateTime resetTokenExpiry;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

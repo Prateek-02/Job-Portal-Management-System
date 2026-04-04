@@ -149,4 +149,19 @@ public class ApplicationController {
 
         return ResponseEntity.ok(count);
     }
+
+    // VIEW ALL APPLICATIONS (Recruiter)
+    @GetMapping("/recruiter")
+    public ResponseEntity<List<JobApplicationResponse>> getAllApplicationsForRecruiter(
+            @RequestHeader("X-User-Id") Long recruiterId,
+            @RequestHeader("X-User-Role") String role) {
+        
+        log.info("Fetch all recruiter applications API called | recruiterId: {} | role: {}", recruiterId, role);
+        
+        List<JobApplicationResponse> applications = service.getAllApplicationsForRecruiter(recruiterId, role);
+        
+        log.debug("Total recruiter applications fetched | count: {}", applications.size());
+        
+        return ResponseEntity.ok(applications);
+    }
 }

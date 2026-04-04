@@ -1,8 +1,8 @@
 <div class="p-8">
   <div class="flex items-center justify-between mb-8">
     <div>
-      <h1 class="text-3xl font-bold text-white">Manage Users</h1>
-      <p class="text-gray-400 mt-1">{{ users.length }} registered users</p>
+      <h1 class="text-3xl font-bold text-[#1A1A1A]">Manage Users</h1>
+      <p class="text-[#4A4A4A] mt-1">{{ users.length }} registered users</p>
     </div>
   </div>
 
@@ -33,7 +33,7 @@
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="bg-surface/50 border-b border-white/10 text-xs text-gray-400 uppercase tracking-wider">
+            <tr class="bg-surface/50 border-b border-white/10 text-xs text-[#4A4A4A] uppercase tracking-wider">
               <th class="px-6 py-4 font-semibold">User</th>
               <th class="px-6 py-4 font-semibold">Email</th>
               <th class="px-6 py-4 font-semibold">Phone</th>
@@ -50,18 +50,18 @@
                     <div class="w-9 h-9 rounded-full bg-gradient-to-br from-primary-600 to-secondary-600 flex items-center justify-center text-sm font-bold text-white flex-shrink-0">
                       {{ user.name.charAt(0).toUpperCase() }}
                     </div>
-                    <span class="text-white font-medium text-sm">{{ user.name }}</span>
+                    <span class="text-[#1A1A1A] font-medium text-sm">{{ user.name }}</span>
                   </div>
                 </td>
-                <td class="px-6 py-4 text-gray-400 text-sm">{{ user.email }}</td>
-                <td class="px-6 py-4 text-gray-400 text-sm">{{ user.phone || '—' }}</td>
+                <td class="px-6 py-4 text-[#4A4A4A] text-sm">{{ user.email }}</td>
+                <td class="px-6 py-4 text-[#4A4A4A] text-sm">{{ user.phone || '—' }}</td>
                 <td class="px-6 py-4">
-                  <span [class]="roleClass(user.role)"
-                        class="px-2.5 py-1 text-xs font-semibold rounded-lg border uppercase">
+                  <span [ngClass]="roleClass(user.role)"
+                        class="px-2.5 py-1 text-xs font-black rounded-lg border uppercase shadow-sm">
                     {{ user.role.replace('_', ' ') }}
                   </span>
                 </td>
-                <td class="px-6 py-4 text-gray-400 text-sm">{{ user.createdAt | date:'mediumDate' }}</td>
+                <td class="px-6 py-4 text-[#4A4A4A] text-sm">{{ user.createdAt | date:'mediumDate' }}</td>
                 <td class="px-6 py-4 text-right">
                   @if (user.role !== 'ADMIN') {
                     <button (click)="deleteUser(user.id)"
@@ -79,7 +79,7 @@
               </tr>
             }
             @empty {
-              <tr><td colspan="6" class="px-6 py-12 text-center text-gray-400">No users found.</td></tr>
+              <tr><td colspan="6" class="px-6 py-12 text-center text-[#4A4A4A]">No users found.</td></tr>
             }
           </tbody>
         </table>

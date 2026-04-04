@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
+import { getFriendlyError } from '../../../../core/utils/error-handler.util';
 
 @Component({
   selector: 'app-login',
@@ -60,7 +61,7 @@ export class LoginComponent implements OnInit {
       },
       error: (err) => {
         this.isLoading = false;
-        this.errorMessage = err.message || 'Invalid email or password.';
+        this.errorMessage = getFriendlyError(err, 'login');
       }
     });
   }

@@ -47,6 +47,9 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private EmailService emailService;
+
     // REGISTER
     @Override
     public RegisterResponse register(RegisterRequest request) {
@@ -271,6 +274,47 @@ public class AuthServiceImpl implements AuthService {
         userRepository.delete(user);
 
         log.info("User deleted successfully | userId: {}", id);
+    }
+
+    // FORGOT PASSWORD
+    @Override
+    public void forgotPassword(com.jobportal.authservice.dto.request.ForgotPasswordRequest request) {
+        log.info("Forgot password requested for email: {}", request.getEmail());
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + request.getEmail()));
+
+        // Generate 6-digit OTP
+        String otp = String.format("%06d", new java.util.Random().nextInt(999999));
+        
+        user.setResetToken(otp);
+        user.setResetTokenExpiry(java.time.LocalDateTime.now().plusMinutes(10));
+        userRepository.save(user);
+
+        emailService.sendPasswordResetOTP(user.getEmail(), otp);
+    }
+
+    // RESET PASSWORD
+    @Override
+    public void resetPassword(com.jobportal.authservice.dto.request.ResetPasswordRequest request) {
+        log.info("Reset password attempt for email: {}", request.getEmail());
+        
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + request.getEmail()));
+
+        if (user.getResetToken() == null || !user.getResetToken().equals(request.getOtp())) {
+            throw new UnauthorizedException("Invalid or incorrect OTP");
+        }
+
+        if (user.getResetTokenExpiry().isBefore(java.time.LocalDateTime.now())) {
+            throw new UnauthorizedException("OTP has expired");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        user.setResetToken(null);
+        user.setResetTokenExpiry(null);
+        userRepository.save(user);
+        
+        log.info("Password successfully reset for user: {}", user.getEmail());
     }
 }
 

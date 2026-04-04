@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
-import { Subscription, of } from 'rxjs';
+import { Router, RouterLink } from '@angular/router';
+import { Subscription, of, forkJoin } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { AuthService } from '../../../../core/services/auth.service';
 import { ApiService } from '../../../../core/services/api.service';
@@ -34,6 +34,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   get appliedCount() { return this.myApplications.length; }
   get interviewCount() { return this.myApplications.filter(a => a.status === 'SHORTLISTED').length; }
   get rejectedCount() { return this.myApplications.filter(a => a.status === 'REJECTED').length; }
+  get uniqueCandidatesCount() {
+    return new Set(this.recentApplicationsForJobs.map(a => a.userId)).size;
+  }
 
   getStatusClass(status: string): string {
     const map: Record<string, string> = {
@@ -64,8 +67,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     public authService: AuthService,
     private apiService: ApiService,
     private notificationService: NotificationService,
+    private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.user = this.authService.getCurrentUser();
@@ -76,6 +80,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.loadJobSeekerData();
     } else if (this.isRecruiter) {
       this.loadRecruiterData();
+    } else if (this.authService.isAdmin()) {
+      this.router.navigate(['/admin/dashboard']);
     } else {
       this.isLoadingApps = false;
       this.isLoadingJobs = false;
@@ -95,7 +101,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         next: (apps) => {
           const seenKey = `jp_seen_apps_${this.user?.id}`;
           const seenIds: number[] = JSON.parse(localStorage.getItem(seenKey) || '[]');
-          
+
           apps.forEach(app => {
             if (!seenIds.includes(app.id)) {
               const statusMsg: Record<string, string> = {
@@ -134,7 +140,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           const pageJobs = jobsPage.content || [];
           const seenJobsKey = `jp_seen_jobs_${this.user?.id}`;
           const seenJobIds: number[] = JSON.parse(localStorage.getItem(seenJobsKey) || '[]');
-          
+
           pageJobs.forEach(job => {
             if (!seenJobIds.includes(job.id)) {
               this.notificationService.push(
@@ -158,7 +164,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   private loadRecruiterData(): void {
-    // 1. Fetch First Jobs
+    // Fetch recruiter's jobs first, then applications in parallel
     this.subs.add(
       this.apiService.getJobs(0, 10).pipe(
         catchError(() => of({ content: [], totalPages: 0, totalElements: 0, size: 10, number: 0, last: true, first: true, empty: true } as PageResponse<Job>))
@@ -169,49 +175,46 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.cdr.detectChanges();
 
           if (this.myPostedJobs.length > 0) {
-            import('rxjs').then(({ forkJoin, of }) => {
-              const appRequests = this.myPostedJobs.map(job =>
-                this.apiService.getJobApplications(job.id).pipe(catchError(() => of([])))
-              );
+            const appRequests = this.myPostedJobs.map(job =>
+              this.apiService.getJobApplications(job.id).pipe(catchError(() => of([])))
+            );
 
-              this.subs.add(
-                forkJoin(appRequests).subscribe({
-                  next: (responses: any[]) => {
-                    let allApplications: JobApplicationResponse[] = [];
-                    responses.forEach(apps => {
-                      if (Array.isArray(apps)) {
-                        allApplications = [...allApplications, ...apps];
-                      }
-                    });
+            this.subs.add(
+              forkJoin(appRequests).subscribe({
+                next: (responses: any[]) => {
+                  let allApplications: JobApplicationResponse[] = [];
+                  responses.forEach(apps => {
+                    if (Array.isArray(apps)) {
+                      allApplications = [...allApplications, ...apps];
+                    }
+                  });
 
-                    // Sort by newest first assuming higher ID means newer, or just take slice
-                    allApplications.sort((a, b) => b.id - a.id);
+                  allApplications.sort((a, b) => b.id - a.id);
 
-                    const seenKey = `jp_seen_applicants_${this.user?.id}`;
-                    const seenIds: number[] = JSON.parse(localStorage.getItem(seenKey) || '[]');
-                    
-                    allApplications.forEach(app => {
-                      if (!seenIds.includes(app.id)) {
-                        const relatedJob = this.myPostedJobs.find(j => j.id === app.jobId);
-                        this.notificationService.push(
-                          'JOB_APPLIED',
-                          `New Application Received`,
-                          `${app.applicantName} applied for ${relatedJob?.title || 'your target position'}.`,
-                          `/applications/manage/${app.jobId}`
-                        );
-                        seenIds.push(app.id);
-                      }
-                    });
-                    localStorage.setItem(seenKey, JSON.stringify(seenIds));
+                  const seenKey = `jp_seen_applicants_${this.user?.id}`;
+                  const seenIds: number[] = JSON.parse(localStorage.getItem(seenKey) || '[]');
 
-                    this.recentApplicationsForJobs = allApplications; // Keep them all or slice them. The template maps length and iterates. Let's slice for display if large.
-                    this.isLoadingApps = false;
-                    this.cdr.detectChanges();
-                  },
-                  error: () => { this.isLoadingApps = false; this.cdr.detectChanges(); }
-                })
-              );
-            });
+                  allApplications.forEach(app => {
+                    if (!seenIds.includes(app.id)) {
+                      const relatedJob = this.myPostedJobs.find(j => j.id === app.jobId);
+                      this.notificationService.push(
+                        'JOB_APPLIED',
+                        `New Application Received`,
+                        `${app.applicantName} applied for ${relatedJob?.title || 'your job posting'}.`,
+                        `/applications/job/${app.jobId}`
+                      );
+                      seenIds.push(app.id);
+                    }
+                  });
+                  localStorage.setItem(seenKey, JSON.stringify(seenIds));
+
+                  this.recentApplicationsForJobs = allApplications;
+                  this.isLoadingApps = false;
+                  this.cdr.detectChanges();
+                },
+                error: () => { this.isLoadingApps = false; this.cdr.detectChanges(); }
+              })
+            );
           } else {
             this.isLoadingApps = false;
             this.cdr.detectChanges();
@@ -231,5 +234,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  deleteJob(jobId: number): void {
+    if (confirm('Are you sure you want to delete this job? All associated applications will also be deleted.')) {
+      this.apiService.deleteJob(jobId).subscribe({
+        next: () => {
+          this.myPostedJobs = this.myPostedJobs.filter(j => j.id !== jobId);
+          this.recentApplicationsForJobs = this.recentApplicationsForJobs.filter(a => a.jobId !== jobId);
+          this.cdr.detectChanges();
+        },
+        error: (err) => alert(err.message || 'Failed to delete job.')
+      });
+    }
   }
 }

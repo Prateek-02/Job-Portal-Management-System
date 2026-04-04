@@ -38,6 +38,11 @@ public class JobSpecification {
             if (filter.getMaxExperience() != null) {
                 predicates.add(cb.lessThanOrEqualTo(root.get("experience"), filter.getMaxExperience()));
             }
+            if (filter.getSkills() != null && !filter.getSkills().isEmpty()) {
+                for (String skill : filter.getSkills()) {
+                    predicates.add(cb.isMember(skill, root.get("skills")));
+                }
+            }
             return cb.and(predicates.toArray(new Predicate[0]));
         };
     }

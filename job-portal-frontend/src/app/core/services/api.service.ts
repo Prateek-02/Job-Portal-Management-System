@@ -13,7 +13,7 @@ import { AdminJobResponse, AdminPageResponse, AdminReports, AdminUserResponse } 
 export class ApiService {
   private readonly apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   // ============ AUTH ENDPOINTS ============
 
@@ -27,6 +27,14 @@ export class ApiService {
 
   refreshToken(token: string): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.apiUrl}/auth/refresh`, { refreshToken: token });
+  }
+
+  forgotPassword(email: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/auth/forgot-password`, { email });
+  }
+
+  resetPassword(email: string, otp: string, newPassword: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/auth/reset-password`, { email, otp, newPassword });
   }
 
   getProfile(): Observable<User> {
@@ -85,6 +93,12 @@ export class ApiService {
     return this.http.post<PageResponse<Job>>(`${this.apiUrl}/jobs/search`, filter, { params });
   }
 
+  // ============ JOB ENDPOINTS (CONTINUED) ============
+  
+  getJobsByRecruiter(recruiterId: number): Observable<Job[]> {
+    return this.http.get<Job[]>(`${this.apiUrl}/jobs/recruiter/${recruiterId}`);
+  }
+
   // ============ APPLICATION ENDPOINTS ============
 
   applyForJob(jobId: number, resumeFile: File): Observable<ApplicationResponse> {
@@ -100,6 +114,10 @@ export class ApiService {
 
   getJobApplications(jobId: number): Observable<JobApplicationResponse[]> {
     return this.http.get<JobApplicationResponse[]>(`${this.apiUrl}/applications/jobApplications/${jobId}`);
+  }
+
+  getAllRecruiterApplications(): Observable<JobApplicationResponse[]> {
+    return this.http.get<JobApplicationResponse[]>(`${this.apiUrl}/applications/recruiter`);
   }
 
   updateApplicationStatus(appId: number, status: ApplicationStatus): Observable<ApplicationResponse> {

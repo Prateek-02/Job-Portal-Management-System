@@ -38,4 +38,8 @@ public interface AuthService {
 
     // Delete user
     void deleteUser(Long id);
+
+    // Password reset
+    void forgotPassword(com.jobportal.authservice.dto.request.ForgotPasswordRequest request);
+    void resetPassword(com.jobportal.authservice.dto.request.ResetPasswordRequest request);
 }

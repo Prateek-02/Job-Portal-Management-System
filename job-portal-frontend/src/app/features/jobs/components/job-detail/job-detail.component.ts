@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ApiService } from '../../../../core/services/api.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { Job } from '../../../../models/job.model';
+import { getFriendlyError } from '../../../../core/utils/error-handler.util';
 
 @Component({
   selector: 'app-job-detail',
@@ -32,22 +33,35 @@ export class JobDetailComponent implements OnInit {
     public authService: AuthService,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.applyForm = this.fb.group({ resume: [null, Validators.required] });
 
     this.route.paramMap.subscribe(params => {
       const id = Number(params.get('id'));
-      if (id) this.loadJob(id);
+      if (id) {
+        this.loadJob(id);
+      }
     });
   }
+
+
 
   loadJob(id: number): void {
     this.isLoading = true;
     this.apiService.getJobById(id).subscribe({
-      next: (job) => { this.job = job; this.isLoading = false; this.cdr.detectChanges(); },
-      error: () => { this.errorMessage = 'Job not found or has been removed.'; this.isLoading = false; this.cdr.detectChanges(); }
+      next: (job) => {
+        this.job = job;
+
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.errorMessage = getFriendlyError(err, 'load_jobs');
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -84,8 +98,12 @@ export class JobDetailComponent implements OnInit {
       },
       error: (err) => {
         this.isApplying = false;
-        this.applyError = err.message || 'Failed to submit application. Please try again.';
+        this.applyError = getFriendlyError(err, 'apply_job');
       }
     });
+  }
+
+  filterBySkill(skill: string): void {
+    this.router.navigate(['/jobs'], { queryParams: { skill: skill } });
   }
 }

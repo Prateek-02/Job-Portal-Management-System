@@ -1,26 +1,37 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../../../core/services/api.service';
-import { JobRequest } from '../../../../models/job.model';
+import { Job, JobRequest } from '../../../../models/job.model';
+import { getFriendlyError } from '../../../../core/utils/error-handler.util';
+import { Editor, Toolbar, NgxEditorModule } from 'ngx-editor';
 
 @Component({
   selector: 'app-create-job',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgxEditorModule],
   templateUrl: './create-job.component.html'
 })
-export class CreateJobComponent {
+export class CreateJobComponent implements OnInit, OnDestroy {
   jobForm: FormGroup;
   isSubmitting = false;
+  isEditMode = false;
+  jobId?: number;
   successMessage = '';
   errorMessage = '';
+
+  editor!: Editor;
+  toolbar: Toolbar = [
+    ['bold', 'italic'],
+    ['bullet_list', 'ordered_list']
+  ];
 
   constructor(
     private fb: FormBuilder,
     private apiService: ApiService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.jobForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
@@ -28,7 +39,42 @@ export class CreateJobComponent {
       location: ['', Validators.required],
       salary: [null, [Validators.required, Validators.min(0)]],
       experience: [null, [Validators.required, Validators.min(0)]],
-      description: ['', [Validators.required, Validators.minLength(30)]]
+      description: ['', [Validators.required, Validators.minLength(30)]],
+      skills: ['']
+    });
+  }
+
+  ngOnInit(): void {
+    this.editor = new Editor();
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.isEditMode = true;
+      this.jobId = +id;
+      this.loadJobDetails();
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.editor.destroy();
+  }
+
+  loadJobDetails(): void {
+    if (!this.jobId) return;
+    this.apiService.getJobById(this.jobId).subscribe({
+      next: (job) => {
+        this.jobForm.patchValue({
+          title: job.title,
+          companyName: job.companyName,
+          location: job.location,
+          salary: job.salary,
+          experience: job.experience,
+          description: job.description,
+          skills: job.skills?.join(', ') || ''
+        });
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to load job details. Please try again.';
+      }
     });
   }
 
@@ -37,16 +83,31 @@ export class CreateJobComponent {
     this.isSubmitting = true;
     this.errorMessage = '';
 
-    const payload: JobRequest = this.jobForm.value;
-    this.apiService.createJob(payload).subscribe({
+    const formValue = this.jobForm.value;
+    const skills = formValue.skills 
+      ? formValue.skills.split(',').map((s: string) => s.trim()).filter((s: string) => s !== '')
+      : [];
+
+    const payload: JobRequest = {
+      ...formValue,
+      skills
+    };
+    
+    const request = this.isEditMode && this.jobId
+      ? this.apiService.updateJob(this.jobId, payload)
+      : this.apiService.createJob(payload);
+
+    request.subscribe({
       next: (job) => {
         this.isSubmitting = false;
-        this.successMessage = 'Job posted successfully! Redirecting...';
+        this.successMessage = this.isEditMode 
+          ? 'Job updated successfully! Redirecting...' 
+          : 'Job posted successfully! Redirecting...';
         setTimeout(() => this.router.navigate(['/jobs', job.id]), 1500);
       },
       error: (err) => {
         this.isSubmitting = false;
-        this.errorMessage = err.message || 'Failed to post job. Please try again.';
+        this.errorMessage = getFriendlyError(err, this.isEditMode ? 'update_job' : 'post_job');
       }
     });
   }
