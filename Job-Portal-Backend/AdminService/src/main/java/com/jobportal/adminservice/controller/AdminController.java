@@ -133,12 +133,12 @@ public class AdminController {
     public ResponseEntity<Map<String, Object>> getReports(
             @RequestHeader("X-User-Role") String role) {
 
-        log.info("Get reports API called | role: {}", role);
+        log.info("Generating reports check | role: {}", role);
 
-        if (!role.equalsIgnoreCase("ADMIN")) {
-            log.warn("Unauthorized access to reports | role: {}", role);
+        if (role == null || !role.contains("ADMIN")) {
+            log.warn("Reports access denied | role: {}", role);
             throw new UnauthorizedException(
-                    "Access Denied! Only Admin can view reports.");
+                    "Access Denied! Your current role (" + role + ") is not authorized for reports.");
         }
 
         Map<String, Object> reports = adminService.getReports();

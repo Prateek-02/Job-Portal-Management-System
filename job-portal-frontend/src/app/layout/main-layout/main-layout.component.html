@@ -7,8 +7,8 @@
 <!-- Main Application Layout -->
 <div class="min-h-screen flex flex-col relative z-10 selection:bg-obsidian selection:text-white">
 
-  <!-- Sophisticated Industrial Navbar -->
-  <nav class="fixed top-0 w-full z-[100] transition-all duration-500 border-b border-glass-border bg-white/60 backdrop-blur-3xl">
+  <!-- Global Navbar -->
+<nav class="fixed top-0 w-full z-[100] transition-all duration-500 border-b border-glass-border bg-white/60 backdrop-blur-3xl">
     <div class="max-w-7xl mx-auto px-8 lg:px-12">
       <div class="flex items-center justify-between h-24">
 
@@ -23,7 +23,7 @@
           <span class="text-3xl font-bold tracking-tighter text-obsidian font-display">Talent<span class="text-obsidian/30 ml-1">Sphere</span></span>
         </a>
 
-        <!-- Navigation Links (Center Systems) -->
+        <!-- Navigation Links -->
         <div class="hidden lg:flex flex-1 items-center justify-center space-x-12">
           @if (authService.isJobSeeker() || authService.isRecruiter()) {
             <a routerLink="/dashboard" routerLinkActive="text-obsidian font-bold" [routerLinkActiveOptions]="{exact: true}"
@@ -50,10 +50,15 @@
               Candidates
               <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-obsidian transition-all duration-500 group-hover:w-full"></span>
             </a>
+            <a routerLink="/jobs/my-postings" routerLinkActive="text-obsidian font-bold"
+              class="text-xs font-bold text-obsidian/40 uppercase tracking-[0.3em] hover:text-obsidian transition-all py-2 relative group">
+              Postings
+              <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-obsidian transition-all duration-500 group-hover:w-full"></span>
+            </a>
           }
         </div>
 
-        <!-- Terminal Access (Right) -->
+        <!-- Auth & Profile (Right) -->
         <div class="hidden lg:flex items-center gap-8">
           @if (currentUser) {
             <!-- Notifications System -->
@@ -84,7 +89,7 @@
                   {{ currentUser?.name?.charAt(0)?.toUpperCase() }}
                 </div>
                 <div class="text-left">
-                  <p class="text-[11px] font-bold text-obsidian/40 uppercase tracking-widest leading-none mb-1">Authenticated</p>
+                  <p class="text-[11px] font-bold text-obsidian/40 uppercase tracking-widest leading-none mb-1">Logged In</p>
                   <p class="text-xs font-bold text-obsidian">{{ currentUser?.name?.split(' ')[0] }}</p>
                 </div>
                 <svg class="w-4 h-4 text-obsidian/20 transition-transform duration-500" [class.rotate-180]="isDropdownOpen" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -112,8 +117,8 @@
             </div>
           } @else {
             <div class="flex items-center gap-6">
-              <a routerLink="/login" class="text-xs font-bold text-obsidian/40 uppercase tracking-[0.2em] hover:text-obsidian transition-all">Login</a>
-              <a routerLink="/register" class="btn-celestial !px-8 !py-3.5 !rounded-2xl !text-[11px] !font-bold !tracking-[0.2em] !bg-obsidian !text-white shadow-2xl">Initialize</a>
+              <a routerLink="/auth/login" class="text-xs font-bold text-obsidian/40 uppercase tracking-[0.2em] hover:text-obsidian transition-all">Login</a>
+              <a routerLink="/auth/signup" class="btn-celestial !px-8 !py-3.5 !rounded-2xl !text-[11px] !font-bold !tracking-[0.2em] !bg-obsidian !text-white shadow-2xl">Register</a>
             </div>
           }
         </div>
@@ -142,6 +147,7 @@
         }
         @if (authService.isRecruiter()) {
           <a routerLink="/jobs/create/new" (click)="toggleMenu()" class="block px-5 py-4 text-sm font-bold text-obsidian/60 hover:text-obsidian hover:bg-obsidian/5 rounded-2xl transition-all">Post a Job</a>
+          <a routerLink="/jobs/my-postings" (click)="toggleMenu()" class="block px-5 py-4 text-sm font-bold text-obsidian/60 hover:text-obsidian hover:bg-obsidian/5 rounded-2xl transition-all">My Postings</a>
           <a routerLink="/applications/recruiter" (click)="toggleMenu()" class="block px-5 py-4 text-sm font-bold text-obsidian/60 hover:text-obsidian hover:bg-obsidian/5 rounded-2xl transition-all">Candidate Management</a>
         }
 
@@ -156,8 +162,8 @@
           </div>
         } @else {
           <div class="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-glass-border p-2">
-            <a routerLink="/login" (click)="toggleMenu()" class="px-6 py-4 rounded-2xl border border-glass-border text-center text-xs font-bold uppercase tracking-widest text-obsidian/60">Login</a>
-            <a routerLink="/register" (click)="toggleMenu()" class="px-6 py-4 rounded-2xl bg-obsidian text-white text-center text-xs font-bold uppercase tracking-widest shadow-xl">Initialize</a>
+            <a routerLink="/auth/login" (click)="toggleMenu()" class="px-6 py-4 rounded-2xl border border-glass-border text-center text-xs font-bold uppercase tracking-widest text-obsidian/60">Login</a>
+            <a routerLink="/auth/signup" (click)="toggleMenu()" class="px-6 py-4 rounded-2xl bg-obsidian text-white text-center text-xs font-bold uppercase tracking-widest shadow-xl">Register</a>
           </div>
         }
       </div>
@@ -169,16 +175,12 @@
     <router-outlet />
   </main>
 
-  <!-- Industrial Footer -->
+  <!-- TalentSphere Footer -->
   <footer class="border-t border-glass-border bg-white/40 backdrop-blur-xl py-12 relative z-20">
-    <div class="max-w-7xl mx-auto px-8 lg:px-12 flex flex-col lg:flex-row justify-between items-center gap-8">
+    <div class="max-w-7xl mx-auto px-8 lg:px-12 flex flex-col lg:flex-row justify-center items-center gap-8">
       <div class="flex items-center gap-4">
-        <div class="w-8 h-8 rounded-lg bg-obsidian/10 flex items-center justify-center text-obsidian/30 font-black text-xs">OT</div>
+        <div class="w-8 h-8 rounded-lg bg-obsidian/10 flex items-center justify-center text-obsidian/30 font-black text-[10px]">TS</div>
         <p class="text-[11px] font-bold text-obsidian/30 uppercase tracking-[0.3em]">TalentSphere &copy; 2026. All Rights Reserved.</p>
-      </div>
-      <div class="flex gap-10">
-        <a href="#" class="text-[10px] font-bold text-obsidian/40 uppercase tracking-[0.2em] hover:text-obsidian transition-all">Privacy protocol</a>
-        <a href="#" class="text-[10px] font-bold text-obsidian/40 uppercase tracking-[0.2em] hover:text-obsidian transition-all">Operational terms</a>
       </div>
     </div>
   </footer>

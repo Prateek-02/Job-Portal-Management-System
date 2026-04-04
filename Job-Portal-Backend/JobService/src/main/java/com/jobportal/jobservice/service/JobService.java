@@ -24,4 +24,6 @@ public interface JobService {
     void deleteRecruiterJobs(Long recruiterId);
     
     List<JobResponseDto> getJobsByRecruiter(Long recruiterId);
+
+    com.jobportal.jobservice.dto.response.MarketStatsDto getMarketPulseStats();
 }

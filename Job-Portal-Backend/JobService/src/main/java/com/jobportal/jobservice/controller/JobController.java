@@ -153,5 +153,11 @@ public class JobController {
         log.info("Get jobs by recruiter | recruiterId: {}", recruiterId);
         return ResponseEntity.ok(jobService.getJobsByRecruiter(recruiterId));
     }
+
+    @GetMapping("/stats/market-pulse")
+    public ResponseEntity<com.jobportal.jobservice.dto.response.MarketStatsDto> getMarketPulseStats() {
+        log.info("Get market pulse stats API called");
+        return ResponseEntity.ok(jobService.getMarketPulseStats());
+    }
 }
 

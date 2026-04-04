@@ -141,7 +141,7 @@ public class ApplicationController {
     @GetMapping("/count")
     public ResponseEntity<Long> getTotalApplications() {
 
-        log.info("Get total applications count API called");
+        log.info("Total applications count requested internally.");
 
         Long count = service.getTotalApplications();
 

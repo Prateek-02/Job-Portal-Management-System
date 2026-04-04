@@ -178,8 +178,9 @@ public class AdminServiceImpl implements AdminService {
                 circuitBreakerFactory.create("adminApplicationService")
                         .run(applicationServiceClient::getTotalApplications,
                                 throwable -> {
-                                    log.error("ApplicationService unavailable while building reports", throwable);
-                                    throw new RuntimeException("ApplicationService is unavailable. Cannot build reports.");
+                                    log.error("ApplicationService call failed while building reports. Reason: {}", 
+                                            throwable.getMessage(), throwable);
+                                    throw new RuntimeException("ApplicationService is unavailable (" + throwable.getMessage() + "). Cannot build reports.");
                                 });
 
         log.info("Reports generated | users: {} | jobSeekers: {} | recruiters: {} | jobs: {} | applications: {}",

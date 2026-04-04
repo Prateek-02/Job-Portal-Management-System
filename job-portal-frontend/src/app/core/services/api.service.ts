@@ -99,6 +99,10 @@ export class ApiService {
     return this.http.get<Job[]>(`${this.apiUrl}/jobs/recruiter/${recruiterId}`);
   }
 
+  getMarketPulseStats(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/jobs/stats/market-pulse`);
+  }
+
   // ============ APPLICATION ENDPOINTS ============
 
   applyForJob(jobId: number, resumeFile: File): Observable<ApplicationResponse> {
