@@ -1,3 +1,102 @@
-<div class="auth-layout-container">
-  <!-- Component template -->
+<div class="min-h-screen flex flex-col lg:flex-row relative z-10 w-full">
+
+  <!-- ── LEFT PANEL — Details & Branding ───────────────────────── -->
+  <div class="relative hidden lg:flex lg:w-5/12 xl:w-1/2 flex-col justify-between overflow-hidden border-r border-white/40"
+       style="background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);">
+
+    <!-- Subtle overlay gradient to pop text -->
+    <div class="absolute inset-0 bg-gradient-to-br from-white/60 to-transparent pointer-events-none"></div>
+
+    <!-- Content -->
+    <div class="relative z-10 flex flex-col flex-1 px-12 xl:px-20 py-16 justify-center">
+
+      <!-- Logo -->
+      <div class="flex items-center gap-3 mb-16">
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg"
+             style="background: linear-gradient(135deg, #FF9A9E, #A18CD1);">
+          <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                  d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+        </div>
+        <span class="text-[#1A1A1A] font-extrabold text-2xl tracking-tight">JobPortal</span>
+      </div>
+
+      <!-- Headline -->
+      <div class="mb-14">
+        <h1 class="text-3xl xl:text-4xl font-extrabold text-[#1A1A1A] leading-tight mb-8 tracking-tighter">
+          The Future of<br/>
+          <span style="background: linear-gradient(90deg, #A18CD1, #667eea); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;">
+            Talent & Growth.
+          </span>
+        </h1>
+        <p class="text-[#4A4A4A] text-base font-medium leading-relaxed max-w-lg">
+          Whether you're looking to land your dream role or hire the world's best talent, TalentSphere provides the premium tools to reach your destination.
+        </p>
+      </div>
+
+      <!-- Feature bullets -->
+      <div class="space-y-8 mb-14">
+        <!-- Job Seeker Feature -->
+        <div class="flex items-start gap-5">
+          <div class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm border border-white/60 bg-white/50">
+            <svg class="w-6 h-6 text-[#A18CD1]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </div>
+          <div>
+            <p class="text-[#1A1A1A] font-bold text-lg">Intelligent Discovery</p>
+            <p class="text-[#4A4A4A] text-base mt-1 font-medium">Find opportunities precisely matched to your trajectory.</p>
+          </div>
+        </div>
+        
+        <!-- Recruiter Feature -->
+        <div class="flex items-start gap-5">
+          <div class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm border border-white/60 bg-white/50">
+            <svg class="w-6 h-6 text-[#FF9A9E]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+          </div>
+          <div>
+            <p class="text-[#1A1A1A] font-bold text-lg">Precision Talent Sourcing</p>
+            <p class="text-[#4A4A4A] text-base mt-1 font-medium">Connect with top-tier candidates already within your orbit.</p>
+          </div>
+        </div>
+
+        <!-- Management Feature -->
+        <div class="flex items-start gap-5">
+          <div class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm border border-white/60 bg-white/50">
+            <svg class="w-6 h-6 text-[#667eea]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01m-.01 4h.01"/></svg>
+          </div>
+          <div>
+            <p class="text-[#1A1A1A] font-bold text-lg">Enterprise Workflow</p>
+            <p class="text-[#4A4A4A] text-base mt-1 font-medium">End-to-end recruitment lifecycle management for modern teams.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom credit -->
+    <div class="relative z-10 px-12 xl:px-20 pb-8">
+      <p class="text-[#4A4A4A] text-xs font-semibold">© 2026 JobPortal. All rights reserved.</p>
+    </div>
+  </div>
+
+  <!-- ── RIGHT PANEL — Form ──────────────────────────── -->
+  <div class="flex-1 flex flex-col justify-center items-center px-6 py-12 lg:px-12 xl:px-16 relative w-full">
+
+    <!-- Mobile logo (visible only on small screens) -->
+    <div class="flex items-center gap-3 mb-10 lg:hidden animate-fade-in-up">
+      <div class="w-10 h-10 rounded-xl flex items-center justify-center shadow-md border border-white/60"
+           style="background: linear-gradient(135deg, #FF9A9E, #A18CD1);">
+        <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+        </svg>
+      </div>
+      <span class="text-[#1A1A1A] font-extrabold text-2xl tracking-tight">JobPortal</span>
+    </div>
+
+    <!-- The login/signup card -->
+    <div class="w-full max-w-lg animate-fade-in-up relative z-10 px-4">
+      <router-outlet />
+    </div>
+  </div>
 </div>

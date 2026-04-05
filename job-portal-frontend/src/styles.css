@@ -1,14 +1,22 @@
 @import "tailwindcss";
 
 @theme {
-  --color-obsidian: #050506;
-  --color-obsidian-light: #0D0D0E;
+  --color-obsidian: #0F172A; /* Updated to Midnight */
+  --color-obsidian-light: #1E293B; /* Updated to Slate Navy */
+  
+  --color-warm-white: #FDFCFB;
+  --color-cloud-blue: #F0F4F8;
+  --color-slate-navy: #1E293B;
+  --color-midnight: #0F172A;
+  --color-royal-blue: #2563EB;
+  --color-body-text: #4A6076;
+  
   --color-pearl: #FFFFFF;
   --color-pearl-dim: #F8FAFC;
   
   --color-energy-emerald: #10B981;
-  --color-energy-violet: #8B5CF6;
-  --color-energy-indigo: #6366F1;
+  --color-energy-violet: #2563EB; /* Replaced with Royal Blue */
+  --color-energy-indigo: #1D4ED8; /* Replaced with Darker Royal Blue */
   
   --color-text-primary: var(--color-text-primary-val);
   --color-text-secondary: var(--color-text-secondary-val);
@@ -25,14 +33,15 @@
 }
 
 :root {
-  --color-bg-primary: #FFFFFF;
-  --color-text-primary-val: #0F172A;
-  --color-text-secondary-val: #64748B;
+  --color-bg-primary: #FDFCFB; /* Warm White */
+  --color-bg-gradient: linear-gradient(135deg, #FDFCFB 0%, #E2E8F0 100%); /* Warm White to Slate Blue */
+  --color-text-primary-val: #0F172A; /* Slate Navy Base */
+  --color-text-secondary-val: #4A6076; /* Body Text Blue-Gray */
   
-  --color-glass-bg-val: rgba(255, 255, 255, 0.7);
-  --color-glass-border-val: rgba(255, 255, 255, 0.4);
+  --color-glass-bg-val: rgba(253, 252, 251, 0.7); /* Translucent Warm White */
+  --color-glass-border-val: rgba(30, 41, 59, 0.1); /* Slightly more visible border */
   
-  --energy-sphere-color: var(--color-energy-indigo);
+  --energy-sphere-color: #2563EB; /* Royal Blue */
 }
 
 [data-theme='dark'] {
@@ -48,13 +57,14 @@
 
 @layer base {
   body {
-    background: var(--color-bg-primary);
+    background: var(--color-bg-gradient);
+    background-attachment: fixed;
+    min-height: 100vh;
     overflow-x: hidden;
     color: var(--color-text-primary-val);
     font-family: 'Outfit', 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    min-height: 100vh;
     transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
@@ -112,7 +122,7 @@
     left: -10%;
     width: 600px;
     height: 600px;
-    background: radial-gradient(circle at center, var(--color-energy-indigo), transparent 70%);
+    background: radial-gradient(circle at center, var(--color-royal-blue), transparent 70%);
     filter: blur(100px);
     opacity: 0.1;
     animation: sphere-pulse 12s ease-in-out infinite reverse;
@@ -182,22 +192,23 @@
     transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     cursor: pointer;
     border: none;
-    background: linear-gradient(135deg, var(--energy-sphere-color), var(--color-energy-indigo));
-    box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
+    background: #2563EB; /* Royal Blue Accent */
+    box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.3);
     text-decoration: none;
   }
 
   .btn-celestial:hover {
     transform: translateY(-3px);
-    box-shadow: 0 20px 30px -10px rgba(99, 102, 241, 0.6);
-    filter: brightness(1.1);
+    box-shadow: 0 20px 30px -10px rgba(37, 99, 235, 0.5);
+    background: #1D4ED8;
   }
 
   .btn-celestial-outline {
     padding: 1rem 2rem;
     border-radius: 20px;
     font-weight: 700;
-    border: 2px solid var(--color-glass-border-val);
+    border: 2px solid #2563EB;
+    color: #2563EB;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
@@ -206,7 +217,7 @@
   }
 
   .btn-celestial-outline:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(37, 99, 235, 0.05);
   }
 
   /* Sophisticated Inputs */
@@ -216,7 +227,7 @@
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.6);
-    color: var(--color-obsidian, #050506);
+    color: var(--color-slate-navy);
     border-radius: 1rem;
     padding: 1rem 1.5rem;
     outline: none;
@@ -226,8 +237,8 @@
   }
 
   .celestial-input:focus, .glass-input:focus {
-    border-color: var(--color-energy-indigo);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    border-color: var(--color-royal-blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
   }
 }
 
