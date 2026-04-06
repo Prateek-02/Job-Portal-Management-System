@@ -6,7 +6,7 @@
       <div class="inline-block px-4 py-1.5 rounded-full bg-energy-emerald/10 border border-energy-emerald/20 text-energy-emerald text-[10px] font-bold uppercase tracking-[0.3em] mb-4">
         Job Management
       </div>
-      <h1 class="text-6xl font-bold text-obsidian tracking-tighter">My Postings</h1>
+      <h1 class="text-6xl font-bold text-text-primary tracking-tighter">My Postings</h1>
       <p class="text-xl font-medium text-text-secondary opacity-60 mt-4 leading-relaxed">Systematic management of your active market presence.</p>
     </div>
     <a routerLink="/jobs/create/new" class="btn-celestial !py-5 !px-10 !rounded-2xl shadow-2xl flex items-center gap-3 hover:scale-105 transition-transform">
@@ -20,64 +20,64 @@
 
     @if (isLoading) {
       <div class="p-16 space-y-8 animate-pulse">
-        <div class="h-10 bg-obsidian/5 rounded-xl w-full"></div>
+        <div class="h-10 bg-glass-bg rounded-xl w-full"></div>
         @for (i of [1,2,3,4]; track i) {
-          <div class="h-20 bg-obsidian/[0.03] rounded-2xl w-full"></div>
+          <div class="h-20 bg-glass-bg rounded-2xl w-full"></div>
         }
       </div>
     } @else if (jobs.length === 0) {
       <div class="p-24 text-center">
-        <div class="w-24 h-24 bg-obsidian/[0.03] border border-glass-border rounded-full flex items-center justify-center mx-auto mb-8 text-obsidian/10">
+        <div class="w-24 h-24 bg-bg-secondary border border-glass-border rounded-full flex items-center justify-center mx-auto mb-8 text-text-muted/10">
           <svg class="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
         </div>
-        <h3 class="text-3xl font-bold text-obsidian mb-4 tracking-tight">Zero Activity Detected</h3>
+        <h3 class="text-3xl font-bold text-text-primary mb-4 tracking-tight">Zero Activity Detected</h3>
         <p class="text-xl font-medium text-text-secondary opacity-60 mb-10 max-w-md mx-auto">You haven't posted any job opportunities yet. Create your first listing to start hiring.</p>
         <a routerLink="/jobs/create/new" class="btn-celestial !px-12 !py-5 !rounded-2xl">Publish Listing</a>
       </div>
     } @else {
       <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
+        <table class="w-full text-left">
           <thead>
-            <tr class="border-b border-glass-border bg-obsidian/[0.02]">
-              <th class="px-10 py-6 text-[10px] font-bold text-obsidian/40 uppercase tracking-[0.3em]">Job Title</th>
-              <th class="px-10 py-6 text-[10px] font-bold text-obsidian/40 uppercase tracking-[0.3em]">Location</th>
-              <th class="px-10 py-6 text-[10px] font-bold text-obsidian/40 uppercase tracking-[0.3em]">Salary</th>
-              <th class="px-10 py-6 text-[10px] font-bold text-obsidian/40 uppercase tracking-[0.3em]">Posted Date</th>
-              <th class="px-10 py-6 text-[10px] font-bold text-obsidian/40 uppercase tracking-[0.3em] text-right">Actions</th>
+            <tr class="border-b border-glass-border bg-bg-secondary">
+              <th class="px-10 py-6 text-[10px] font-bold text-text-muted uppercase tracking-[0.3em]">Job Title</th>
+              <th class="px-10 py-6 text-[10px] font-bold text-text-muted uppercase tracking-[0.3em]">Location</th>
+              <th class="px-10 py-6 text-[10px] font-bold text-text-muted uppercase tracking-[0.3em]">Salary</th>
+              <th class="px-10 py-6 text-[10px] font-bold text-text-muted uppercase tracking-[0.3em]">Posted Date</th>
+              <th class="px-10 py-6 text-[10px] font-bold text-text-muted uppercase tracking-[0.3em] text-right">Actions</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-glass-border">
             @for (job of jobs; track job.id) {
-              <tr class="hover:bg-obsidian/[0.02] transition-all group">
+              <tr class="hover:bg-bg-secondary transition-all group">
                 <td class="px-10 py-8">
                   <div class="flex items-center gap-6">
-                    <div class="w-12 h-12 rounded-xl bg-obsidian text-white flex items-center justify-center font-bold text-lg shadow-xl">
+                    <div class="w-12 h-12 rounded-xl bg-bg-accent text-white flex items-center justify-center font-bold text-lg shadow-xl">
                       {{ job.companyName.charAt(0) }}
                     </div>
                     <div>
-                      <p class="text-[17px] font-bold text-obsidian group-hover:text-energy-emerald transition-colors tracking-tight">{{ job.title }}</p>
-                      <p class="text-[11px] font-bold text-obsidian/30 uppercase tracking-widest mt-1">#{{ job.id.toString().slice(-6) }}</p>
+                      <p class="text-[17px] font-bold text-text-primary group-hover:text-energy-emerald transition-colors tracking-tight">{{ job.title }}</p>
+                      <p class="text-[11px] font-bold text-text-muted uppercase tracking-widest mt-1">#{{ job.id.toString().slice(-6) }}</p>
                     </div>
                   </div>
                 </td>
                 <td class="px-10 py-8">
-                  <span class="text-[13px] font-bold text-obsidian/60">{{ job.location }}</span>
+                  <span class="text-[13px] font-bold text-text-secondary">{{ job.location }}</span>
                 </td>
                 <td class="px-10 py-8">
-                  <span class="text-[13px] font-bold text-obsidian px-4 py-2 bg-white border border-glass-border rounded-xl shadow-sm">{{ formatSalary(job.salary) }}</span>
+                  <span class="text-[13px] font-bold text-text-primary px-4 py-2 bg-bg-secondary border border-glass-border rounded-xl shadow-sm">{{ formatSalary(job.salary) }}</span>
                 </td>
                 <td class="px-10 py-8">
-                  <p class="text-[13px] font-bold text-obsidian/40">{{ job.createdAt | date:'MMM d, yyyy' }}</p>
+                  <p class="text-[13px] font-bold text-text-muted transition-colors">{{ job.createdAt | date:'MMM d, yyyy' }}</p>
                 </td>
                 <td class="px-10 py-8">
                   <div class="flex justify-end gap-3">
-                    <a [routerLink]="['/applications/job', job.id]" class="w-10 h-10 rounded-xl bg-white border border-glass-border text-obsidian/20 hover:text-energy-emerald hover:border-energy-emerald/40 hover:bg-energy-emerald/5 flex items-center justify-center transition-all shadow-sm" title="View Applications">
+                    <a [routerLink]="['/applications/job', job.id]" class="w-10 h-10 rounded-xl bg-bg-secondary border border-glass-border text-text-muted hover:text-energy-emerald hover:border-energy-emerald/40 hover:bg-energy-emerald/5 flex items-center justify-center transition-all shadow-sm" title="View Applications">
                       <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                     </a>
-                    <a [routerLink]="['/jobs/edit', job.id]" class="w-10 h-10 rounded-xl bg-white border border-glass-border text-obsidian/20 hover:text-obsidian hover:border-obsidian/40 hover:bg-obsidian/5 flex items-center justify-center transition-all shadow-sm" title="Edit Job">
+                    <a [routerLink]="['/jobs/edit', job.id]" class="w-10 h-10 rounded-xl bg-bg-secondary border border-glass-border text-text-muted hover:text-text-primary hover:border-text-primary/40 hover:bg-bg-accent/10 flex items-center justify-center transition-all shadow-sm" title="Edit Job">
                       <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                     </a>
-                    <button (click)="deleteJob(job.id!)" class="w-10 h-10 rounded-xl bg-white border border-glass-border text-obsidian/20 hover:text-red-500 hover:border-red-500/40 hover:bg-red-500/5 flex items-center justify-center transition-all shadow-sm" title="Delete Job">
+                    <button (click)="deleteJob(job.id!)" class="w-10 h-10 rounded-xl bg-bg-secondary border border-glass-border text-text-muted hover:text-red-500 hover:border-red-500/40 hover:bg-red-500/5 flex items-center justify-center transition-all shadow-sm" title="Delete Job">
                       <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                     </button>
                   </div>

@@ -11,7 +11,7 @@
           <div class="w-28 h-28 rounded-full p-1.5 shadow-2xl relative z-10"
             style="background: linear-gradient(135deg, var(--energy-sphere-color), var(--color-energy-indigo))">
             <div
-              class="w-full h-full rounded-full bg-white flex items-center justify-center text-obsidian font-bold text-4xl shadow-inner">
+              class="w-full h-full rounded-full bg-bg-primary flex items-center justify-center text-text-primary font-bold text-4xl shadow-inner">
               {{ user?.name?.charAt(0)?.toUpperCase() || 'U' }}
             </div>
           </div>
@@ -20,20 +20,20 @@
             style="background: var(--energy-sphere-color)"></div>
         </div>
 
-        <h2 class="text-2xl font-bold text-obsidian mb-1">{{ user?.name || 'User Profile' }}</h2>
+        <h2 class="text-2xl font-bold text-text-primary mb-1">{{ user?.name || 'User Profile' }}</h2>
         <p class="text-sm font-semibold text-text-secondary opacity-60 mb-6">{{ user?.email }}</p>
 
         <div
-          class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] bg-obsidian text-white mb-10 shadow-lg">
+          class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] bg-bg-secondary text-text-primary mb-10 shadow-lg border border-glass-border">
           {{ isJobSeeker ? 'Job Seeker' : (isRecruiter ? 'Recruiter' : 'System Admin') }}
         </div>
 
         <!-- Dashboard Navigation -->
         <div class="w-full space-y-2 text-left border-t border-glass-border pt-8 mt-4">
           @if (isJobSeeker) {
-          <a routerLink="/applications"
-            routerLinkActive="!bg-energy-indigo/10 !text-energy-indigo !border-energy-indigo/40"
-            class="flex items-center gap-4 px-5 py-4 rounded-2xl text-[14px] font-bold text-text-secondary hover:bg-obsidian/5 hover:text-obsidian transition-all border border-transparent">
+          <a routerLink="/applications/my-applications"
+            routerLinkActive="!bg-royal-blue/10 !text-royal-blue !border-royal-blue/40"
+            class="flex items-center gap-4 px-5 py-4 rounded-2xl text-[14px] font-bold text-text-secondary hover:bg-bg-secondary hover:text-text-primary transition-all border border-transparent">
             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -41,8 +41,8 @@
             My Applications
           </a>
           } @else if (isRecruiter) {
-          <a routerLink="/jobs" routerLinkActive="!bg-energy-indigo/10 !text-energy-indigo !border-energy-indigo/40"
-            class="flex items-center gap-4 px-5 py-4 rounded-2xl text-[14px] font-bold text-text-secondary hover:bg-obsidian/5 hover:text-obsidian transition-all border border-transparent">
+          <a routerLink="/jobs" routerLinkActive="!bg-royal-blue/10 !text-royal-blue !border-royal-blue/40"
+            class="flex items-center gap-4 px-5 py-4 rounded-2xl text-[14px] font-bold text-text-secondary hover:bg-bg-secondary hover:text-text-primary transition-all border border-transparent">
             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -51,8 +51,8 @@
           </a>
           }
 
-          <a routerLink="/profile" routerLinkActive="!bg-energy-indigo/10 !text-energy-indigo !border-energy-indigo/40"
-            class="flex items-center gap-4 px-5 py-4 rounded-2xl text-[14px] font-bold text-text-secondary hover:bg-obsidian/5 hover:text-obsidian transition-all border border-transparent">
+          <a routerLink="/profile" routerLinkActive="!bg-royal-blue/10 !text-royal-blue !border-royal-blue/40"
+            class="flex items-center gap-4 px-5 py-4 rounded-2xl text-[14px] font-bold text-text-secondary hover:bg-bg-secondary hover:text-text-primary transition-all border border-transparent">
             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -69,33 +69,33 @@
       <!-- ── JOB SEEKER PERSPECTIVE ─────────────────────────── -->
       @if (isJobSeeker) {
       <div class="mb-12">
-        <h1 class="text-5xl font-bold text-obsidian tracking-tighter mb-3">Hello, {{ user?.name?.split(' ')[0] }}</h1>
+        <h1 class="text-5xl font-bold text-text-primary tracking-tighter mb-3">Hello, {{ user?.name?.split(' ')[0] }}</h1>
         <p class="text-lg font-medium text-text-secondary opacity-70">Manage your applications and track market trends.
         </p>
       </div>
 
       <!-- Application Stats -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
-        <div class="celestial-card p-8 inner-glow border-none bg-obsidian text-white group">
-          <div class="text-[10px] font-bold uppercase tracking-[0.2em] mb-4 opacity-50 text-white/40">Applications Sent
+        <div class="celestial-card p-8 inner-glow border-none bg-bg-secondary text-text-primary group border border-glass-border">
+          <div class="text-[10px] font-bold uppercase tracking-[0.2em] mb-4 opacity-50 text-text-secondary">Applications Sent
           </div>
-          <div class="text-5xl font-bold mb-2 group-hover:scale-105 transition-all text-white">{{ appliedCount }}</div>
+          <div class="text-5xl font-bold mb-2 group-hover:scale-105 transition-all text-text-primary">{{ appliedCount }}</div>
           <div class="w-8 h-1 rounded-full bg-energy-emerald"></div>
         </div>
 
         <div class="celestial-card p-8">
           <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary mb-4 opacity-50">Active
             Interviews</div>
-          <div class="text-5xl font-bold text-obsidian mb-2">{{ interviewCount }}</div>
-          <div class="w-8 h-1 rounded-full bg-energy-violet"></div>
+          <div class="text-5xl font-bold text-text-primary mb-2">{{ interviewCount }}</div>
+          <div class="w-8 h-1 rounded-full bg-royal-blue"></div>
         </div>
 
         <div class="celestial-card p-8">
           <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary mb-4 opacity-50">Awaiting
             Feedback</div>
-          <div class="text-5xl font-bold text-obsidian mb-2">{{ myApplications.length - (interviewCount + rejectedCount)
+          <div class="text-5xl font-bold text-text-primary mb-2">{{ myApplications.length - (interviewCount + rejectedCount)
             }}</div>
-          <div class="w-8 h-1 rounded-full bg-energy-indigo"></div>
+          <div class="w-8 h-1 rounded-full bg-royal-blue"></div>
         </div>
       </div>
 
@@ -103,7 +103,7 @@
         <!-- Recommended Jobs (Left Column) -->
         <div class="xl:col-span-2 space-y-8">
           <div class="flex items-end justify-between">
-            <h3 class="text-2xl font-bold text-obsidian">Recommended For You</h3>
+            <h3 class="text-2xl font-bold text-text-primary">Recommended For You</h3>
             <a routerLink="/jobs"
               class="text-xs font-bold text-energy-indigo uppercase tracking-widest flex items-center gap-2 group/link">
               View All <svg class="w-4 h-4 group-hover/link:translate-x-1 transition-transform" fill="none"
@@ -126,7 +126,7 @@
               </div>
               <div class="flex justify-between items-start mb-6 relative z-10">
                 <div
-                  class="w-12 h-12 rounded-xl bg-obsidian text-white flex items-center justify-center font-black text-xs shadow-xl">
+                  class="w-12 h-12 rounded-xl bg-bg-accent text-white flex items-center justify-center font-black text-xs shadow-xl">
                   {{ job.companyName.charAt(0) }}
                 </div>
                 <span
@@ -134,18 +134,18 @@
                   Match</span>
               </div>
               <div class="relative z-10">
-                <h4 class="text-xl font-bold text-obsidian mb-1 line-clamp-1">{{ job.title }}</h4>
-                <p class="text-[10px] font-bold text-obsidian/30 uppercase tracking-[0.2em] mb-6">{{ job.companyName }}
+                <h4 class="text-xl font-bold text-text-primary mb-1 line-clamp-1">{{ job.title }}</h4>
+                <p class="text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] mb-6">{{ job.companyName }}
                   • {{ job.location }}</p>
 
                 <!-- Job Meta Pills -->
                 <div class="flex flex-wrap gap-2 mb-8">
                   <span
-                    class="px-3 py-1.5 rounded-xl bg-obsidian/[0.03] border border-glass-border text-[10px] font-bold text-obsidian/60 flex items-center gap-1.5">
+                    class="px-3 py-1.5 rounded-xl bg-bg-secondary border border-glass-border text-[10px] font-bold text-text-secondary flex items-center gap-1.5">
                     <span class="w-1.5 h-1.5 rounded-full bg-energy-violet"></span> {{ formatSalary(job.salary) }}
                   </span>
                   <span
-                    class="px-3 py-1.5 rounded-xl bg-obsidian/[0.03] border border-glass-border text-[10px] font-bold text-obsidian/60 flex items-center gap-1.5">
+                    class="px-3 py-1.5 rounded-xl bg-bg-secondary border border-glass-border text-[10px] font-bold text-text-secondary flex items-center gap-1.5">
                     <span class="w-1.5 h-1.5 rounded-full bg-energy-emerald"></span> {{ job.experience }}+ Yrs
                   </span>
                 </div>
@@ -155,10 +155,10 @@
                   [innerHTML]="job.description"></div>
 
                 <div class="flex items-center justify-between pt-6 border-t border-glass-border">
-                  <span class="text-[9px] font-bold text-obsidian/30 uppercase tracking-widest">POSTED: {{ job.createdAt
+                  <span class="text-[9px] font-bold text-text-muted uppercase tracking-widest">POSTED: {{ job.createdAt
                     | date:'MMM yyyy' }}</span>
                   <a [routerLink]="['/jobs', job.id]"
-                    class="text-xs font-bold text-obsidian hover:text-energy-violet transition-all flex items-center gap-2">
+                    class="text-xs font-bold text-text-primary hover:text-energy-violet transition-all flex items-center gap-2">
                     View Job Details <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                         d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -174,24 +174,24 @@
 
         <!-- Recent Activity (Right Column) -->
         <div class="space-y-6">
-          <h3 class="text-xl font-bold text-obsidian px-2">Recent Activity</h3>
+          <h3 class="text-xl font-bold text-text-primary px-2">Recent Activity</h3>
           <div class="celestial-card p-6 inner-glow min-h-[180px]">
             <div class="relative space-y-8 pl-8">
               <!-- Vertical Progress Line -->
-              <div class="absolute left-[11px] top-4 bottom-4 w-0.5 border-l border-dashed border-obsidian/20"></div>
+              <div class="absolute left-[11px] top-4 bottom-4 w-0.5 border-l border-dashed border-glass-border"></div>
 
               @for (entry of recentActivity.slice(0, 3); track entry.id; let first = $first) {
               <div class="relative animate-fade-in-right" [style.animation-delay]="($index * 100) + 'ms'">
                 <!-- Progress Dot -->
                 <div
-                  class="absolute -left-[27px] top-1.5 w-4 h-4 rounded-full bg-white border-2 flex items-center justify-center transform transition-transform group-hover:scale-125"
-                  [ngClass]="first ? 'border-energy-indigo shadow-[0_0_10px_rgba(161,140,209,0.5)]' : 'border-obsidian/20'">
+                  class="absolute -left-[27px] top-1.5 w-4 h-4 rounded-full bg-bg-primary border-2 flex items-center justify-center transform transition-transform group-hover:scale-125 focus:outline-none"
+                  [ngClass]="first ? 'border-energy-indigo shadow-[0_0_10px_rgba(161,140,209,0.5)]' : 'border-glass-border'">
                   <div class="w-1.5 h-1.5 rounded-full"
-                    [ngClass]="first ? 'bg-energy-indigo animate-pulse' : 'bg-obsidian/10'"></div>
+                    [ngClass]="first ? 'bg-energy-indigo animate-pulse' : 'bg-text-muted/20'"></div>
                 </div>
-                <p class="text-[9px] font-black uppercase tracking-widest text-obsidian/30 mb-1">{{ entry.timestamp |
+                <p class="text-[9px] font-black uppercase tracking-widest text-text-muted mb-1">{{ entry.timestamp |
                   date:'shortTime' }}</p>
-                <h4 class="text-sm font-bold text-obsidian mb-1 leading-tight">{{ entry.title }}</h4>
+                <h4 class="text-sm font-bold text-text-primary mb-1 leading-tight">{{ entry.title }}</h4>
                 <p class="text-xs text-text-secondary opacity-60 line-clamp-2 leading-relaxed">{{ entry.message }}</p>
               </div>
               }
@@ -206,7 +206,7 @@
       </div>
 
       <!-- Job Market Insights -->
-      <h3 class="text-2xl font-bold text-obsidian mb-8">Job Market Pulse</h3>
+      <h3 class="text-2xl font-bold text-text-primary mb-8">Job Market Pulse</h3>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <!-- Avg Salary Trend -->
         <div class="celestial-card p-10 group overflow-hidden relative">
@@ -216,7 +216,7 @@
               Trend</div>
             <div class="flex items-end justify-between">
               <div>
-                <div class="text-4xl font-bold text-obsidian mb-2">{{ formatSalary(marketStats?.averageSalary || 840000)
+                <div class="text-4xl font-bold text-text-primary mb-2">{{ formatSalary(marketStats?.averageSalary || 840000)
                   }}</div>
                 <div class="flex items-center gap-1.5 text-energy-emerald">
                   <span class="text-xs font-bold">↑ {{ marketStats?.salaryGrowthYoy || '4.2' }}% YOY</span>
@@ -244,7 +244,7 @@
               Demand</div>
             <div class="flex items-end justify-between">
               <div>
-                <div class="text-4xl font-black text-obsidian mb-2">{{ marketStats?.marketDemandStatus || 'High' }}
+                <div class="text-4xl font-black text-text-primary mb-2">{{ marketStats?.marketDemandStatus || 'High' }}
                 </div>
                 <p class="text-[10px] font-bold uppercase tracking-widest text-energy-indigo">Peaking Now</p>
               </div>
@@ -265,18 +265,18 @@
             @if (topSkills.length > 0) {
             @for (skill of topSkills; track skill.name) {
             <div>
-              <div class="flex justify-between text-[10px] font-black uppercase tracking-widest text-obsidian mb-2">
+              <div class="flex justify-between text-[10px] font-black uppercase tracking-widest text-text-primary mb-2">
                 <span>{{ skill.name }}</span>
                 <span>{{ skill.level }}%</span>
               </div>
-              <div class="h-1.5 w-full bg-obsidian/5 rounded-full overflow-hidden">
-                <div class="h-full bg-obsidian rounded-full transition-all duration-1000"
+              <div class="h-1.5 w-full bg-glass-bg rounded-full overflow-hidden">
+                <div class="h-full bg-energy-indigo rounded-full transition-all duration-1000"
                   [style.width]="skill.level + '%'"></div>
               </div>
             </div>
             }
             } @else {
-            <div class="text-xs font-bold text-obsidian/30 py-4 italic">Analyzing market skills...</div>
+            <div class="text-xs font-bold text-text-muted py-4 italic">Analyzing market skills...</div>
             }
           </div>
         </div>
@@ -287,7 +287,7 @@
       @if (isRecruiter) {
       <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12 animate-fade-in-up">
         <div>
-          <h1 class="text-5xl font-bold text-obsidian tracking-tighter mb-3">Recruiter Dashboard</h1>
+          <h1 class="text-5xl font-bold text-text-primary tracking-tighter mb-3">Recruiter Dashboard</h1>
           <p class="text-lg font-medium text-text-secondary opacity-70">Optimize your hiring pipeline and track
             candidate flow.</p>
         </div>
@@ -302,11 +302,11 @@
         <div class="celestial-card p-8 group overflow-hidden relative">
           <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary mb-4 opacity-50">Live Job
             Postings</div>
-          <div class="text-4xl font-bold text-obsidian mb-2">{{ myPostedJobs.length }}</div>
+          <div class="text-4xl font-bold text-text-primary mb-2">{{ myPostedJobs.length }}</div>
           <div class="h-1 w-8 bg-energy-emerald rounded-full"></div>
         </div>
 
-        <div class="celestial-card p-8 group overflow-hidden relative border-none bg-obsidian text-white">
+        <div class="celestial-card p-8 group overflow-hidden relative border-none bg-slate-navy text-white transition-colors duration-500">
           <div class="relative z-10">
             <div class="text-[10px] font-bold uppercase tracking-[0.2em] mb-4 opacity-30 text-white">Application
               Velocity</div>
@@ -327,14 +327,14 @@
         <div class="celestial-card p-8">
           <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary mb-4 opacity-50">Awaiting
             Review</div>
-          <div class="text-4xl font-bold text-obsidian mb-2">{{ pendingApplications.length }}</div>
+          <div class="text-4xl font-bold text-text-primary mb-2">{{ pendingApplications.length }}</div>
           <div class="h-1 w-8 bg-energy-violet rounded-full"></div>
         </div>
 
         <div class="celestial-card p-8">
           <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary mb-4 opacity-50">Conversion
             Rate</div>
-          <div class="text-4xl font-bold text-obsidian mb-2">
+          <div class="text-4xl font-bold text-text-primary mb-2">
             {{ (recentApplicationsForJobs.length > 0 ? (interviewCount / recentApplicationsForJobs.length *
             100).toFixed(0) : '0') }}%
           </div>
@@ -346,9 +346,9 @@
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 mb-16">
         <!-- Quick Review Deck -->
         <div class="lg:col-span-2 space-y-8">
-          <h3 class="text-2xl font-bold text-obsidian flex items-center gap-3">
+          <h3 class="text-2xl font-bold text-text-primary flex items-center gap-3">
             Quick Review Queue
-            <span class="px-3 py-1 bg-obsidian text-white text-[10px] rounded-full">{{ pendingApplications.length
+            <span class="px-3 py-1 bg-royal-blue text-white text-[10px] rounded-full">{{ pendingApplications.length
               }}</span>
           </h3>
 
@@ -361,33 +361,32 @@
                       'z-10 translate-y-8 translate-x-8 opacity-30 scale-90': i === 2
                     }">
               <div
-                class="celestial-card p-10 h-full flex flex-col justify-between border-glass-border/30 shadow-2xl backdrop-blur-3xl"
-                [ngStyle]="i === 0 ? {'background': 'rgba(255,255,255,0.9)'} : {}">
+                class="celestial-card p-10 h-full flex flex-col justify-between border-glass-border/30 shadow-2xl backdrop-blur-3xl bg-glass-bg transition-colors duration-500">
                 <div class="flex justify-between items-start mb-8">
                   <div class="flex items-center gap-6">
                     <div
-                      class="w-16 h-16 rounded-2xl bg-obsidian text-white flex items-center justify-center font-bold text-xl shadow-xl">
+                      class="w-16 h-16 rounded-2xl bg-bg-accent text-white flex items-center justify-center font-bold text-xl shadow-xl">
                       {{ app.applicantName.charAt(0) }}
                     </div>
                     <div>
-                      <h4 class="text-2xl font-bold text-obsidian tracking-tight">{{ app.applicantName }}</h4>
-                      <p class="text-xs font-bold text-obsidian/40 uppercase tracking-widest mt-1">Applying for: {{
+                      <h4 class="text-2xl font-bold text-text-primary tracking-tight">{{ app.applicantName }}</h4>
+                      <p class="text-xs font-bold text-text-secondary uppercase tracking-widest mt-1">Applying for: {{
                         app.jobTitle }}</p>
                     </div>
                   </div>
                   <div class="text-right">
-                    <p class="text-[10px] font-black text-obsidian/20 uppercase tracking-[0.2em] mb-1">Applied</p>
-                    <p class="text-sm font-bold text-obsidian">{{ app.appliedAt | date:'shortDate' }}</p>
+                    <p class="text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] mb-1">Applied</p>
+                    <p class="text-sm font-bold text-text-primary">{{ app.appliedAt | date:'shortDate' }}</p>
                   </div>
                 </div>
 
                 <div class="flex gap-4 mb-2">
                   <button (click)="updateQuickStatus(app, 'SHORTLISTED')"
-                    class="flex-1 btn-celestial !bg-energy-emerald/10 !text-energy-emerald border border-energy-emerald/30 !py-4 hover:!bg-energy-emerald hover:!text-white transition-all">
+                    class="flex-1 btn-celestial !bg-energy-emerald/10 !text-energy-emerald border border-energy-emerald/30 !py-4 hover:!bg-energy-emerald hover:!text-white transition-all shadow-none">
                     Shortlist Candidate
                   </button>
                   <button (click)="updateQuickStatus(app, 'REJECTED')"
-                    class="flex-1 btn-celestial !bg-obsidian/5 !text-obsidian !py-4 hover:!bg-red-500 hover:!text-white border-none transition-all">
+                    class="flex-1 btn-celestial !bg-slate-500/5 !text-slate-500 !py-4 hover:!bg-red-500 hover:!text-white border-none transition-all shadow-none">
                     Pass
                   </button>
                 </div>
@@ -397,12 +396,12 @@
             } @else {
             <div
               class="celestial-card p-12 text-center flex flex-col items-center justify-center h-full border-dashed border-2 border-glass-border opacity-50">
-              <div class="w-16 h-16 rounded-full bg-obsidian/5 flex items-center justify-center mb-6">
-                <svg class="w-8 h-8 text-obsidian/20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div class="w-16 h-16 rounded-full bg-royal-blue/10 flex items-center justify-center mb-6">
+                <svg class="w-8 h-8 text-royal-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h4 class="text-xl font-bold text-obsidian mb-2">Inbox Zero!</h4>
+              <h4 class="text-xl font-bold text-text-primary mb-2">Inbox Zero!</h4>
               <p class="text-sm font-medium text-text-secondary">All pending applications have been reviewed.</p>
             </div>
             }
@@ -411,13 +410,13 @@
 
         <!-- Market Overview / Helper Widget -->
         <div class="space-y-8">
-          <h3 class="text-2xl font-bold text-obsidian">Market Pulse</h3>
+          <h3 class="text-2xl font-bold text-text-primary">Market Pulse</h3>
           <div
             class="celestial-card p-8 inner-glow bg-gradient-to-br from-energy-violet/5 to-transparent border-energy-violet/20">
             <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary mb-6 opacity-50">Local
               Talent Supply</div>
             <div class="text-center py-6">
-              <div class="text-5xl font-bold text-obsidian mb-3 tracking-tighter">High</div>
+              <div class="text-5xl font-bold text-text-primary mb-3 tracking-tighter">High</div>
               <p class="text-[10px] font-bold text-energy-violet uppercase tracking-widest">Growing Daily</p>
             </div>
             <div class="pt-6 border-t border-glass-border">
@@ -430,15 +429,15 @@
 
       <!-- Job Management Table -->
       <div class="celestial-card overflow-hidden mb-12">
-        <div class="px-8 py-6 border-b border-glass-border bg-obsidian/[0.02] flex items-center justify-between">
-          <h3 class="text-xl font-bold text-obsidian">Recent Postings</h3>
+        <div class="px-8 py-6 border-b border-glass-border bg-bg-secondary flex items-center justify-between">
+          <h3 class="text-xl font-bold text-text-primary">Recent Postings</h3>
           <a routerLink="/jobs/my-postings" class="text-xs font-bold text-energy-indigo">View All Postings</a>
         </div>
 
         <div class="overflow-x-auto">
           <table class="w-full text-left">
             <thead>
-              <tr class="bg-obsidian/5">
+              <tr class="bg-bg-secondary">
                 <th class="px-8 py-4 text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em]">Job ID</th>
                 <th class="px-8 py-4 text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em]">Job Details
                 </th>
@@ -450,12 +449,12 @@
             </thead>
             <tbody class="divide-y divide-glass-border">
               @for (job of myPostedJobs; track job.id) {
-              <tr class="hover:bg-obsidian/[0.01] transition-colors">
+              <tr class="hover:bg-bg-secondary transition-colors group">
                 <td class="px-8 py-6">
                   <span class="font-mono text-xs text-text-secondary">{{ job.id }}</span>
                 </td>
                 <td class="px-8 py-6">
-                  <p class="font-bold text-obsidian">{{ job.title }}</p>
+                  <p class="font-bold text-text-primary transition-colors">{{ job.title }}</p>
                   <p class="text-xs font-semibold text-text-secondary opacity-60">{{ job.location }}</p>
                 </td>
                 <td class="px-8 py-6">
@@ -478,15 +477,15 @@
 
       <!-- Recent Candidates Table -->
       <div class="celestial-card overflow-hidden">
-        <div class="px-8 py-6 border-b border-glass-border bg-obsidian/[0.02] flex items-center justify-between">
-          <h3 class="text-xl font-bold text-obsidian">Recent Candidates</h3>
+        <div class="px-8 py-6 border-b border-glass-border bg-bg-secondary flex items-center justify-between">
+          <h3 class="text-xl font-bold text-text-primary">Recent Candidates</h3>
           <a routerLink="/applications/recruiter" class="text-xs font-bold text-energy-indigo">View All Candidates</a>
         </div>
 
         <div class="overflow-x-auto">
           <table class="w-full text-left">
             <thead>
-              <tr class="bg-obsidian/5">
+              <tr class="bg-bg-secondary">
                 <th class="px-8 py-4 text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em]">Candidate
                 </th>
                 <th class="px-8 py-4 text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em]">Applied For
@@ -498,7 +497,7 @@
             </thead>
             <tbody class="divide-y divide-glass-border">
               @for (app of recentApplicationsForJobs; track app.id) {
-              <tr class="hover:bg-obsidian/[0.01] transition-colors">
+              <tr class="hover:bg-bg-secondary transition-colors group">
                 <td class="px-8 py-6">
                   <div class="flex items-center gap-3">
                     <div
@@ -506,26 +505,26 @@
                       {{ app.applicantName.charAt(0) }}
                     </div>
                     <div>
-                      <p class="font-bold text-obsidian text-sm">{{ app.applicantName }}</p>
-                      <p class="text-[10px] text-obsidian/40 font-bold uppercase tracking-wider">{{ app.applicantEmail
+                      <p class="font-bold text-text-primary text-sm">{{ app.applicantName }}</p>
+                      <p class="text-[10px] text-text-muted font-bold uppercase tracking-wider">{{ app.applicantEmail
                         }}</p>
                     </div>
                   </div>
                 </td>
                 <td class="px-8 py-6">
-                  <p class="text-sm font-bold text-obsidian">{{ app.jobTitle || 'Job #' + app.jobId }}</p>
+                  <p class="text-sm font-bold text-text-primary">{{ app.jobTitle || 'Job #' + app.jobId }}</p>
                 </td>
                 <td class="px-8 py-6">
                   <p class="text-xs font-bold text-text-secondary">{{ app.appliedAt | date:'MMM d' }}</p>
-                  <p class="text-[9px] font-bold text-obsidian/20 mt-1">{{ app.appliedAt | date:'HH:mm':'+0530' }} IST
+                  <p class="text-[9px] font-bold text-text-muted mt-1">{{ app.appliedAt | date:'HH:mm':'+0530' }} IST
                   </p>
                 </td>
                 <td class="px-8 py-6 text-right">
-                  <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border" [ngClass]="{
-                          'bg-blue-50 text-blue-600 border-blue-100': app.status === 'APPLIED',
-                          'bg-orange-50 text-orange-600 border-orange-100': app.status === 'UNDER_REVIEW',
-                          'bg-green-50 text-green-600 border-green-100': app.status === 'SHORTLISTED',
-                          'bg-red-50 text-red-600 border-red-100': app.status === 'REJECTED'
+                  <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border transition-colors" [ngClass]="{
+                          'bg-blue-500/10 text-blue-500 border-blue-500/20': app.status === 'APPLIED',
+                          'bg-orange-500/10 text-orange-500 border-orange-500/20': app.status === 'UNDER_REVIEW',
+                          'bg-green-500/10 text-green-500 border-green-500/20': app.status === 'SHORTLISTED',
+                          'bg-red-500/10 text-red-500 border-red-500/20': app.status === 'REJECTED'
                         }">
                     {{ app.status }}
                   </span>

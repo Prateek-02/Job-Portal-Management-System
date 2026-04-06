@@ -1,3 +1,21 @@
-<div class="loading-spinner-container">
-  <!-- Component template -->
+<div [class]="containerClasses">
+  <div class="relative flex items-center justify-center" [class]="spinnerSizeClass">
+    <!-- Inner Energy Sphere -->
+    <div class="absolute inset-2 rounded-full bg-gradient-to-tr from-royal-blue to-energy-indigo blur-xl opacity-40 animate-pulse"></div>
+    
+    <!-- Outer Orbit 1 -->
+    <div class="absolute inset-0 border-2 border-transparent border-t-royal-blue rounded-full animate-spin-slow"></div>
+    
+    <!-- Middle Orbit 2 -->
+    <div class="absolute inset-3 border-2 border-transparent border-b-energy-emerald rounded-full animate-spin-reverse"></div>
+    
+    <!-- Small Internal Orbit -->
+    <div class="absolute inset-6 border-[1px] border-white/20 rounded-full animate-pulse"></div>
+  </div>
+
+  @if (message) {
+    <p class="mt-8 text-xs font-bold text-text-primary uppercase tracking-[0.4em] opacity-60 animate-pulse text-center">
+      {{ message }}
+    </p>
+  }
 </div>

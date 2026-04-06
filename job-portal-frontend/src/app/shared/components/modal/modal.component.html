@@ -1,3 +1,36 @@
-<div class="modal-container">
-  <!-- Component template -->
+<div *ngIf="isOpen" 
+     class="fixed inset-0 z-[1000] flex items-center justify-center p-4 modal-backdrop"
+     (click)="onBackdropClick($event)">
+  
+  <div class="celestial-card w-full shadow-2xl animate-modal-in overflow-hidden relative"
+       [class]="modalSizeClass">
+    
+    <!-- Header -->
+    <div class="px-8 py-6 border-b border-glass-border flex items-center justify-between bg-white/[0.02]">
+      <div>
+        <h3 class="text-xl font-bold text-text-primary tracking-tight">{{ title }}</h3>
+        <div class="h-1 w-12 bg-royal-blue rounded-full mt-1.5 opacity-50"></div>
+      </div>
+      <button (click)="onClose()" 
+              class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white/5 text-text-muted hover:text-text-primary transition-all group">
+        <svg class="w-5 h-5 transition-transform group-hover:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="px-8 py-8 max-h-[75vh] overflow-y-auto custom-scrollbar">
+      <ng-content></ng-content>
+    </div>
+
+    <!-- Footer (Project Injection) -->
+    <div class="px-8 py-6 border-t border-glass-border bg-white/[0.01]">
+       <ng-content select="[modal-footer]"></ng-content>
+    </div>
+
+    <!-- Decorative Corner Glow -->
+    <div class="absolute -top-12 -right-12 w-24 h-24 bg-royal-blue/10 blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-12 -left-12 w-24 h-24 bg-energy-indigo/10 blur-3xl pointer-events-none"></div>
+  </div>
 </div>

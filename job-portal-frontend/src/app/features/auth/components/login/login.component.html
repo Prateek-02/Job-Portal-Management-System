@@ -5,7 +5,7 @@
     <div class="absolute -top-24 -right-24 w-48 h-48 bg-royal-blue/10 blur-[60px] rounded-full pointer-events-none"></div>
 
     <!-- Back to Portal -->
-    <a routerLink="/" class="absolute top-8 left-8 flex items-center gap-2 text-[13px] font-bold text-slate-navy/40 uppercase tracking-widest hover:text-royal-blue transition-all group z-20">
+    <a routerLink="/" class="absolute top-8 left-8 flex items-center gap-2 text-[13px] font-bold text-text-muted uppercase tracking-widest hover:text-royal-blue transition-all group z-20">
       <svg class="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
       </svg>
@@ -14,13 +14,13 @@
 
     <!-- Header -->
     <div class="text-center mb-12">
-      <div class="w-20 h-20 bg-slate-navy rounded-[24px] flex items-center justify-center mx-auto mb-6 shadow-2xl relative">
-        <svg class="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div class="w-20 h-20 bg-bg-secondary border border-glass-border rounded-[24px] flex items-center justify-center mx-auto mb-6 shadow-2xl relative">
+        <svg class="w-10 h-10 text-text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
         </svg>
       </div>
-      <h1 class="text-3xl font-bold text-slate-navy mb-3 tracking-tighter">Welcome Back</h1>
-      <p class="text-lg font-medium text-body-text opacity-70">Access your professional ecosystem.</p>
+      <h1 class="text-3xl font-bold text-text-primary mb-3 tracking-tighter">Welcome Back</h1>
+      <p class="text-lg font-medium text-text-secondary opacity-70">Access your professional ecosystem.</p>
     </div>
 
     <!-- Error Alert -->
@@ -34,9 +34,9 @@
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6 relative z-10">
       <!-- Email -->
       <div class="space-y-2">
-        <label class="text-[11px] font-bold text-slate-navy/40 uppercase tracking-[0.2em] ml-1" for="email">Email Address</label>
+        <label class="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em] ml-1" for="email">Email Address</label>
         <input id="email" type="email" formControlName="email" 
-          class="w-full px-6 py-4 bg-slate-navy/[0.03] border border-glass-border rounded-2xl text-slate-navy font-bold placeholder:text-slate-navy/20 focus:bg-white focus:ring-4 focus:ring-royal-blue/5 transition-all outline-none" 
+          class="w-full px-6 py-4 bg-bg-secondary border border-glass-border rounded-2xl text-text-primary font-bold placeholder:text-text-muted/50 focus:bg-bg-primary focus:ring-4 focus:ring-royal-blue/5 transition-all outline-none" 
           placeholder="email@example.com">
         @if (email?.touched && email?.invalid) {
           <p class="text-[10px] font-bold text-red-500 ml-1 uppercase tracking-wider">Invalid email entry</p>
@@ -46,16 +46,16 @@
       <!-- Password -->
       <div class="space-y-2">
         <div class="flex items-center justify-between ml-1">
-          <label class="text-[11px] font-bold text-slate-navy/40 uppercase tracking-[0.2em]" for="password">Password</label>
+          <label class="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em]" for="password">Password</label>
           <a routerLink="/auth/forgot-password" class="text-[11px] font-bold text-royal-blue hover:underline transition-opacity uppercase tracking-wider">Forgot Password?</a>
         </div>
         <div class="relative">
           <input id="password" [type]="showPassword ? 'text' : 'password'" formControlName="password" 
-            class="w-full px-6 py-4 bg-slate-navy/[0.03] border border-glass-border rounded-2xl text-slate-navy font-bold placeholder:text-slate-navy/20 focus:bg-white focus:ring-4 focus:ring-royal-blue/5 transition-all outline-none" 
+            class="w-full px-6 py-4 bg-bg-secondary border border-glass-border rounded-2xl text-text-primary font-bold placeholder:text-text-muted/50 focus:bg-bg-primary focus:ring-4 focus:ring-royal-blue/5 transition-all outline-none" 
             placeholder="••••••••">
-          <button type="button" (click)="showPassword = !showPassword" class="absolute inset-y-0 right-4 flex items-center text-slate-navy/30 hover:text-slate-navy transition-colors">
+          <button type="button" (click)="showPassword = !showPassword" class="absolute inset-y-0 right-4 flex items-center text-text-muted hover:text-text-primary transition-colors">
             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              @if (showPassword) { <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /> } 
+              @if (showPassword) { <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268-2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /> } 
               @else { <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /> }
             </svg>
           </button>
@@ -76,7 +76,7 @@
     </form>
 
     <div class="mt-12 text-center">
-      <p class="text-md font-bold text-body-text opacity-60 mb-2">New to the platform?</p>
+      <p class="text-md font-bold text-text-secondary opacity-60 mb-2">New to the platform?</p>
       <a routerLink="/auth/signup" class="text-md font-bold text-royal-blue hover:underline transition-all">Create Account</a>
     </div>
   </div>

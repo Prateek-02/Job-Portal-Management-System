@@ -1,8 +1,8 @@
 <div class="p-8">
   <div class="flex items-center justify-between mb-8">
     <div>
-      <h1 class="text-3xl font-bold text-[#1A1A1A]">Manage Users</h1>
-      <p class="text-[#4A4A4A] mt-1">{{ users.length }} registered users</p>
+      <h1 class="text-3xl font-bold text-text-primary">Manage Users</h1>
+      <p class="text-text-secondary mt-1">{{ users.length }} registered users</p>
     </div>
   </div>
 
@@ -29,49 +29,49 @@
   }
 
   @if (!isLoading) {
-    <div class="glass-card overflow-hidden animate-fade-in">
+    <div class="celestial-card overflow-hidden animate-fade-in group inner-glow">
       <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
+        <table class="w-full text-left">
           <thead>
-            <tr class="bg-surface/50 border-b border-white/10 text-xs text-[#4A4A4A] uppercase tracking-wider">
-              <th class="px-6 py-4 font-semibold">User</th>
-              <th class="px-6 py-4 font-semibold">Email</th>
-              <th class="px-6 py-4 font-semibold">Phone</th>
-              <th class="px-6 py-4 font-semibold">Role</th>
-              <th class="px-6 py-4 font-semibold">Joined</th>
-              <th class="px-6 py-4 font-semibold text-right">Actions</th>
+            <tr class="bg-bg-secondary border-b border-glass-border">
+              <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] font-semibold">User</th>
+              <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] font-semibold">Email</th>
+              <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] font-semibold">Phone</th>
+              <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] font-semibold">Role</th>
+              <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] font-semibold">Joined</th>
+              <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] font-semibold text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             @for (user of users; track user.id) {
-              <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
-                <td class="px-6 py-4">
+              <tr class="border-b border-glass-border hover:bg-bg-secondary transition-colors">
+                <td class="px-6 py-4 text-sm">
                   <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-primary-600 to-secondary-600 flex items-center justify-center text-sm font-bold text-white flex-shrink-0">
+                    <div class="w-10 h-10 rounded-xl bg-bg-accent text-white flex items-center justify-center font-bold text-lg shadow-xl shrink-0">
                       {{ user.name.charAt(0).toUpperCase() }}
                     </div>
-                    <span class="text-[#1A1A1A] font-medium text-sm">{{ user.name }}</span>
+                    <span class="text-text-primary font-bold text-[15px] tracking-tight">{{ user.name }}</span>
                   </div>
                 </td>
-                <td class="px-6 py-4 text-[#4A4A4A] text-sm">{{ user.email }}</td>
-                <td class="px-6 py-4 text-[#4A4A4A] text-sm">{{ user.phone || '—' }}</td>
+                <td class="px-6 py-4 text-text-secondary font-medium text-sm">{{ user.email }}</td>
+                <td class="px-6 py-4 text-text-secondary font-medium text-sm">{{ user.phone || '—' }}</td>
                 <td class="px-6 py-4">
                   <span [ngClass]="roleClass(user.role)"
-                        class="px-2.5 py-1 text-xs font-black rounded-lg border uppercase shadow-sm">
+                        class="px-3 py-1.5 text-[9px] font-black rounded-lg border border-dashed uppercase tracking-widest shadow-sm">
                     {{ user.role.replace('_', ' ') }}
                   </span>
                 </td>
-                <td class="px-6 py-4 text-[#4A4A4A] text-sm">{{ user.createdAt | date:'mediumDate' }}</td>
+                <td class="px-6 py-4 text-text-secondary font-medium text-sm">{{ user.createdAt | date:'mediumDate' }}</td>
                 <td class="px-6 py-4 text-right">
                   @if (user.role !== 'ADMIN') {
                     <button (click)="deleteUser(user.id)"
                             [disabled]="deletingId === user.id"
-                            class="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-all disabled:opacity-50"
+                            class="w-10 h-10 flex items-center justify-center bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-all shadow-sm border border-red-500/20 disabled:opacity-50 ml-auto"
                             title="Delete user">
                       @if (deletingId === user.id) {
-                        <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle></svg>
+                        <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle></svg>
                       } @else {
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                       }
                     </button>
                   }
@@ -79,7 +79,7 @@
               </tr>
             }
             @empty {
-              <tr><td colspan="6" class="px-6 py-12 text-center text-[#4A4A4A]">No users found.</td></tr>
+              <tr><td colspan="6" class="px-6 py-12 text-center text-text-muted font-bold text-sm uppercase tracking-widest bg-bg-secondary/50">No users found.</td></tr>
             }
           </tbody>
         </table>

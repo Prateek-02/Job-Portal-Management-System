@@ -6,72 +6,24 @@
 
 <div class="flex min-h-screen relative z-0">
 
-  <!-- Sidebar -->
-  <aside class="w-64 bg-white/40 backdrop-blur-2xl border-r border-white/40 flex flex-col fixed h-full z-40 shadow-xl">
-    <!-- Logo -->
-    <div class="h-20 flex items-center px-6 border-b border-white/20">
-      <a routerLink="/admin/dashboard" class="flex items-center space-x-3 group">
-        <div class="w-9 h-9 bg-gradient-to-br from-[#667eea] to-[#FF9A9E] rounded-[10px] flex items-center justify-center shadow-lg transition-transform group-hover:scale-105">
-          <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-          </svg>
-        </div>
-        <div>
-          <span class="text-[17px] font-black text-[#1A1A1A] tracking-tight block leading-tight">Admin Console</span>
-          <span class="text-[10px] font-bold text-[#4A4A4A] uppercase tracking-[0.1em] opacity-60">System Root</span>
-        </div>
-      </a>
-    </div>
-
-    <!-- Nav Items -->
-    <nav class="flex-1 px-4 py-8 space-y-2 overflow-y-auto">
-      <a routerLink="/admin/dashboard" routerLinkActive="bg-white/80 !text-[#1A1A1A] shadow-md border-white/60"
-         [routerLinkActiveOptions]="{exact: true}"
-         class="flex items-center px-4 py-3 rounded-xl text-[14px] font-bold text-[#4A4A4A] hover:bg-white/40 hover:text-[#1A1A1A] border border-transparent transition-all duration-300 group">
-        <svg class="w-5 h-5 mr-3 opacity-70 group-hover:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
-        Overview
-      </a>
-      <a routerLink="/admin/users" routerLinkActive="bg-white/80 !text-[#1A1A1A] shadow-md border-white/60"
-         class="flex items-center px-4 py-3 rounded-xl text-[14px] font-bold text-[#4A4A4A] hover:bg-white/40 hover:text-[#1A1A1A] border border-transparent transition-all duration-300 group">
-        <svg class="w-5 h-5 mr-3 opacity-70 group-hover:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-        User Management
-      </a>
-      <a routerLink="/admin/jobs" routerLinkActive="bg-white/80 !text-[#1A1A1A] shadow-md border-white/60"
-         class="flex items-center px-4 py-3 rounded-xl text-[14px] font-bold text-[#4A4A4A] hover:bg-white/40 hover:text-[#1A1A1A] border border-transparent transition-all duration-300 group">
-        <svg class="w-5 h-5 mr-3 opacity-70 group-hover:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-        Job Moderation
-      </a>
-      <div class="pt-4 mt-4 border-t border-white/20">
-        <a routerLink="/jobs" class="flex items-center px-4 py-3 rounded-xl text-[14px] font-bold text-[#4A4A4A] hover:bg-white/40 hover:text-[#1A1A1A] border border-transparent transition-all duration-300 group">
-          <svg class="w-5 h-5 mr-3 opacity-70 group-hover:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-          Browse Jobs
-        </a>
-      </div>
-    </nav>
-
-    <!-- Logout -->
-    <div class="p-6 border-t border-white/20">
-      <button (click)="logout()" class="w-full flex items-center px-4 py-3 rounded-xl text-[14px] font-black text-red-600 hover:bg-red-500/10 border border-transparent transition-all duration-300">
-        <svg class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-        Sign Out
-      </button>
-    </div>
-  </aside>
+  <!-- Shared Shared Sidebar -->
+  <app-sidebar></app-sidebar>
 
   <!-- Main Content -->
   <main class="flex-1 ml-64 relative z-10 min-h-screen">
     
-    <!-- Top Header Bar -->
-    <header class="h-20 bg-white/40 backdrop-blur-3xl border-b border-white/20 sticky top-0 z-50 flex items-center justify-between px-8">
+    <!-- Top Header Bar (Admin Specific Header) -->
+    <header class="h-20 bg-glass-bg backdrop-blur-3xl border-b border-glass-border sticky top-0 z-50 flex items-center justify-between px-8">
       <div class="flex items-center gap-4">
-        <h2 class="text-xs font-black text-[#4A4A4A] uppercase tracking-[0.2em] opacity-40">Administrative Cloud</h2>
+        <h2 class="text-xs font-black text-text-muted uppercase tracking-[0.2em] opacity-40">Administrative Cloud</h2>
       </div>
 
       <div class="flex items-center gap-6">
+        <app-theme-toggle></app-theme-toggle>
         <!-- Notification Bell -->
         <div class="relative notification-container">
           <button (click)="toggleNotifications($event)" 
-            class="w-11 h-11 flex items-center justify-center rounded-2xl bg-white/60 border border-white/40 text-[#4A4A4A] hover:bg-obsidian hover:text-white transition-all relative group shadow-sm">
+            class="w-11 h-11 flex items-center justify-center rounded-2xl bg-bg-secondary border border-glass-border text-text-secondary hover:bg-bg-primary hover:text-text-primary transition-all relative group shadow-sm">
             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
@@ -89,13 +41,13 @@
           }
         </div>
 
-        <div class="flex items-center gap-3 pl-6 border-l border-white/20">
-          <div class="w-9 h-9 rounded-xl bg-obsidian text-white flex items-center justify-center font-bold text-xs">
+        <div class="flex items-center gap-3 pl-6 border-l border-glass-border">
+          <div class="w-9 h-9 rounded-xl bg-bg-secondary text-text-primary border border-glass-border flex items-center justify-center font-bold text-xs">
             {{ authService.getCurrentUser()?.name?.charAt(0) }}
           </div>
           <div class="hidden xl:block">
-            <p class="text-[10px] font-black text-obsidian/30 uppercase tracking-widest leading-none mb-1">System User</p>
-            <p class="text-xs font-bold text-obsidian">{{ authService.getCurrentUser()?.name }}</p>
+            <p class="text-[10px] font-black text-text-secondary opacity-30 uppercase tracking-widest leading-none mb-1">System User</p>
+            <p class="text-xs font-bold text-text-primary">{{ authService.getCurrentUser()?.name }}</p>
           </div>
         </div>
       </div>

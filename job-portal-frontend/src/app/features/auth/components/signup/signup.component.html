@@ -5,7 +5,7 @@
     <div class="absolute -top-24 -right-24 w-48 h-48 bg-royal-blue/10 blur-[60px] rounded-full pointer-events-none"></div>
 
     <!-- Back to Portal -->
-    <a routerLink="/" class="absolute top-8 left-8 flex items-center gap-2 text-[13px] font-bold text-slate-navy/40 uppercase tracking-widest hover:text-royal-blue transition-all group z-20">
+    <a routerLink="/" class="absolute top-8 left-8 flex items-center gap-2 text-[13px] font-bold text-text-muted uppercase tracking-widest hover:text-royal-blue transition-all group z-20">
       <svg class="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
       </svg>
@@ -18,43 +18,43 @@
 
     <!-- Header -->
     <div class="text-center mb-12">
-      <div class="w-20 h-20 bg-slate-navy rounded-[24px] flex items-center justify-center mx-auto mb-6 shadow-2xl relative">
-        <svg class="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div class="w-20 h-20 bg-bg-secondary border border-glass-border rounded-[24px] flex items-center justify-center mx-auto mb-6 shadow-2xl relative">
+        <svg class="w-10 h-10 text-text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
         </svg>
       </div>
-      <h1 class="text-3xl font-bold text-slate-navy mb-3 tracking-tighter">Create Account</h1>
-      <p class="text-lg font-medium text-body-text opacity-70">Join the TalentSphere network today.</p>
+      <h1 class="text-3xl font-bold text-text-primary mb-3 tracking-tighter">Create Account</h1>
+      <p class="text-lg font-medium text-text-secondary opacity-70">Join the TalentSphere network today.</p>
     </div>
 
     <!-- Role Matrix -->
     <div class="grid grid-cols-2 gap-6 mb-10">
       <button type="button" (click)="selectRole('JOB_SEEKER')" 
-        [class.!border-royal-blue/40]="selectedRole === 'JOB_SEEKER'" [class.bg-white]="selectedRole === 'JOB_SEEKER'"
-        class="relative p-6 rounded-3xl border border-glass-border bg-slate-navy/[0.02] hover:bg-white transition-all duration-500 text-left group">
+        [class.!border-royal-blue/40]="selectedRole === 'JOB_SEEKER'" [class.!bg-bg-primary]="selectedRole === 'JOB_SEEKER'"
+        class="relative p-6 rounded-3xl border border-glass-border bg-bg-secondary hover:bg-bg-primary transition-all duration-500 text-left group">
         <div class="flex items-center mb-4">
           <div class="w-10 h-10 rounded-xl flex items-center justify-center mr-4 transition-all"
-            [style.background]="selectedRole === 'JOB_SEEKER' ? 'var(--color-royal-blue)' : 'rgba(0,0,0,0.05)'"
-            [style.color]="selectedRole === 'JOB_SEEKER' ? 'white' : 'var(--color-slate-navy)'">
+            [style.background]="selectedRole === 'JOB_SEEKER' ? 'var(--color-royal-blue)' : 'var(--color-bg-primary)'"
+            [style.color]="selectedRole === 'JOB_SEEKER' ? 'white' : 'var(--color-text-primary)'">
             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
           </div>
-          <span class="text-lg font-bold text-slate-navy tracking-tight">Job Seeker</span>
+          <span class="text-lg font-bold text-text-primary tracking-tight">Job Seeker</span>
         </div>
-        <p class="text-xs font-bold text-body-text opacity-50 uppercase tracking-widest pl-1">Find Opportunities</p>
+        <p class="text-xs font-bold text-text-muted opacity-50 uppercase tracking-widest pl-1">Find Opportunities</p>
       </button>
 
       <button type="button" (click)="selectRole('RECRUITER')" 
-        [class.!border-royal-blue/40]="selectedRole === 'RECRUITER'" [class.bg-white]="selectedRole === 'RECRUITER'"
-        class="relative p-6 rounded-3xl border border-glass-border bg-slate-navy/[0.02] hover:bg-white transition-all duration-500 text-left group">
+        [class.!border-royal-blue/40]="selectedRole === 'RECRUITER'" [class.!bg-bg-primary]="selectedRole === 'RECRUITER'"
+        class="relative p-6 rounded-3xl border border-glass-border bg-bg-secondary hover:bg-bg-primary transition-all duration-500 text-left group">
         <div class="flex items-center mb-4">
           <div class="w-10 h-10 rounded-xl flex items-center justify-center mr-4 transition-all"
-            [style.background]="selectedRole === 'RECRUITER' ? 'var(--color-royal-blue)' : 'rgba(0,0,0,0.05)'"
-            [style.color]="selectedRole === 'RECRUITER' ? 'white' : 'var(--color-slate-navy)'">
+            [style.background]="selectedRole === 'RECRUITER' ? 'var(--color-royal-blue)' : 'var(--color-bg-primary)'"
+            [style.color]="selectedRole === 'RECRUITER' ? 'white' : 'var(--color-text-primary)'">
             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
           </div>
-          <span class="text-lg font-bold text-slate-navy tracking-tight">Recruiter</span>
+          <span class="text-lg font-bold text-text-primary tracking-tight">Recruiter</span>
         </div>
-        <p class="text-xs font-bold text-body-text opacity-50 uppercase tracking-widest pl-1">Hire Top Talent</p>
+        <p class="text-xs font-bold text-text-muted opacity-50 uppercase tracking-widest pl-1">Hire Top Talent</p>
       </button>
     </div>
 
@@ -71,9 +71,9 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <!-- Name -->
         <div class="space-y-2">
-          <label class="text-[11px] font-bold text-slate-navy/40 uppercase tracking-[0.2em] ml-1" for="name">Full Name</label>
+          <label class="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em] ml-1" for="name">Full Name</label>
           <input id="name" type="text" formControlName="name" 
-            class="w-full px-6 py-4 bg-slate-navy/[0.03] border border-glass-border rounded-2xl text-slate-navy font-bold placeholder:text-slate-navy/20 focus:bg-white focus:ring-4 focus:ring-royal-blue/5 transition-all outline-none" 
+            class="w-full px-6 py-4 bg-bg-secondary border border-glass-border rounded-2xl text-text-primary font-bold placeholder:text-text-muted/50 focus:bg-bg-primary focus:ring-4 focus:ring-royal-blue/5 transition-all outline-none" 
             placeholder="e.g. John Doe">
           @if (name?.touched && name?.invalid) {
             <p class="text-[10px] font-bold text-red-500 ml-1 uppercase tracking-wider">Please enter your name</p>
@@ -82,9 +82,9 @@
 
         <!-- Phone -->
         <div class="space-y-2">
-          <label class="text-[11px] font-bold text-slate-navy/40 uppercase tracking-[0.2em] ml-1" for="phone">Phone Number</label>
+          <label class="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em] ml-1" for="phone">Phone Number</label>
           <input id="phone" type="tel" formControlName="phone" 
-            class="w-full px-6 py-4 bg-slate-navy/[0.03] border border-glass-border rounded-2xl text-slate-navy font-bold placeholder:text-slate-navy/20 focus:bg-white focus:ring-4 focus:ring-royal-blue/5 transition-all outline-none" 
+            class="w-full px-6 py-4 bg-bg-secondary border border-glass-border rounded-2xl text-text-primary font-bold placeholder:text-text-muted/50 focus:bg-bg-primary focus:ring-4 focus:ring-royal-blue/5 transition-all outline-none" 
             placeholder="+91 9876543210">
           @if (phone?.touched && phone?.invalid) {
             <p class="text-[10px] font-bold text-red-500 ml-1 uppercase tracking-wider">Invalid phone number</p>
@@ -94,9 +94,9 @@
 
       <!-- Email -->
       <div class="space-y-2">
-        <label class="text-[11px] font-bold text-slate-navy/40 uppercase tracking-[0.2em] ml-1" for="reg-email">Email Address</label>
+        <label class="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em] ml-1" for="reg-email">Email Address</label>
         <input id="reg-email" type="email" formControlName="email" 
-          class="w-full px-6 py-4 bg-slate-navy/[0.03] border border-glass-border rounded-2xl text-slate-navy font-bold placeholder:text-slate-navy/20 focus:bg-white focus:ring-4 focus:ring-royal-blue/5 transition-all outline-none" 
+          class="w-full px-6 py-4 bg-bg-secondary border border-glass-border rounded-2xl text-text-primary font-bold placeholder:text-text-muted/50 focus:bg-bg-primary focus:ring-4 focus:ring-royal-blue/5 transition-all outline-none" 
           placeholder="email@example.com">
         @if (email?.touched && email?.invalid) {
           <p class="text-[10px] font-bold text-red-500 ml-1 uppercase tracking-wider">Invalid email format</p>
@@ -105,14 +105,14 @@
 
       <!-- Password -->
       <div class="space-y-2">
-        <label class="text-[11px] font-bold text-slate-navy/40 uppercase tracking-[0.2em] ml-1" for="reg-password">Password</label>
+        <label class="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em] ml-1" for="reg-password">Password</label>
         <div class="relative">
           <input id="reg-password" [type]="showPassword ? 'text' : 'password'" formControlName="password" 
-            class="w-full px-6 py-4 bg-slate-navy/[0.03] border border-glass-border rounded-2xl text-slate-navy font-bold placeholder:text-slate-navy/20 focus:bg-white focus:ring-4 focus:ring-royal-blue/5 transition-all outline-none" 
+            class="w-full px-6 py-4 bg-bg-secondary border border-glass-border rounded-2xl text-text-primary font-bold placeholder:text-text-muted/50 focus:bg-bg-primary focus:ring-4 focus:ring-royal-blue/5 transition-all outline-none" 
             placeholder="Min 6 characters">
-          <button type="button" (click)="showPassword = !showPassword" class="absolute inset-y-0 right-4 flex items-center text-slate-navy/30 hover:text-slate-navy transition-colors">
+          <button type="button" (click)="showPassword = !showPassword" class="absolute inset-y-0 right-4 flex items-center text-text-muted hover:text-text-primary transition-colors">
             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              @if (showPassword) { <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /> } 
+              @if (showPassword) { <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268-2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /> } 
               @else { <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /> }
             </svg>
           </button>
@@ -132,7 +132,7 @@
     </form>
 
     <div class="mt-12 text-center">
-      <p class="text-md font-bold text-body-text opacity-60 mb-2">Already have an account?</p>
+      <p class="text-md font-bold text-text-secondary opacity-60 mb-2">Already have an account?</p>
       <a routerLink="/auth/login" class="text-md font-bold text-royal-blue hover:underline transition-colors ml-1">Sign In</a>
     </div>
   </div>

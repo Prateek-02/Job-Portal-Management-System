@@ -1,0 +1,163 @@
+<nav class="fixed top-0 w-full z-[100] transition-all duration-500 border-b border-glass-border bg-glass-bg backdrop-blur-3xl">
+    <div class="w-full px-8 lg:px-12">
+      <div class="flex items-center justify-between h-24">
+
+        <!-- Logo -->
+        <a [routerLink]="getLogoLink()" class="flex-shrink-0 flex items-center gap-4 group">
+          <div class="w-12 h-12 rounded-[18px] bg-bg-accent flex items-center justify-center transition-all duration-700 group-hover:rotate-[360deg] shadow-2xl relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-tr from-white/20 to-white/10 animate-pulse"></div>
+            <svg class="w-7 h-7 text-white relative z-10" width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <span class="text-3xl font-bold tracking-tighter text-text-primary font-display">Talent<span class="text-royal-blue ml-1">Sphere</span></span>
+        </a>
+
+        <!-- Navigation Links -->
+        <div class="hidden lg:flex flex-1 items-center justify-center space-x-12">
+          @if (authService.isJobSeeker() || authService.isRecruiter()) {
+            <a routerLink="/dashboard" routerLinkActive="text-royal-blue font-bold" [routerLinkActiveOptions]="{exact: true}"
+              class="text-xs font-bold text-text-primary/60 uppercase tracking-[0.3em] hover:text-royal-blue transition-all py-2 relative group">
+              Dashboard
+              <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-royal-blue transition-all duration-500 group-hover:w-full"></span>
+            </a>
+          }
+          <a routerLink="/jobs" routerLinkActive="text-royal-blue font-bold"
+            class="text-xs font-bold text-text-primary/60 uppercase tracking-[0.3em] hover:text-royal-blue transition-all py-2 relative group">
+            Jobs
+            <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-royal-blue transition-all duration-500 group-hover:w-full"></span>
+          </a>
+          @if (authService.isJobSeeker()) {
+            <a routerLink="/applications/my-applications" routerLinkActive="text-royal-blue font-bold"
+              class="text-xs font-bold text-text-primary/60 uppercase tracking-[0.3em] hover:text-royal-blue transition-all py-2 relative group">
+              Applications
+              <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-royal-blue transition-all duration-500 group-hover:w-full"></span>
+            </a>
+          }
+          @if (authService.isRecruiter()) {
+            <a routerLink="/applications/recruiter" routerLinkActive="text-royal-blue font-bold"
+              class="text-xs font-bold text-text-primary/60 uppercase tracking-[0.3em] hover:text-royal-blue transition-all py-2 relative group">
+              Candidates
+              <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-royal-blue transition-all duration-500 group-hover:w-full"></span>
+            </a>
+            <a routerLink="/jobs/my-postings" routerLinkActive="text-royal-blue font-bold"
+              class="text-xs font-bold text-text-primary/60 uppercase tracking-[0.3em] hover:text-royal-blue transition-all py-2 relative group">
+              Postings
+              <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-royal-blue transition-all duration-500 group-hover:w-full"></span>
+            </a>
+          }
+        </div>
+
+        <!-- Auth & Profile (Right) -->
+        <div class="hidden lg:flex items-center gap-6">
+          <app-theme-toggle></app-theme-toggle>
+          
+          @if (currentUser) {
+            <!-- Notifications System -->
+            <div class="relative notification-container">
+              <button (click)="toggleNotifications($event)" 
+                class="w-12 h-12 flex items-center justify-center rounded-2xl bg-bg-secondary border border-glass-border text-text-primary hover:bg-bg-accent hover:text-white transition-all relative group shadow-sm">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                @if (notificationService.unreadCount > 0) {
+                  <span class="absolute -top-1 -right-1 w-5 h-5 bg-royal-blue text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-lg animate-pulse">
+                    {{ notificationService.unreadCount }}
+                  </span>
+                }
+              </button>
+
+              @if (isNotificationOpen) {
+                <div class="absolute right-0 mt-6 z-[120]">
+                  <app-notification-panel></app-notification-panel>
+                </div>
+              }
+            </div>
+
+            <div class="relative profile-container">
+              <button (click)="toggleDropdown($event)"
+                class="flex items-center gap-4 p-1.5 rounded-2xl hover:bg-bg-secondary transition-all focus:outline-none border border-glass-border pr-5">
+                <div class="w-10 h-10 rounded-xl bg-bg-accent text-white flex items-center justify-center font-bold text-sm shadow-xl">
+                  {{ currentUser?.name?.charAt(0)?.toUpperCase() }}
+                </div>
+                <div class="text-left">
+                  <p class="text-[11px] font-bold text-text-muted uppercase tracking-widest leading-none mb-1">Logged In</p>
+                  <p class="text-xs font-bold text-text-primary">{{ currentUser?.name?.split(' ')[0] }}</p>
+                </div>
+                <svg class="w-4 h-4 text-text-muted transition-transform duration-500" [class.rotate-180]="isDropdownOpen" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              @if (isDropdownOpen) {
+                <div (click)="closeDropdown()" class="absolute right-0 mt-6 w-72 celestial-card p-2 z-[110] inner-glow shadow-2xl animate-fade-in-up">
+                  <div class="px-5 py-5 mb-2 bg-bg-secondary rounded-[24px]">
+                    <p class="text-[17px] font-bold text-text-primary tracking-tight">{{ currentUser?.name }}</p>
+                    <p class="text-[11px] font-bold text-text-muted uppercase tracking-widest mt-1">{{ currentUser?.email }}</p>
+                  </div>
+                  <a routerLink="/profile" class="flex items-center px-5 py-4 text-[13px] font-bold text-text-secondary hover:text-text-primary hover:bg-bg-secondary rounded-2xl transition-all">
+                    <svg class="w-5 h-5 mr-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                    Profile Settings
+                  </a>
+                  <div class="h-px bg-glass-border my-2 mx-4"></div>
+                  <button (click)="logout()" class="w-full flex items-center px-5 py-4 text-[13px] font-bold text-red-500 hover:bg-red-500/5 rounded-2xl transition-all text-left">
+                    <svg class="w-5 h-5 mr-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                    Logout
+                  </button>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="flex items-center gap-6">
+              <a routerLink="/auth/login" class="text-xs font-bold text-text-muted uppercase tracking-[0.2em] hover:text-text-primary transition-all">Login</a>
+              <a routerLink="/auth/signup" class="btn-celestial !px-8 !py-3.5 !rounded-2xl !text-[11px] !font-bold !tracking-[0.2em] shadow-2xl">Register</a>
+            </div>
+          }
+        </div>
+
+        <!-- Mobile Logic -->
+        <div class="flex items-center lg:hidden gap-6">
+          <button (click)="toggleMenu()" class="w-12 h-12 flex items-center justify-center bg-bg-secondary border border-glass-border rounded-xl text-text-primary shadow-sm">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" [attr.d]="isMenuOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    @if (isMenuOpen) {
+      <div class="lg:hidden celestial-card mx-6 mb-6 mt-4 p-4 space-y-2 animate-fade-in-up inner-glow shadow-2xl border border-glass-border overflow-hidden">
+        @if (authService.isJobSeeker() || authService.isRecruiter()) {
+          <a routerLink="/dashboard" (click)="toggleMenu()" class="block px-5 py-4 text-sm font-bold text-text-muted hover:text-text-primary hover:bg-bg-secondary rounded-2xl transition-all">Dashboard</a>
+        }
+        <a routerLink="/jobs" (click)="toggleMenu()" class="block px-5 py-4 text-sm font-bold text-text-muted hover:text-text-primary hover:bg-bg-secondary rounded-2xl transition-all">Job Board</a>
+        
+        @if (authService.isJobSeeker()) {
+          <a routerLink="/applications/my-applications" (click)="toggleMenu()" class="block px-5 py-4 text-sm font-bold text-text-muted hover:text-text-primary hover:bg-bg-secondary rounded-2xl transition-all">My Applications</a>
+        }
+        @if (authService.isRecruiter()) {
+          <a routerLink="/jobs/create/new" (click)="toggleMenu()" class="block px-5 py-4 text-sm font-bold text-text-muted hover:text-text-primary hover:bg-bg-secondary rounded-2xl transition-all">Post a Job</a>
+          <a routerLink="/jobs/my-postings" (click)="toggleMenu()" class="block px-5 py-4 text-sm font-bold text-text-muted hover:text-text-primary hover:bg-bg-secondary rounded-2xl transition-all">My Postings</a>
+          <a routerLink="/applications/recruiter" (click)="toggleMenu()" class="block px-5 py-4 text-sm font-bold text-text-muted hover:text-text-primary hover:bg-bg-secondary rounded-2xl transition-all">Candidate Management</a>
+        }
+
+        @if (currentUser) {
+          <div class="border-t border-glass-border mt-4 pt-4">
+            <div class="px-5 py-3 mb-4 bg-bg-secondary rounded-2xl">
+              <p class="text-sm font-bold text-text-primary">{{ currentUser?.name }}</p>
+              <p class="text-[10px] font-bold text-text-muted uppercase tracking-widest mt-1">{{ currentUser.email }}</p>
+            </div>
+            <a routerLink="/profile" (click)="toggleMenu()" class="block px-5 py-4 text-sm font-bold text-text-secondary hover:text-text-primary rounded-2xl">Profile Settings</a>
+            <button (click)="logout()" class="block w-full text-left px-5 py-4 text-sm font-bold text-red-500 hover:bg-red-500/5 rounded-2xl transition-all">Logout</button>
+          </div>
+        } @else {
+          <div class="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-glass-border p-2">
+            <a routerLink="/auth/login" (click)="toggleMenu()" class="px-6 py-4 rounded-2xl border border-glass-border text-center text-xs font-bold uppercase tracking-widest text-text-muted hover:text-text-primary">Login</a>
+            <a routerLink="/auth/signup" (click)="toggleMenu()" class="px-6 py-4 rounded-2xl bg-bg-accent text-white text-center text-xs font-bold uppercase tracking-widest shadow-xl">Register</a>
+          </div>
+        }
+      </div>
+    }
+  </nav>

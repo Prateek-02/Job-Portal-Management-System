@@ -1,8 +1,8 @@
 <div class="p-8">
   <div class="flex items-center justify-between mb-8">
     <div>
-      <h1 class="text-3xl font-bold text-[#1A1A1A]">Manage Jobs</h1>
-      <p class="text-[#4A4A4A] mt-1">{{ totalElements }} total job listings</p>
+      <h1 class="text-3xl font-bold text-text-primary">Manage Jobs</h1>
+      <p class="text-text-secondary mt-1">{{ totalElements }} total job listings</p>
     </div>
   </div>
 
@@ -29,43 +29,43 @@
   }
 
   @if (!isLoading) {
-    <div class="glass-card overflow-hidden animate-fade-in">
+    <div class="celestial-card overflow-hidden animate-fade-in group inner-glow">
       <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
+        <table class="w-full text-left">
           <thead>
-            <tr class="bg-surface/50 border-b border-white/10 text-xs text-[#4A4A4A] uppercase tracking-wider">
-              <th class="px-6 py-4 font-semibold">Job Title</th>
-              <th class="px-6 py-4 font-semibold">Company</th>
-              <th class="px-6 py-4 font-semibold">Location</th>
-              <th class="px-6 py-4 font-semibold">Salary</th>
-              <th class="px-6 py-4 font-semibold">Posted</th>
-              <th class="px-6 py-4 font-semibold text-right">Actions</th>
+            <tr class="bg-bg-secondary border-b border-glass-border">
+              <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] font-semibold">Job Title</th>
+              <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] font-semibold">Company</th>
+              <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] font-semibold">Location</th>
+              <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] font-semibold">Salary</th>
+              <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] font-semibold">Posted</th>
+              <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] font-semibold text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             @for (job of jobs; track job.id) {
-              <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
-                <td class="px-6 py-4 text-[#1A1A1A] font-medium text-sm max-w-xs truncate">{{ job.title }}</td>
-                <td class="px-6 py-4 text-[#4A4A4A] text-sm">{{ job.companyName }}</td>
-                <td class="px-6 py-4 text-[#4A4A4A] text-sm">{{ job.location }}</td>
-                <td class="px-6 py-4 text-green-400 text-sm font-medium">₹{{ job.salary | number:'1.0-0' }}</td>
-                <td class="px-6 py-4 text-[#4A4A4A] text-sm">{{ job.createdAt | date:'mediumDate' }}</td>
+              <tr class="border-b border-glass-border hover:bg-bg-secondary transition-colors">
+                <td class="px-6 py-4 text-text-primary font-bold text-sm max-w-xs truncate tracking-tight">{{ job.title }}</td>
+                <td class="px-6 py-4 text-text-secondary font-medium text-sm">{{ job.companyName }}</td>
+                <td class="px-6 py-4 text-text-secondary font-medium text-sm">{{ job.location }}</td>
+                <td class="px-6 py-4 text-energy-emerald text-sm font-black">₹{{ job.salary | number:'1.0-0' }}</td>
+                <td class="px-6 py-4 text-text-muted font-medium text-sm">{{ job.createdAt | date:'mediumDate' }}</td>
                 <td class="px-6 py-4 text-right">
                   <button (click)="deleteJob(job.id)"
                           [disabled]="deletingId === job.id"
-                          class="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-all disabled:opacity-50"
+                          class="w-10 h-10 flex items-center justify-center bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-all shadow-sm border border-red-500/20 disabled:opacity-50 ml-auto"
                           title="Delete job">
                     @if (deletingId === job.id) {
-                      <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle></svg>
+                      <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle></svg>
                     } @else {
-                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                     }
                   </button>
                 </td>
               </tr>
             }
             @empty {
-              <tr><td colspan="6" class="px-6 py-12 text-center text-[#4A4A4A]">No jobs found.</td></tr>
+              <tr><td colspan="6" class="px-6 py-12 text-center text-text-muted font-bold text-sm uppercase tracking-widest bg-bg-secondary/50">No jobs found.</td></tr>
             }
           </tbody>
         </table>

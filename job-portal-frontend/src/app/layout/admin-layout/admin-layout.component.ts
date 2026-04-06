@@ -1,14 +1,16 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { NotificationService } from '../../features/notifications/services/notification.service';
 import { NotificationPanelComponent } from '../../features/notifications/components/notification-panel/notification-panel.component';
+import { ThemeToggleComponent } from '../../shared/components/theme-toggle/theme-toggle.component';
+import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, NotificationPanelComponent],
+  imports: [CommonModule, RouterOutlet, NotificationPanelComponent, ThemeToggleComponent, SidebarComponent],
   templateUrl: './admin-layout.component.html'
 })
 export class AdminLayoutComponent {
@@ -16,14 +18,8 @@ export class AdminLayoutComponent {
 
   constructor(
     public authService: AuthService,
-    public notificationService: NotificationService,
-    private router: Router
+    public notificationService: NotificationService
   ) {}
-
-  logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/auth/login']);
-  }
 
   toggleNotifications(event?: Event): void {
     if (event) event.stopPropagation();

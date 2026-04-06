@@ -1,0 +1,5 @@
+:host { display: block; }
+.bg-glass-bg { background: var(--color-glass-bg-val); }
+.bg-glass-bg-hover { background: var(--color-bg-secondary); }
+.text-text-primary { color: var(--color-text-primary-val); }
+.border-glass-border { border-color: var(--color-glass-border-val); }

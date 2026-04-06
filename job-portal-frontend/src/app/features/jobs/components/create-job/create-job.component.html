@@ -1,7 +1,7 @@
 <div class="max-w-5xl mx-auto px-6 lg:px-12 py-12 relative z-20">
 
   <!-- Navigation -->
-  <a routerLink="/dashboard" class="inline-flex items-center text-xs font-bold text-obsidian/40 hover:text-obsidian transition-all mb-12 group uppercase tracking-[0.2em] bg-white px-6 py-3 rounded-2xl border border-glass-border shadow-sm">
+  <a routerLink="/dashboard" class="inline-flex items-center text-xs font-bold text-text-muted hover:text-text-primary transition-all mb-12 group uppercase tracking-[0.2em] bg-bg-secondary px-6 py-3 rounded-2xl border border-glass-border shadow-sm">
     <svg class="w-4 h-4 mr-3 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
     Return to Dashboard
   </a>
@@ -11,7 +11,7 @@
     <div class="inline-block px-5 py-2 rounded-full bg-energy-emerald/10 border border-energy-emerald/20 text-energy-emerald text-[11px] font-bold uppercase tracking-[0.3em] mb-6">
       Job Posting Information
     </div>
-    <h1 class="text-6xl font-bold text-obsidian tracking-tighter">
+    <h1 class="text-6xl font-bold text-text-primary tracking-tighter">
       {{ isEditMode ? 'Edit Job' : 'Post New Job' }}
     </h1>
     <p class="text-xl font-medium text-text-secondary opacity-60 mt-4 max-w-2xl mx-auto leading-relaxed">
@@ -45,14 +45,14 @@
       <section>
         <div class="flex items-center gap-4 mb-10 pb-4 border-b border-glass-border">
           <span class="w-2 h-2 rounded-full bg-energy-emerald shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>
-          <h3 class="text-xs font-bold text-obsidian/30 uppercase tracking-[0.3em]">General Information</h3>
+          <h3 class="text-xs font-bold text-text-muted uppercase tracking-[0.3em]">General Information</h3>
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div class="md:col-span-2 space-y-3">
-            <label class="text-[11px] font-bold text-obsidian/40 uppercase tracking-[0.2em] ml-1" for="title">Job Title</label>
+            <label class="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em] ml-1" for="title">Job Title</label>
             <input id="title" type="text" formControlName="title" 
-              class="w-full px-6 py-4 bg-obsidian/[0.03] border border-glass-border rounded-2xl text-obsidian font-bold placeholder:text-obsidian/20 focus:bg-white focus:border-energy-emerald/40 focus:ring-4 focus:ring-energy-emerald/5 transition-all outline-none" 
+              class="w-full px-6 py-4 bg-bg-secondary border border-glass-border rounded-2xl text-text-primary font-bold placeholder:text-text-muted/40 focus:bg-bg-primary focus:border-energy-emerald/40 focus:ring-4 focus:ring-energy-emerald/5 transition-all outline-none shadow-inner" 
               placeholder="e.g. Senior Software Engineer">
             @if (jobForm.get('title')?.touched && jobForm.get('title')?.invalid) {
               <p class="text-[10px] font-bold text-red-500 ml-1 uppercase tracking-wider">Job title is required</p>
@@ -60,9 +60,9 @@
           </div>
 
           <div class="space-y-3">
-            <label class="text-[11px] font-bold text-obsidian/40 uppercase tracking-[0.2em] ml-1" for="companyName">Company Name</label>
+            <label class="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em] ml-1" for="companyName">Company Name</label>
             <input id="companyName" type="text" formControlName="companyName" 
-              class="w-full px-6 py-4 bg-obsidian/[0.03] border border-glass-border rounded-2xl text-obsidian font-bold placeholder:text-obsidian/20 focus:bg-white focus:border-energy-emerald/40 focus:ring-4 focus:ring-energy-emerald/5 transition-all outline-none" 
+              class="w-full px-6 py-4 bg-bg-secondary border border-glass-border rounded-2xl text-text-primary font-bold placeholder:text-text-muted/40 focus:bg-bg-primary focus:border-energy-emerald/40 focus:ring-4 focus:ring-energy-emerald/5 transition-all outline-none shadow-inner" 
               placeholder="Enter Company Name">
             @if (jobForm.get('companyName')?.touched && jobForm.get('companyName')?.invalid) {
               <p class="text-[10px] font-bold text-red-500 ml-1 uppercase tracking-wider">Company name is required</p>
@@ -70,9 +70,9 @@
           </div>
 
           <div class="space-y-3">
-            <label class="text-[11px] font-bold text-obsidian/40 uppercase tracking-[0.2em] ml-1" for="skills">Skills Required <span class="opacity-50 text-[9px]">(Comma Separated)</span></label>
+            <label class="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em] ml-1" for="skills">Skills Required <span class="opacity-50 text-[9px]">(Comma Separated)</span></label>
             <input id="skills" type="text" formControlName="skills" 
-              class="w-full px-6 py-4 bg-obsidian/[0.03] border border-glass-border rounded-2xl text-obsidian font-bold placeholder:text-obsidian/20 focus:bg-white focus:border-energy-emerald/40 focus:ring-4 focus:ring-energy-emerald/5 transition-all outline-none" 
+              class="w-full px-6 py-4 bg-bg-secondary border border-glass-border rounded-2xl text-text-primary font-bold placeholder:text-text-muted/40 focus:bg-bg-primary focus:border-energy-emerald/40 focus:ring-4 focus:ring-energy-emerald/5 transition-all outline-none shadow-inner" 
               placeholder="e.g. Java, SQL, Angular">
           </div>
         </div>
@@ -82,15 +82,15 @@
       <section>
         <div class="flex items-center gap-4 mb-10 pb-4 border-b border-glass-border">
           <span class="w-2 h-2 rounded-full bg-energy-emerald shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>
-          <h3 class="text-xs font-bold text-obsidian/30 uppercase tracking-[0.3em]">Requirements & Salary</h3>
+          <h3 class="text-xs font-bold text-text-muted uppercase tracking-[0.3em]">Requirements & Salary</h3>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div class="space-y-3">
-            <label class="text-[11px] font-bold text-obsidian/40 uppercase tracking-[0.2em] ml-1" for="location">Job Location</label>
+            <label class="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em] ml-1" for="location">Job Location</label>
             <div class="relative">
               <input id="location" type="text" formControlName="location" 
-                class="w-full px-6 py-4 bg-obsidian/[0.03] border border-glass-border rounded-2xl text-obsidian font-bold placeholder:text-obsidian/20 focus:bg-white focus:border-energy-emerald/40 focus:ring-4 focus:ring-energy-emerald/5 transition-all outline-none" 
+                class="w-full px-6 py-4 bg-bg-secondary border border-glass-border rounded-2xl text-text-primary font-bold placeholder:text-text-muted/40 focus:bg-bg-primary focus:border-energy-emerald/40 focus:ring-4 focus:ring-energy-emerald/5 transition-all outline-none shadow-inner" 
                 placeholder="e.g. Remote / New York">
             </div>
             @if (jobForm.get('location')?.touched && jobForm.get('location')?.invalid) {
@@ -99,10 +99,10 @@
           </div>
 
           <div class="space-y-3">
-            <label class="text-[11px] font-bold text-obsidian/40 uppercase tracking-[0.2em] ml-1" for="salary">Annual Salary (₹)</label>
+            <label class="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em] ml-1" for="salary">Annual Salary (₹)</label>
             <div class="relative">
               <input id="salary" type="number" formControlName="salary" 
-                class="w-full px-6 py-4 bg-obsidian/[0.03] border border-glass-border rounded-2xl text-obsidian font-bold placeholder:text-obsidian/20 focus:bg-white focus:border-energy-emerald/40 focus:ring-4 focus:ring-energy-emerald/5 transition-all outline-none" 
+                class="w-full px-6 py-4 bg-bg-secondary border border-glass-border rounded-2xl text-text-primary font-bold placeholder:text-text-muted/40 focus:bg-bg-primary focus:border-energy-emerald/40 focus:ring-4 focus:ring-energy-emerald/5 transition-all outline-none shadow-inner" 
                 placeholder="0.00">
             </div>
             @if (jobForm.get('salary')?.touched && jobForm.get('salary')?.invalid) {
@@ -111,10 +111,10 @@
           </div>
 
           <div class="space-y-3">
-            <label class="text-[11px] font-bold text-obsidian/40 uppercase tracking-[0.2em] ml-1" for="experience">Experience Required (Years)</label>
+            <label class="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em] ml-1" for="experience">Experience Required (Years)</label>
             <div class="relative">
               <input id="experience" type="number" formControlName="experience" 
-                class="w-full px-6 py-4 bg-obsidian/[0.03] border border-glass-border rounded-2xl text-obsidian font-bold placeholder:text-obsidian/20 focus:bg-white focus:border-energy-emerald/40 focus:ring-4 focus:ring-energy-emerald/5 transition-all outline-none" 
+                class="w-full px-6 py-4 bg-bg-secondary border border-glass-border rounded-2xl text-text-primary font-bold placeholder:text-text-muted/40 focus:bg-bg-primary focus:border-energy-emerald/40 focus:ring-4 focus:ring-energy-emerald/5 transition-all outline-none shadow-inner" 
                 placeholder="e.g. 5">
             </div>
             @if (jobForm.get('experience')?.touched && jobForm.get('experience')?.invalid) {
@@ -128,12 +128,12 @@
       <section>
         <div class="flex items-center gap-4 mb-10 pb-4 border-b border-glass-border">
           <span class="w-2 h-2 rounded-full bg-energy-emerald shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>
-          <h3 class="text-xs font-bold text-obsidian/30 uppercase tracking-[0.3em]">Job Description</h3>
+          <h3 class="text-xs font-bold text-text-muted uppercase tracking-[0.3em]">Job Description</h3>
         </div>
 
         <div class="space-y-4">
-          <label class="text-[11px] font-bold text-obsidian/40 uppercase tracking-[0.2em] ml-1 mb-2 block">Detailed Job Description</label>
-          <div class="celestial-editor-wrapper bg-obsidian/[0.02] rounded-3xl border border-glass-border overflow-hidden min-h-[450px] flex flex-col transition-all focus-within:bg-white focus-within:border-energy-emerald focus-within:ring-4 focus-within:ring-energy-emerald/5">
+          <label class="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em] ml-1 mb-2 block">Detailed Job Description</label>
+          <div class="celestial-editor-wrapper bg-bg-secondary rounded-3xl border border-glass-border overflow-hidden min-h-[450px] flex flex-col transition-all focus-within:bg-bg-primary focus-within:border-energy-emerald focus-within:ring-4 focus-within:ring-energy-emerald/5 shadow-inner">
             <ngx-editor [editor]="editor" formControlName="description" 
               class="flex-1 p-8 text-text-primary text-lg font-medium leading-relaxed focus:outline-none"></ngx-editor>
           </div>
@@ -145,9 +145,9 @@
 
       <!-- Form Execution -->
       <div class="flex flex-col sm:flex-row gap-6 pt-10 mt-12 border-t border-glass-border">
-        <a routerLink="/dashboard" class="w-full sm:w-auto px-10 py-5 rounded-2xl border border-glass-border text-obsidian font-bold text-sm uppercase tracking-widest text-center hover:bg-obsidian/5 transition-all">Cancel Posting</a>
+        <a routerLink="/dashboard" class="w-full sm:w-auto px-10 py-5 rounded-2xl border border-glass-border text-text-primary font-bold text-sm uppercase tracking-widest text-center hover:bg-bg-secondary transition-all">Cancel Posting</a>
         <button type="submit" [disabled]="isSubmitting || jobForm.invalid" 
-          class="flex-1 btn-celestial !py-5 !bg-obsidian hover:!bg-energy-emerald shadow-2xl !rounded-2xl transition-all flex items-center justify-center gap-3">
+          class="flex-1 btn-celestial !py-5 !bg-bg-accent hover:!bg-energy-emerald shadow-2xl !rounded-2xl transition-all flex items-center justify-center gap-3">
           @if (isSubmitting) {
             <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
             Publishing...

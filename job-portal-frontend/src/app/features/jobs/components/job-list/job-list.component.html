@@ -2,7 +2,7 @@
 
   <!-- Header -->
   <div class="mb-14 animate-fade-in-up">
-    <h1 class="text-6xl font-bold text-obsidian mb-4 tracking-tighter">Job Board</h1>
+    <h1 class="text-6xl font-bold text-text-primary mb-4 tracking-tighter">Job Board</h1>
     <p class="text-xl font-medium text-text-secondary opacity-70 max-w-2xl leading-relaxed">Find your next career move among our curated opportunities.</p>
   </div>
 
@@ -10,64 +10,64 @@
   <form [formGroup]="filterForm" class="celestial-card p-10 mb-12 animate-fade-in-up inner-glow relative overflow-hidden" style="animation-delay: 0.05s">
     <div class="absolute -top-24 -right-24 w-64 h-64 bg-energy-violet/5 blur-[80px] rounded-full pointer-events-none"></div>
     
-    <h3 class="text-[11px] font-bold text-obsidian/40 uppercase tracking-[0.3em] mb-8 border-b border-glass-border pb-4">Filters</h3>
+    <h3 class="text-[11px] font-bold text-text-muted uppercase tracking-[0.3em] mb-8 border-b border-glass-border pb-4">Filters</h3>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8 relative z-10">
 
       <!-- Keyword -->
       <div class="space-y-3">
-        <label class="text-[11px] font-bold text-obsidian/40 uppercase tracking-[0.2em] ml-1">Job Title / Keyword</label>
+        <label class="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em] ml-1">Job Title / Keyword</label>
         <div class="relative">
           <input type="text" formControlName="title" 
-            class="w-full px-5 py-3.5 bg-obsidian/[0.03] border border-glass-border rounded-2xl text-obsidian font-bold placeholder:text-obsidian/20 focus:bg-white focus:border-energy-violet/40 focus:ring-4 focus:ring-energy-violet/5 transition-all outline-none text-sm" 
+            class="w-full px-5 py-3.5 bg-bg-secondary border border-glass-border rounded-2xl text-text-primary font-bold placeholder:text-text-muted/50 focus:bg-bg-primary focus:border-energy-violet/40 focus:ring-4 focus:ring-energy-violet/5 transition-all outline-none text-sm" 
             placeholder="Search Jobs">
         </div>
       </div>
 
       <!-- Location -->
       <div class="space-y-3">
-        <label class="text-[11px] font-bold text-obsidian/40 uppercase tracking-[0.2em] ml-1">Location / Remote</label>
+        <label class="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em] ml-1">Location / Remote</label>
         <div class="relative">
           <input type="text" formControlName="location" 
-            class="w-full px-5 py-3.5 bg-obsidian/[0.03] border border-glass-border rounded-2xl text-obsidian font-bold placeholder:text-obsidian/20 focus:bg-white focus:border-energy-violet/40 focus:ring-4 focus:ring-energy-violet/5 transition-all outline-none text-sm" 
+            class="w-full px-5 py-3.5 bg-bg-secondary border border-glass-border rounded-2xl text-text-primary font-bold placeholder:text-text-muted/50 focus:bg-bg-primary focus:border-energy-violet/40 focus:ring-4 focus:ring-energy-violet/5 transition-all outline-none text-sm" 
             placeholder="Search Location">
         </div>
       </div>
 
       <!-- Company -->
       <div class="space-y-3">
-        <label class="text-[11px] font-bold text-obsidian/40 uppercase tracking-[0.2em] ml-1">Company Name</label>
+        <label class="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em] ml-1">Company Name</label>
         <div class="relative">
           <input type="text" formControlName="companyName" 
-            class="w-full px-5 py-3.5 bg-obsidian/[0.03] border border-glass-border rounded-2xl text-obsidian font-bold placeholder:text-obsidian/20 focus:bg-white focus:border-energy-violet/40 focus:ring-4 focus:ring-energy-violet/5 transition-all outline-none text-sm" 
+            class="w-full px-5 py-3.5 bg-bg-secondary border border-glass-border rounded-2xl text-text-primary font-bold placeholder:text-text-muted/50 focus:bg-bg-primary focus:border-energy-violet/40 focus:ring-4 focus:ring-energy-violet/5 transition-all outline-none text-sm" 
             placeholder="Search Companies">
         </div>
       </div>
 
       <!-- Experience Range -->
       <div class="space-y-3">
-        <label class="text-[11px] font-bold text-obsidian/40 uppercase tracking-[0.2em] ml-1">Experience (Years)</label>
+        <label class="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em] ml-1">Experience (Years)</label>
         <div class="flex gap-2 items-center">
           <input type="number" formControlName="minExperience" 
-            class="w-full px-4 py-3 bg-obsidian/[0.03] border border-glass-border rounded-xl text-obsidian font-bold text-center text-sm outline-none focus:bg-white transition-all" 
+            class="w-full px-4 py-3 bg-bg-secondary border border-glass-border rounded-xl text-text-primary font-bold text-center text-sm outline-none focus:bg-bg-primary transition-all" 
             placeholder="Min">
-          <span class="text-obsidian/20 font-bold">—</span>
+          <span class="text-text-muted/20 font-bold">—</span>
           <input type="number" formControlName="maxExperience" 
-            class="w-full px-4 py-3 bg-obsidian/[0.03] border border-glass-border rounded-xl text-obsidian font-bold text-center text-sm outline-none focus:bg-white transition-all" 
+            class="w-full px-4 py-3 bg-bg-secondary border border-glass-border rounded-xl text-text-primary font-bold text-center text-sm outline-none focus:bg-bg-primary transition-all" 
             placeholder="Max">
         </div>
       </div>
 
       <!-- Salary Range -->
       <div class="space-y-3">
-        <label class="text-[11px] font-bold text-obsidian/40 uppercase tracking-[0.2em] ml-1">Annual Salary (₹)</label>
+        <label class="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em] ml-1">Annual Salary (₹)</label>
         <div class="flex gap-2 items-center">
           <input type="number" formControlName="minSalary" 
-            class="w-full px-4 py-3 bg-obsidian/[0.03] border border-glass-border rounded-xl text-obsidian font-bold text-center text-sm outline-none focus:bg-white transition-all" 
+            class="w-full px-4 py-3 bg-bg-secondary border border-glass-border rounded-xl text-text-primary font-bold text-center text-sm outline-none focus:bg-bg-primary transition-all" 
             placeholder="Min">
-          <span class="text-obsidian/20 font-bold">—</span>
+          <span class="text-text-muted/20 font-bold">—</span>
           <input type="number" formControlName="maxSalary" 
-            class="w-full px-4 py-3 bg-obsidian/[0.03] border border-glass-border rounded-xl text-obsidian font-bold text-center text-sm outline-none focus:bg-white transition-all" 
+            class="w-full px-4 py-3 bg-bg-secondary border border-glass-border rounded-xl text-text-primary font-bold text-center text-sm outline-none focus:bg-bg-primary transition-all" 
             placeholder="Max">
         </div>
       </div>
@@ -77,7 +77,7 @@
     <div class="mt-10 pt-8 border-t border-glass-border flex flex-wrap items-center justify-between gap-6 relative z-10">
       <div class="flex flex-wrap items-center gap-3">
         @if (selectedSkills.length > 0) {
-          <span class="text-[10px] font-bold text-obsidian/40 uppercase tracking-[0.2em] mr-2">Filters:</span>
+          <span class="text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] mr-2">Filters:</span>
           @for (skill of selectedSkills; track skill) {
             <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-energy-violet/10 border border-energy-violet/20 text-energy-violet text-[11px] font-bold shadow-sm transition-all hover:bg-energy-violet/20 group">
               {{ skill }}
@@ -91,10 +91,10 @@
 
       <div class="flex items-center gap-6">
         @if (totalElements > 0 && !isLoading) {
-          <span class="text-[12px] font-bold text-obsidian/40 uppercase tracking-widest">{{ totalElements }} Jobs Found</span>
+          <span class="text-[12px] font-bold text-text-muted uppercase tracking-widest">{{ totalElements }} Jobs Found</span>
         }
         <button type="button" (click)="clearFilters()"
-          class="px-6 py-2.5 rounded-xl border border-glass-border text-obsidian font-bold text-[12px] uppercase tracking-widest hover:bg-obsidian hover:text-white transition-all shadow-sm">
+          class="px-6 py-2.5 rounded-xl border border-glass-border text-text-primary font-bold text-[12px] uppercase tracking-widest hover:bg-bg-secondary transition-all shadow-sm">
           Reset Filters
         </button>
       </div>
@@ -107,14 +107,14 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
       @for (i of [1,2,3,4,5,6]; track i) {
         <div class="celestial-card p-10 animate-pulse relative overflow-hidden h-[400px]">
-          <div class="w-16 h-16 bg-obsidian/5 rounded-2xl mb-8"></div>
-          <div class="h-8 bg-obsidian/5 rounded-xl w-3/4 mb-4"></div>
-          <div class="h-4 bg-obsidian/5 rounded-lg w-1/2 mb-8"></div>
+          <div class="w-16 h-16 bg-glass-bg rounded-2xl mb-8"></div>
+          <div class="h-8 bg-glass-bg rounded-xl w-3/4 mb-4"></div>
+          <div class="h-4 bg-glass-bg rounded-lg w-1/2 mb-8"></div>
           <div class="space-y-3 mb-8">
-            <div class="h-4 bg-obsidian/5 rounded-lg w-full"></div>
-            <div class="h-4 bg-obsidian/5 rounded-lg w-5/6"></div>
+            <div class="h-4 bg-glass-bg rounded-lg w-full"></div>
+            <div class="h-4 bg-glass-bg rounded-lg w-5/6"></div>
           </div>
-          <div class="h-14 bg-obsidian/5 rounded-2xl w-full mt-auto"></div>
+          <div class="h-14 bg-glass-bg rounded-2xl w-full mt-auto"></div>
         </div>
       }
     </div>
@@ -122,12 +122,12 @@
 
   @if (!isLoading && jobs.length === 0) {
     <div class="celestial-card py-24 text-center flex flex-col items-center animate-fade-in-up inner-glow">
-      <div class="w-24 h-24 bg-obsidian/[0.03] rounded-full flex items-center justify-center mb-8 border border-glass-border shadow-inner">
-        <svg class="w-10 h-10 text-obsidian/20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+      <div class="w-24 h-24 bg-bg-secondary rounded-full flex items-center justify-center mb-8 border border-glass-border shadow-inner">
+        <svg class="w-10 h-10 text-text-muted/20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
       </div>
-      <h2 class="text-3xl font-bold text-obsidian mb-3 tracking-tight">No Jobs Found</h2>
+      <h2 class="text-3xl font-bold text-text-primary mb-3 tracking-tight">No Jobs Found</h2>
       <p class="text-text-secondary opacity-60 text-lg max-w-md mx-auto leading-relaxed">No jobs match your current search parameters. Try adjusting your filters.</p>
-      <button (click)="clearFilters()" class="btn-celestial mt-10 !bg-obsidian hover:!bg-energy-violet">Clear All Filters</button>
+      <button (click)="clearFilters()" class="btn-celestial mt-10 !bg-bg-accent hover:!bg-energy-violet">Clear All Filters</button>
     </div>
   }
 
@@ -138,14 +138,14 @@
           
           <!-- Job Information -->
           <div class="flex items-start justify-between mb-8 relative">
-            <div class="w-16 h-16 rounded-[20px] flex items-center justify-center text-2xl font-bold text-white bg-obsidian shadow-xl transition-transform group-hover:scale-110">
+            <div class="w-16 h-16 rounded-[20px] flex items-center justify-center text-2xl font-bold text-white bg-bg-accent shadow-xl transition-transform group-hover:scale-110">
               {{ job.companyName.charAt(0) }}
             </div>
 
             <!-- Contextual Actions -->
             <div class="flex gap-2">
               @if (authService.isRecruiter()) {
-                <a [routerLink]="['/applications/job', job.id]" class="w-10 h-10 bg-obsidian/[0.03] hover:bg-obsidian hover:text-white rounded-xl flex items-center justify-center transition-all">
+                <a [routerLink]="['/applications/job', job.id]" class="w-10 h-10 bg-bg-secondary hover:bg-bg-primary text-text-primary rounded-xl flex items-center justify-center transition-all border border-glass-border shadow-sm">
                   <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                 </a>
               }
@@ -154,20 +154,20 @@
 
           <!-- Entity Details -->
           <div class="mb-4">
-            <h3 class="text-2xl font-bold text-obsidian leading-tight mb-2 group-hover:text-energy-violet transition-colors">{{ job.title }}</h3>
+            <h3 class="text-2xl font-bold text-text-primary leading-tight mb-2 group-hover:text-energy-violet transition-colors">{{ job.title }}</h3>
             <div class="flex items-center gap-2">
-              <span class="text-xs font-bold text-obsidian/30 uppercase tracking-[0.2em]">{{ job.companyName }}</span>
-              <span class="w-1 h-1 rounded-full bg-obsidian/10"></span>
-              <span class="text-xs font-bold text-obsidian/30 uppercase tracking-[0.2em]">{{ job.location }}</span>
+              <span class="text-xs font-bold text-text-muted uppercase tracking-[0.2em]">{{ job.companyName }}</span>
+              <span class="w-1 h-1 rounded-full bg-glass-border"></span>
+              <span class="text-xs font-bold text-text-muted uppercase tracking-[0.2em]">{{ job.location }}</span>
             </div>
           </div>
 
           <!-- Job Details -->
           <div class="flex flex-wrap gap-2 mb-8 mt-6">
-            <span class="px-3 py-1.5 rounded-xl bg-obsidian/[0.03] border border-glass-border text-[11px] font-bold text-obsidian/60 flex items-center gap-2">
+            <span class="px-3 py-1.5 rounded-xl bg-bg-secondary border border-glass-border text-[11px] font-bold text-text-secondary flex items-center gap-2">
               <span class="w-1.5 h-1.5 rounded-full bg-energy-violet"></span> {{ formatSalary(job.salary) }}
             </span>
-            <span class="px-3 py-1.5 rounded-xl bg-obsidian/[0.03] border border-glass-border text-[11px] font-bold text-obsidian/60 flex items-center gap-2">
+            <span class="px-3 py-1.5 rounded-xl bg-bg-secondary border border-glass-border text-[11px] font-bold text-text-secondary flex items-center gap-2">
               <span class="w-1.5 h-1.5 rounded-full bg-energy-emerald"></span> {{ job.experience }}+ Yrs
             </span>
           </div>
@@ -175,8 +175,8 @@
           <div class="text-sm font-medium text-text-secondary opacity-60 line-clamp-3 mb-10 flex-1 leading-relaxed" [innerHTML]="job.description"></div>
 
           <div class="mt-auto pt-6 border-t border-glass-border/50 flex items-center justify-between">
-            <span class="text-[10px] font-bold text-obsidian/30 uppercase tracking-widest">Posted: {{ job.createdAt | date:'MMM yyyy' }}</span>
-            <a [routerLink]="['/jobs', job.id]" class="text-sm font-bold text-obsidian group-hover:text-energy-violet transition-all flex items-center gap-2">
+            <span class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Posted: {{ job.createdAt | date:'MMM yyyy' }}</span>
+            <a [routerLink]="['/jobs', job.id]" class="text-sm font-bold text-text-primary group-hover:text-energy-violet transition-all flex items-center gap-2">
               View Job Details <svg class="w-4 h-4 transform transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
             </a>
           </div>
@@ -188,29 +188,29 @@
     @if (totalPages > 1) {
       <div class="mt-16 pt-10 border-t border-glass-border flex justify-center items-center gap-4">
         <button [disabled]="currentPage === 0" (click)="loadJobs(currentPage - 1)"
-          class="w-12 h-12 rounded-2xl flex items-center justify-center border border-glass-border bg-white text-obsidian hover:bg-obsidian hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition-all">
+          class="w-12 h-12 rounded-2xl flex items-center justify-center border border-glass-border bg-bg-primary text-text-primary hover:bg-bg-secondary disabled:opacity-20 disabled:cursor-not-allowed transition-all shadow-sm">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" /></svg>
         </button>
 
         <div class="flex items-center gap-2">
           @for (page of pages; track page) {
             <button (click)="goToPage(page)"
-              class="w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-sm transition-all"
-              [class.bg-obsidian]="currentPage === page" 
+              class="w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-sm transition-all shadow-sm"
+              [class.bg-bg-accent]="currentPage === page" 
               [class.text-white]="currentPage === page"
               [class.shadow-xl]="currentPage === page" 
               [class.border]="currentPage !== page"
               [class.border-glass-border]="currentPage !== page" 
-              [class.bg-white]="currentPage !== page"
-              [class.text-obsidian]="currentPage !== page" 
-              [class.hover:bg-obsidian/5]="currentPage !== page">
+              [class.bg-bg-primary]="currentPage !== page"
+              [class.text-text-primary]="currentPage !== page" 
+              [class.hover:bg-bg-secondary]="currentPage !== page">
               {{ page + 1 }}
             </button>
           }
         </div>
 
         <button [disabled]="currentPage === totalPages - 1" (click)="goToPage(currentPage + 1)"
-          class="w-12 h-12 rounded-2xl flex items-center justify-center border border-glass-border bg-white text-obsidian hover:bg-obsidian hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition-all">
+          class="w-12 h-12 rounded-2xl flex items-center justify-center border border-glass-border bg-bg-primary text-text-primary hover:bg-bg-secondary disabled:opacity-20 disabled:cursor-not-allowed transition-all shadow-sm">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" /></svg>
         </button>
       </div>
