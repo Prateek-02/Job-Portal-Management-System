@@ -17,10 +17,12 @@ export class NotificationService {
   private init(): void {
     // We try to get user from localStorage directly to initialize early
     try {
-      const userStr = localStorage.getItem('user');
+      const userStr = localStorage.getItem('current_user');
       if (userStr) {
         const user = JSON.parse(userStr);
-        this.setUserId(user.id);
+        if (user && user.id) {
+          this.setUserId(user.id);
+        }
       }
     } catch {}
   }

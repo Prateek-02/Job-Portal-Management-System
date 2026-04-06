@@ -13,7 +13,7 @@
       <div class="flex items-center justify-between h-24">
 
         <!-- Logo -->
-        <a routerLink="/" class="flex-shrink-0 flex items-center gap-4 group">
+        <a [routerLink]="getLogoLink()" class="flex-shrink-0 flex items-center gap-4 group">
           <div class="w-12 h-12 rounded-[18px] bg-slate-navy flex items-center justify-center transition-all duration-700 group-hover:rotate-[360deg] shadow-2xl relative overflow-hidden">
             <div class="absolute inset-0 bg-gradient-to-tr from-royal-blue/20 to-royal-blue/10 animate-pulse"></div>
             <svg class="w-7 h-7 text-white relative z-10" width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor">

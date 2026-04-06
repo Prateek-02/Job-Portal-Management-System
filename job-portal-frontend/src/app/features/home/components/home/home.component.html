@@ -43,17 +43,23 @@
       <div class="bg-slate-navy rounded-[40px] p-12 mt-20 grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-5xl mx-auto shadow-2xl relative z-30">
         <div class="p-4 group">
           <div class="text-xs font-bold text-white/40 uppercase tracking-[0.2em] mb-3">Open Roles</div>
-          <div class="text-5xl font-bold text-white group-hover:text-royal-blue transition-all duration-500">1.8k+</div>
+          <div class="text-5xl font-bold text-white group-hover:text-royal-blue transition-all duration-500">
+            {{ reports?.totalJobs ?? 0 }}
+          </div>
         </div>
 
         <div class="p-4 group border-y sm:border-y-0 sm:border-x border-white/10">
           <div class="text-xs font-bold text-white/40 uppercase tracking-[0.2em] mb-3">Tech Partners</div>
-          <div class="text-5xl font-bold text-white group-hover:text-royal-blue transition-all duration-500">450+</div>
+          <div class="text-5xl font-bold text-white group-hover:text-royal-blue transition-all duration-500">
+            {{ reports?.recruiters ?? 0 }}
+          </div>
         </div>
 
         <div class="p-4 group">
           <div class="text-xs font-bold text-white/40 uppercase tracking-[0.2em] mb-3">Daily Matches</div>
-          <div class="text-5xl font-bold text-white group-hover:text-royal-blue transition-all duration-500">12k+</div>
+          <div class="text-5xl font-bold text-white group-hover:text-royal-blue transition-all duration-500">
+            {{ reports?.totalApplications ?? 0 }}
+          </div>
         </div>
       </div>
     </div>
@@ -198,7 +204,7 @@
   <!-- ── FINAL CALL ───────────────────────────────── -->
   @if (!authService.isAuthenticated()) {
     <section class="w-full px-8 lg:px-12 py-32 mb-20 relative z-20">
-      <div class="celestial-card p-20 md:p-32 text-center border-none bg-slate-navy shadow-[0_50px_100px_-20px_rgba(0,0,0,0.4)]">
+      <div class="celestial-card max-w-5xl mx-auto p-20 md:p-32 text-center border-none bg-slate-navy shadow-[0_50px_100px_-20px_rgba(0,0,0,0.4)]">
         <h2 class="text-5xl sm:text-7xl font-bold text-white mb-8 tracking-tighter">Maximize Your<br />Professional Potential.</h2>
         <p class="text-xl text-white/60 max-w-2xl mx-auto mb-16 font-medium">Join the next evolution of career matchmaking. Fast, fluid, and focused on your success.</p>
         <a routerLink="/auth/signup" class="btn-community-white !bg-white !text-slate-navy !px-16 !py-6 !text-xl !rounded-full hover:!scale-105 transition-all text-center inline-block">

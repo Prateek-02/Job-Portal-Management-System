@@ -36,5 +36,7 @@ export interface AdminReports {
   totalUsers?: number;
   totalJobs?: number;
   totalApplications?: number;
+  recruiters?: number;
+  jobSeekers?: number;
   [key: string]: any;
 }

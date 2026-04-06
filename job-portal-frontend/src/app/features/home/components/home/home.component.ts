@@ -16,6 +16,7 @@ export class HomeComponent implements OnInit {
   featuredJobs: Job[] = [];
   isLoadingJobs = true;
   jobsError = false;
+  reports: any = null;
 
   constructor(
     public authService: AuthService,
@@ -32,6 +33,7 @@ export class HomeComponent implements OnInit {
     this.isLoadingJobs = true;
     this.jobsError = false;
 
+    // Fetch featured jobs
     this.apiService.getJobs(0, 6).pipe(
       catchError(() => {
         this.jobsError = true;
@@ -45,6 +47,13 @@ export class HomeComponent implements OnInit {
           this.featuredJobs = [];
         }
         this.isLoadingJobs = false;
+      }
+    });
+
+    // Fetch real metrics for landing page
+    this.apiService.getPublicStats().subscribe({
+      next: (res) => {
+        this.reports = res;
       }
     });
   }

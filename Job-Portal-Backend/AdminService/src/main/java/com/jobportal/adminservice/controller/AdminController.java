@@ -147,5 +147,13 @@ public class AdminController {
 
         return ResponseEntity.ok(reports);
     }
+
+    @GetMapping("/public/stats")
+    public ResponseEntity<Map<String, Object>> getPublicStats() {
+        log.info("Fetching public platform stats");
+        Map<String, Object> reports = adminService.getReports();
+        log.debug("Public stats fetched successfully");
+        return ResponseEntity.ok(reports);
+    }
 }
 

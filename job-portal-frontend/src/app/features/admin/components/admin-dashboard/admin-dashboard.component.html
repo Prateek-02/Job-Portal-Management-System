@@ -16,82 +16,137 @@
   }
 
   @if (!isLoading && reports) {
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 animate-fade-in-up">
 
     <!-- Total Users -->
-    <div class="glass-card p-6 hover:border-primary-500/30 transition-colors group">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-sm font-medium text-[#4A4A4A] uppercase tracking-wider">Total Users</h3>
+    <div class="celestial-card p-10 group hover:shadow-2xl transition-all">
+      <div class="flex items-center justify-between mb-8">
         <div
-          class="w-10 h-10 rounded-xl bg-primary-500/20 flex items-center justify-center group-hover:bg-primary-500/30 transition-colors">
-          <svg class="w-5 h-5 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          class="w-14 h-14 rounded-2xl bg-royal-blue/10 flex items-center justify-center group-hover:bg-royal-blue/20 transition-all shadow-inner">
+          <svg class="w-7 h-7 text-royal-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
         </div>
+        <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary opacity-40">System Core</div>
       </div>
-      <div class="text-4xl font-bold text-[#1A1A1A]">{{ reports.totalUsers ?? '—' }}</div>
-      <a routerLink="/admin/users"
-        class="text-xs text-[#4A4A4A] hover:text-primary-600 mt-2 inline-block transition-colors font-bold uppercase tracking-wider">Manage
-        users →</a>
+      <div class="text-xs font-bold text-text-secondary uppercase tracking-widest mb-1 opacity-60">Total Users</div>
+      <div class="text-5xl font-bold text-obsidian tracking-tighter mb-6">{{ reports.totalUsers ?? '0' }}</div>
+      <div class="pt-6 border-t border-glass-border">
+        <a routerLink="/admin/users"
+          class="text-[10px] font-black text-royal-blue uppercase tracking-[0.15em] flex items-center gap-2 hover:gap-3 transition-all group/link">
+          Manage Users
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        </a>
+      </div>
     </div>
 
-    <!-- Total Jobs -->
-    <div class="glass-card p-6 hover:border-green-500/30 transition-colors group">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-sm font-medium text-[#4A4A4A] uppercase tracking-wider">Total Jobs</h3>
-        <div class="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
-          <svg class="w-5 h-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <!-- Job Seekers -->
+    <div class="celestial-card p-10 group hover:shadow-2xl transition-all border-l-4 border-l-energy-emerald/30">
+      <div class="flex items-center justify-between mb-8">
+        <div
+          class="w-14 h-14 rounded-2xl bg-energy-emerald/10 flex items-center justify-center group-hover:bg-energy-emerald/20 transition-all shadow-inner">
+          <svg class="w-7 h-7 text-energy-emerald" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
           </svg>
         </div>
+        <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-energy-emerald opacity-40">Talent Pool</div>
       </div>
-      <div class="text-4xl font-bold text-[#1A1A1A]">{{ reports.totalJobs ?? '—' }}</div>
-      <a routerLink="/admin/jobs"
-        class="text-xs text-[#4A4A4A] hover:text-green-600 mt-2 inline-block transition-colors font-bold uppercase tracking-wider">Manage
-        jobs →</a>
+      <div class="text-xs font-bold text-text-secondary uppercase tracking-widest mb-1 opacity-60">Job Seekers</div>
+      <div class="text-5xl font-bold text-obsidian tracking-tighter mb-6">{{ reports.jobSeekers ?? '0' }}</div>
+      <div class="pt-6 border-t border-glass-border">
+        <p class="text-[10px] font-bold text-text-secondary opacity-40 uppercase tracking-widest">Active Candidates</p>
+      </div>
     </div>
 
-    <!-- Total Applications -->
-    <div class="glass-card p-6 hover:border-secondary-500/30 transition-colors group">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-sm font-medium text-[#4A4A4A] uppercase tracking-wider">Total Applications</h3>
-        <div class="w-10 h-10 rounded-xl bg-secondary-500/20 flex items-center justify-center">
-          <svg class="w-5 h-5 text-secondary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <!-- Recruiters -->
+    <div class="celestial-card p-10 group hover:shadow-2xl transition-all border-l-4 border-l-energy-indigo/30">
+      <div class="flex items-center justify-between mb-8">
+        <div
+          class="w-14 h-14 rounded-2xl bg-energy-indigo/10 flex items-center justify-center group-hover:bg-energy-indigo/20 transition-all shadow-inner">
+          <svg class="w-7 h-7 text-energy-indigo" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
           </svg>
         </div>
+        <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-energy-indigo opacity-40">Partners</div>
       </div>
-      <div class="text-4xl font-bold text-[#1A1A1A]">{{ reports.totalApplications ?? '—' }}</div>
+      <div class="text-xs font-bold text-text-secondary uppercase tracking-widest mb-1 opacity-60">Recruiters</div>
+      <div class="text-5xl font-bold text-obsidian tracking-tighter mb-6">{{ reports.recruiters ?? '0' }}</div>
+      <div class="pt-6 border-t border-glass-border">
+        <p class="text-[10px] font-bold text-text-secondary opacity-40 uppercase tracking-widest">Company Partners</p>
+      </div>
+    </div>
+
+    <!-- Total Jobs -->
+    <div class="celestial-card p-10 group hover:shadow-2xl transition-all">
+      <div class="flex items-center justify-between mb-8">
+        <div
+          class="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center group-hover:bg-amber-500/20 transition-all shadow-inner">
+          <svg class="w-7 h-7 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-500 opacity-40">Opportunities</div>
+      </div>
+      <div class="text-xs font-bold text-text-secondary uppercase tracking-widest mb-1 opacity-60">Total Jobs</div>
+      <div class="text-5xl font-bold text-obsidian tracking-tighter mb-6">{{ reports.totalJobs ?? '0' }}</div>
+      <div class="pt-6 border-t border-glass-border">
+        <a routerLink="/admin/jobs"
+          class="text-[10px] font-black text-amber-600 uppercase tracking-[0.15em] flex items-center gap-2 hover:gap-3 transition-all group/link">
+          Manage Jobs
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        </a>
+      </div>
     </div>
 
   </div>
 
-  <!-- Extra report fields if any -->
-  @if (reports) {
-  <div class="mt-8 glass-card p-6">
-    <h2 class="text-lg font-bold text-[#1A1A1A] mb-4">System Report Details</h2>
-    <div class="overflow-x-auto">
-      <table class="w-full text-sm text-left border-collapse">
-        <thead>
-          <tr class="border-b border-white/10">
-            <th class="pb-3 text-[#4A4A4A] font-medium">Metric</th>
-            <th class="pb-3 text-[#4A4A4A] font-medium text-right">Value</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (entry of reports | keyvalue; track entry.key) {
-          <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
-            <td class="py-3 text-[#4A4A4A] capitalize">{{ entry.key.replace(/([A-Z])/g, ' $1') }}</td>
-            <td class="py-3 text-[#1A1A1A] font-semibold text-right">{{ entry.value }}</td>
-          </tr>
-          }
-        </tbody>
-      </table>
+  <!-- Total Applications & Detailed Table Section -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-12">
+    <div class="celestial-card p-10 flex flex-col justify-between bg-obsidian text-white border-none inner-glow">
+      <div>
+        <div class="text-[10px] font-bold uppercase tracking-[0.2em] mb-4 opacity-50">Global Engagement</div>
+        <h3 class="text-3xl font-bold tracking-tighter mb-2 text-white">Total Applications</h3>
+        <p class="text-sm opacity-60">Cumulative system-wide job applications</p>
+        <div class="text-6xl font-black text-energy-indigo mt-12 group-hover:scale-110 transition-transform">{{
+        reports.totalApplications ?? '0' }}</div>
+      </div>
+    </div>
+
+    <div class="lg:col-span-2 celestial-card p-8 min-h-[300px]">
+      <div class="flex items-center justify-between mb-8">
+        <h3 class="text-xl font-bold text-obsidian">Detailed Metrics</h3>
+        <span class="px-3 py-1 bg-royal-blue/10 text-royal-blue text-[10px] font-bold rounded-full uppercase">Real-time
+          Data</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left">
+          <thead class="border-b border-glass-border">
+            <tr>
+              <th class="pb-4 text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em]">Metric Name</th>
+              <th class="pb-4 text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] text-right">Magnitude
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-glass-border/50">
+            @for (entry of reports | keyvalue; track entry.key) {
+            <tr class="hover:bg-royal-blue/[0.02] transition-colors group">
+              <td class="py-4 text-sm font-semibold text-text-secondary group-hover:text-obsidian capitalize">
+                {{ entry.key.replace(/([A-Z])/g, ' $1') }}
+              </td>
+              <td class="py-4 text-base font-black text-obsidian text-right">{{ entry.value }}</td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
-  }
   }
 </div>

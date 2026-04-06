@@ -41,6 +41,12 @@ export class MainLayoutComponent implements OnInit {
     document.documentElement.style.setProperty('--energy-sphere-color', color);
   }
 
+  getLogoLink(): string {
+    if (this.authService.isAdmin()) return '/admin/dashboard';
+    if (this.authService.isRecruiter() || this.authService.isJobSeeker()) return '/dashboard';
+    return '/';
+  }
+
   logout(): void {
     this.authService.logout();
   }

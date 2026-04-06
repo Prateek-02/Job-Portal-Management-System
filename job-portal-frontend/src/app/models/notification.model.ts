@@ -1,4 +1,4 @@
-export type NotificationType = 'APPLICATION_STATUS' | 'JOB_APPLIED' | 'JOB_POSTED';
+export type NotificationType = 'APPLICATION_STATUS' | 'JOB_APPLIED' | 'JOB_POSTED' | 'USER_REGISTERED';
 
 export interface AppNotification {
   id: string;

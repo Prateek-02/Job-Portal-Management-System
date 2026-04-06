@@ -106,20 +106,29 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    this.user = this.authService.getCurrentUser();
-    this.isRecruiter = this.authService.isRecruiter();
-    this.isJobSeeker = this.authService.isJobSeeker();
+    this.subs.add(
+      this.authService.currentUser$.subscribe(user => {
+        if (user) {
+          this.user = user;
+          this.isRecruiter = this.authService.isRecruiter();
+          this.isJobSeeker = this.authService.isJobSeeker();
 
-    if (this.isJobSeeker) {
-      this.loadJobSeekerData();
-    } else if (this.isRecruiter) {
-      this.loadRecruiterData();
-    } else if (this.authService.isAdmin()) {
-      this.router.navigate(['/admin/dashboard']);
-    } else {
-      this.isLoadingApps = false;
-      this.isLoadingJobs = false;
-    }
+          const isAdmin = this.authService.isAdmin();
+
+          if (this.isJobSeeker && !isAdmin) {
+            this.loadJobSeekerData();
+          } else if (this.isRecruiter && !isAdmin) {
+            this.loadRecruiterData();
+          }
+        } else if (this.authService.isAdmin()) {
+          this.router.navigate(['/admin/dashboard']);
+        } else {
+          // If no user and not admin, handle loading state
+          this.isLoadingApps = false;
+          this.isLoadingJobs = false;
+        }
+      })
+    );
   }
 
   ngOnDestroy(): void {
@@ -133,7 +142,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
         catchError(() => of([] as ApplicationResponse[]))
       ).subscribe({
         next: (apps: ApplicationResponse[]) => {
-          const seenKey = `jp_seen_apps_${this.user?.id}`;
+          if (!this.user?.id) return;
+          const seenKey = `jp_seen_apps_${this.user.id}`;
           const seenIds: number[] = JSON.parse(localStorage.getItem(seenKey) || '[]');
           
           apps.forEach((app: ApplicationResponse) => {
@@ -171,8 +181,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
         catchError(() => of({ content: [], totalPages: 0, totalElements: 0, size: 6, number: 0, last: true, first: true, empty: true } as PageResponse<Job>))
       ).subscribe({
         next: (jobsPage: PageResponse<Job>) => {
+          if (!this.user?.id) return;
           const pageJobs = jobsPage.content || [];
-          const seenJobsKey = `jp_seen_jobs_${this.user?.id}`;
+          const seenJobsKey = `jp_seen_jobs_${this.user.id}`;
           const seenJobIds: number[] = JSON.parse(localStorage.getItem(seenJobsKey) || '[]');
           
           pageJobs.forEach((job: Job) => {
@@ -228,7 +239,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
                   allApplications.sort((a, b) => b.id - a.id);
 
-                  const seenKey = `jp_seen_applicants_${this.user?.id}`;
+                  if (!this.user?.id) return;
+                  const seenKey = `jp_seen_applicants_${this.user.id}`;
                   const seenIds: number[] = JSON.parse(localStorage.getItem(seenKey) || '[]');
 
                   allApplications.forEach(app => {

@@ -166,4 +166,8 @@ export class ApiService {
   getAdminReports(): Observable<AdminReports> {
     return this.http.get<AdminReports>(`${this.apiUrl}/admin/reports`);
   }
+
+  getPublicStats(): Observable<AdminReports> {
+    return this.http.get<AdminReports>(`${this.apiUrl}/admin/public/stats`);
+  }
 }
