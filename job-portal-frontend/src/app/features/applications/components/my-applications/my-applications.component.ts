@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../../../core/services/api.service';
+import { AuthService } from '../../../../core/services/auth.service';
 import { ApplicationResponse, ApplicationStatus } from '../../../../models/application.model';
 import { getFriendlyError } from '../../../../core/utils/error-handler.util';
 
@@ -16,13 +17,40 @@ export class MyApplicationsComponent implements OnInit {
   isLoading = true;
   errorMessage = '';
 
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private apiService: ApiService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
     this.apiService.getMyApplications().subscribe({
-      next: (res) => { this.applications = res || []; this.isLoading = false; },
+      next: (res) => { 
+        this.applications = res || []; 
+        this.isLoading = false; 
+        this.checkStatuses(this.applications);
+      },
       error: (err) => { this.errorMessage = getFriendlyError(err, 'load_applications'); this.isLoading = false; }
     });
+  }
+
+  private checkStatuses(apps: ApplicationResponse[]): void {
+    const user = this.authService.getCurrentUser();
+    if (!user || !user.id) return;
+
+    const metadataKey = `jp_app_metadata_${user.id}`;
+    const appMetadata: Record<number, string> = JSON.parse(localStorage.getItem(metadataKey) || '{}');
+    
+    let changed = false;
+    apps.forEach(app => {
+      if (appMetadata[app.id] !== app.status) {
+        appMetadata[app.id] = app.status;
+        changed = true;
+      }
+    });
+
+    if (changed) {
+      localStorage.setItem(metadataKey, JSON.stringify(appMetadata));
+    }
   }
 
   statusClass(status: ApplicationStatus): string {

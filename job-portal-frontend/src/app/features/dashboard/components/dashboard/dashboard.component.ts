@@ -143,29 +143,42 @@ export class DashboardComponent implements OnInit, OnDestroy {
       ).subscribe({
         next: (apps: ApplicationResponse[]) => {
           if (!this.user?.id) return;
-          const seenKey = `jp_seen_apps_${this.user.id}`;
-          const seenIds: number[] = JSON.parse(localStorage.getItem(seenKey) || '[]');
+          const metadataKey = `jp_app_metadata_${this.user.id}`;
+          const appMetadata: Record<number, string> = JSON.parse(localStorage.getItem(metadataKey) || '{}');
           
+          let changed = false;
           apps.forEach((app: ApplicationResponse) => {
-            if (!seenIds.includes(app.id)) {
+            const lastStatus = appMetadata[app.id];
+            
+            // If new application or status changed
+            if (lastStatus === undefined || lastStatus !== app.status) {
               const statusMsg: Record<string, string> = {
                 SHORTLISTED: `🎉 Great news! Your application for ${app.job.title} at ${app.job.companyName} has been shortlisted.`,
                 REJECTED: `Your application for ${app.job.title} at ${app.job.companyName} was not selected. Keep applying!`,
                 UNDER_REVIEW: `Your application for ${app.job.title} at ${app.job.companyName} is under review.`,
                 APPLIED: `You successfully applied for ${app.job.title} at ${app.job.companyName}.`
               };
+
+              // Only push notification if status changed from something else OR if it's the very first seen of this app
               if (statusMsg[app.status]) {
+                const isFirstSeen = lastStatus === undefined;
+                const title = isFirstSeen ? 'Application Submitted' : `Application ${this.getStatusLabel(app.status)}`;
+                
                 this.notificationService.push(
                   'APPLICATION_STATUS',
-                  `Application ${this.getStatusLabel(app.status)}`,
+                  title,
                   statusMsg[app.status],
                   `/applications/my-applications`
                 );
               }
-              seenIds.push(app.id);
+              appMetadata[app.id] = app.status;
+              changed = true;
             }
           });
-          localStorage.setItem(seenKey, JSON.stringify(seenIds));
+
+          if (changed) {
+            localStorage.setItem(metadataKey, JSON.stringify(appMetadata));
+          }
 
           this.myApplications = apps.slice(0, 5);
           this.isLoadingApps = false;
