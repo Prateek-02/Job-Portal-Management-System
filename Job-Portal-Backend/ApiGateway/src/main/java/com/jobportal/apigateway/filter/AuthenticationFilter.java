@@ -67,8 +67,9 @@ public class AuthenticationFilter extends
                 path.contains("/api/auth/forgot-password") ||
                 path.contains("/api/auth/reset-password") ||
                 path.contains("/api/auth/register") ||
-                path.contains("/api/auth/login")) {
-                log.debug("Auth Filter | Bypassing public auth route: {}", path);
+                path.contains("/api/auth/login") ||
+                path.startsWith("/api/admin/public/")) {
+                log.debug("Auth Filter | Bypassing public route: {}", path);
                 return chain.filter(exchange);
             }
 
