@@ -11,10 +11,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.jobportal.jobservice.config.RabbitMQConfig;
-import com.jobportal.jobservice.dto.JobFilterDto;
+import com.jobportal.jobservice.dto.JobFilter;
 import com.jobportal.jobservice.dto.JobPostedEvent;
-import com.jobportal.jobservice.dto.request.JobRequestDto;
-import com.jobportal.jobservice.dto.response.JobResponseDto;
+import com.jobportal.jobservice.dto.request.JobRequest;
+import com.jobportal.jobservice.dto.response.JobResponse;
 import com.jobportal.jobservice.entity.Job;
 import com.jobportal.jobservice.exceptions.JobNotFoundException;
 import com.jobportal.jobservice.exceptions.UnauthorizedException;
@@ -38,7 +38,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     @CacheEvict(value = "jobs", allEntries = true)
-    public JobResponseDto createJob(JobRequestDto dto,
+    public JobResponse createJob(JobRequest dto,
                                    Long recruiterId, String role) {
 
         log.info("Create job | recruiterId: {} | role: {} | title: {}",
@@ -75,12 +75,12 @@ public class JobServiceImpl implements JobService {
             log.error("Job event publish failed | jobId: {}", saved.getId(), e);
         }
 
-        return modelMapper.map(saved, JobResponseDto.class);
+        return modelMapper.map(saved, JobResponse.class);
     }
 
     @Override
-    public Page<JobResponseDto> getAllJobs(int page, int size,
-                                          String sortBy, String direction) {
+    public Page<JobResponse> getAllJobs(int page, int size,
+                                           String sortBy, String direction) {
 
         log.info("Get jobs | page: {} | size: {} | sortBy: {} | direction: {}",
                 page, size, sortBy, direction);
@@ -91,8 +91,8 @@ public class JobServiceImpl implements JobService {
 
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<JobResponseDto> result = jobRepository.findAll(pageable)
-                .map(job -> modelMapper.map(job, JobResponseDto.class));
+        Page<JobResponse> result = jobRepository.findAll(pageable)
+                .map(job -> modelMapper.map(job, JobResponse.class));
 
         log.debug("Jobs fetched | count: {}", result.getNumberOfElements());
 
@@ -101,7 +101,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     @Cacheable(value = "jobs", key = "#id")
-    public JobResponseDto getJobById(Long id) {
+    public JobResponse getJobById(Long id) {
 
         log.info("Get job | jobId: {}", id);
 
@@ -111,13 +111,13 @@ public class JobServiceImpl implements JobService {
                     return new JobNotFoundException("Job not found with id: " + id);
                 });
 
-        return modelMapper.map(job, JobResponseDto.class);
+        return modelMapper.map(job, JobResponse.class);
     }
 
     @Override
     @CacheEvict(value = "jobs", key = "#id")
-    public JobResponseDto updateJob(Long id,
-                                   JobRequestDto dto, Long recruiterId) {
+    public JobResponse updateJob(Long id,
+                                   JobRequest dto, Long recruiterId) {
 
         log.info("Update job | jobId: {} | recruiterId: {}", id, recruiterId);
 
@@ -138,7 +138,7 @@ public class JobServiceImpl implements JobService {
 
         log.info("Job updated | jobId: {}", updated.getId());
 
-        return modelMapper.map(updated, JobResponseDto.class);
+        return modelMapper.map(updated, JobResponse.class);
     }
 
     @Override
@@ -165,7 +165,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Page<JobResponseDto> searchJobs(JobFilterDto filter,
+    public Page<JobResponse> searchJobs(JobFilter filter,
                                           int page, int size,
                                           String sortBy, String direction) {
 
@@ -178,9 +178,9 @@ public class JobServiceImpl implements JobService {
 
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<JobResponseDto> result = jobRepository.findAll(
+        Page<JobResponse> result = jobRepository.findAll(
                 JobSpecification.getFilteredJobs(filter), pageable)
-                .map(job -> modelMapper.map(job, JobResponseDto.class));
+                .map(job -> modelMapper.map(job, JobResponse.class));
 
         log.debug("Search result count: {}", result.getNumberOfElements());
 
@@ -199,20 +199,20 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public List<JobResponseDto> getJobsByRecruiter(Long recruiterId) {
+    public List<JobResponse> getJobsByRecruiter(Long recruiterId) {
         log.info("Fetching jobs for recruiter | recruiterId: {}", recruiterId);
         return jobRepository.findByRecruiterId(recruiterId).stream()
-                .map(job -> modelMapper.map(job, JobResponseDto.class))
+                .map(job -> modelMapper.map(job, JobResponse.class))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public com.jobportal.jobservice.dto.response.MarketStatsDto getMarketPulseStats() {
+    public com.jobportal.jobservice.dto.response.MarketStatsResponse getMarketPulseStats() {
         log.info("Calculating Job Market Pulse stats from database");
         List<Job> allJobs = jobRepository.findAll();
 
         if (allJobs.isEmpty()) {
-            return com.jobportal.jobservice.dto.response.MarketStatsDto.builder()
+            return com.jobportal.jobservice.dto.response.MarketStatsResponse.builder()
                     .averageSalary(0.0)
                     .salaryGrowthYoy(0.0)
                     .salaryTrend(java.util.Arrays.asList(10.0, 10.0, 10.0, 10.0, 10.0))
@@ -232,10 +232,10 @@ public class JobServiceImpl implements JobService {
 
         long totalSkillMentions = skillCounts.values().stream().mapToLong(Long::longValue).sum();
 
-        List<com.jobportal.jobservice.dto.response.SkillStatDto> topSkills = skillCounts.entrySet().stream()
+        List<com.jobportal.jobservice.dto.response.SkillStatResponse> topSkills = skillCounts.entrySet().stream()
                 .sorted(java.util.Map.Entry.<String, Long>comparingByValue().reversed())
                 .limit(3)
-                .map(entry -> new com.jobportal.jobservice.dto.response.SkillStatDto(
+                .map(entry -> new com.jobportal.jobservice.dto.response.SkillStatResponse(
                         entry.getKey(), 
                         (double) Math.round((entry.getValue() * 100.0) / (totalSkillMentions > 0 ? totalSkillMentions : 1))
                 ))
@@ -250,7 +250,7 @@ public class JobServiceImpl implements JobService {
             (double)allJobs.size() * 0.4, (double)allJobs.size() * 0.7, (double)allJobs.size() * 0.5, (double)allJobs.size() * 0.9, (double)allJobs.size()
         );
 
-        return com.jobportal.jobservice.dto.response.MarketStatsDto.builder()
+        return com.jobportal.jobservice.dto.response.MarketStatsResponse.builder()
                 .averageSalary(avgSalary)
                 .salaryGrowthYoy(4.2) // Current growth estimate
                 .salaryTrend(salaryTrend)

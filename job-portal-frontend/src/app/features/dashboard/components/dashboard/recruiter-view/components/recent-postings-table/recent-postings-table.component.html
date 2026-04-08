@@ -1,0 +1,47 @@
+<!-- Job Management Table -->
+<div class="celestial-card overflow-hidden mb-12">
+  <div class="px-8 py-6 border-b border-glass-border bg-bg-secondary flex items-center justify-between">
+    <h3 class="text-xl font-bold text-text-primary">Recent Postings</h3>
+    <a routerLink="/jobs/my-postings" class="text-xs font-bold text-energy-indigo">View All Postings</a>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-left">
+      <thead>
+        <tr class="bg-bg-secondary">
+          <th class="px-8 py-4 text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em]">Job ID</th>
+          <th class="px-8 py-4 text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em]">Job Details
+          </th>
+          <th class="px-8 py-4 text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em]">Posted Date
+          </th>
+          <th class="px-8 py-4 text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] text-right">
+            Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-glass-border">
+        @for (job of myPostedJobs; track job.id) {
+        <tr class="hover:bg-bg-secondary transition-colors group">
+          <td class="px-8 py-6">
+            <span class="font-mono text-xs text-text-secondary">{{ job.id }}</span>
+          </td>
+          <td class="px-8 py-6">
+            <p class="font-bold text-text-primary transition-colors">{{ job.title }}</p>
+            <p class="text-xs font-semibold text-text-secondary opacity-60">{{ job.location }}</p>
+          </td>
+          <td class="px-8 py-6">
+            <p class="text-sm font-bold text-text-secondary">{{ job.createdAt | date:'MMM d, y' }}</p>
+          </td>
+          <td class="px-8 py-6 text-right">
+            <div class="flex justify-end gap-4">
+              <a [routerLink]="['/applications/job', job.id]"
+                class="text-xs font-bold text-energy-indigo hover:underline underline-offset-4">View Apps</a>
+              <button (click)="onDelete(job.id!)"
+                class="text-xs font-bold text-red-500/70 hover:text-red-500">Delete</button>
+            </div>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,63 @@
+<!-- Quick Review Deck -->
+<div class="space-y-8">
+  <h3 class="text-2xl font-bold text-text-primary flex items-center gap-3">
+    Quick Review Queue
+    <span class="px-3 py-1 bg-royal-blue text-white text-[10px] rounded-full">{{ pendingApplications.length
+      }}</span>
+  </h3>
+
+  <div class="relative min-h-[340px]">
+    @if (pendingApplications.length > 0) {
+    @for (app of pendingApplications.slice(0, 3); track app.id; let i = $index) {
+    <div class="absolute inset-0 transition-all duration-500 ease-out" [ngClass]="{
+              'z-30 translate-y-0 opacity-100': i === 0,
+              'z-20 translate-y-4 translate-x-4 opacity-60 scale-95': i === 1,
+              'z-10 translate-y-8 translate-x-8 opacity-30 scale-90': i === 2
+            }">
+      <div
+        class="celestial-card p-10 h-full flex flex-col justify-between border-glass-border/30 shadow-2xl backdrop-blur-3xl bg-glass-bg transition-colors duration-500">
+        <div class="flex justify-between items-start mb-8">
+          <div class="flex items-center gap-6">
+            <div
+              class="w-16 h-16 rounded-2xl bg-bg-accent text-white flex items-center justify-center font-bold text-xl shadow-xl">
+              {{ app.applicantName.charAt(0) }}
+            </div>
+            <div>
+              <h4 class="text-2xl font-bold text-text-primary tracking-tight">{{ app.applicantName }}</h4>
+              <p class="text-xs font-bold text-text-secondary uppercase tracking-widest mt-1">Applying for: {{
+                app.jobTitle }}</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <p class="text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] mb-1">Applied</p>
+            <p class="text-sm font-bold text-text-primary">{{ app.appliedAt | date:'shortDate' }}</p>
+          </div>
+        </div>
+
+        <div class="flex gap-4 mb-2">
+          <button (click)="onUpdateStatus(app, 'SHORTLISTED')"
+            class="flex-1 btn-celestial !bg-energy-emerald/10 !text-energy-emerald border border-energy-emerald/30 !py-4 hover:!bg-energy-emerald hover:!text-white transition-all shadow-none">
+            Shortlist Candidate
+          </button>
+          <button (click)="onUpdateStatus(app, 'REJECTED')"
+            class="flex-1 btn-celestial !bg-slate-500/5 !text-slate-500 !py-4 hover:!bg-red-500 hover:!text-white border-none transition-all shadow-none">
+            Pass
+          </button>
+        </div>
+      </div>
+    </div>
+    }
+    } @else {
+    <div
+      class="celestial-card p-12 text-center flex flex-col items-center justify-center h-full border-dashed border-2 border-glass-border opacity-50">
+      <div class="w-16 h-16 rounded-full bg-royal-blue/10 flex items-center justify-center mb-6">
+        <svg class="w-8 h-8 text-royal-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+        </svg>
+      </div>
+      <h4 class="text-xl font-bold text-text-primary mb-2">Inbox Zero!</h4>
+      <p class="text-sm font-medium text-text-secondary">All pending applications have been reviewed.</p>
+    </div>
+    }
+  </div>
+</div>

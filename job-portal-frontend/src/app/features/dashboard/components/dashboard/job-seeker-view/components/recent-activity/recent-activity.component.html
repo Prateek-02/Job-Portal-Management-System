@@ -1,0 +1,31 @@
+<!-- Recent Activity -->
+<div class="space-y-6">
+  <h3 class="text-xl font-bold text-text-primary px-2">Recent Activity</h3>
+  <div class="celestial-card p-6 inner-glow min-h-[180px]">
+    <div class="relative space-y-8 pl-8">
+      <!-- Vertical Progress Line -->
+      <div class="absolute left-[11px] top-4 bottom-4 w-0.5 border-l border-dashed border-glass-border"></div>
+
+      @for (entry of recentActivity.slice(0, 3); track entry.id; let first = $first) {
+      <div class="relative animate-fade-in-right" [style.animation-delay]="($index * 100) + 'ms'">
+        <!-- Progress Dot -->
+        <div
+          class="absolute -left-[27px] top-1.5 w-4 h-4 rounded-full bg-bg-primary border-2 flex items-center justify-center transform transition-transform group-hover:scale-125 focus:outline-none"
+          [ngClass]="first ? 'border-energy-indigo shadow-[0_0_10px_rgba(161,140,209,0.5)]' : 'border-glass-border'">
+          <div class="w-1.5 h-1.5 rounded-full"
+            [ngClass]="first ? 'bg-energy-indigo animate-pulse' : 'bg-text-muted/20'"></div>
+        </div>
+        <p class="text-[9px] font-black uppercase tracking-widest text-text-muted mb-1">{{ entry.timestamp |
+          date:'shortTime' }}</p>
+        <h4 class="text-sm font-bold text-text-primary mb-1 leading-tight">{{ entry.title }}</h4>
+        <p class="text-xs text-text-secondary opacity-60 line-clamp-2 leading-relaxed">{{ entry.message }}</p>
+      </div>
+      }
+      @if (recentActivity.length === 0) {
+      <div class="pt-6 text-center opacity-40">
+        <p class="text-sm font-bold text-text-secondary">No recent events tracked.</p>
+      </div>
+      }
+    </div>
+  </div>
+</div>

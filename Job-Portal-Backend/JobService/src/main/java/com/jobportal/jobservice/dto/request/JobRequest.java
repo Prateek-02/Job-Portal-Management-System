@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class JobRequestDto {
+public class JobRequest {
 
     @NotBlank(message = "Title is required")
     private String title;

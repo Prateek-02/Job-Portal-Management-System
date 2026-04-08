@@ -1,9 +1,9 @@
 package com.jobportal.jobservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jobportal.jobservice.dto.JobFilterDto;
-import com.jobportal.jobservice.dto.request.JobRequestDto;
-import com.jobportal.jobservice.dto.response.JobResponseDto;
+import com.jobportal.jobservice.dto.JobFilter;
+import com.jobportal.jobservice.dto.request.JobRequest;
+import com.jobportal.jobservice.dto.response.JobResponse;
 import com.jobportal.jobservice.service.JobService;
 
 import org.junit.jupiter.api.Test;
@@ -43,7 +43,7 @@ class JobControllerTest {
     @Test
     void testCreateJob() throws Exception {
 
-    	JobRequestDto request = new JobRequestDto();
+    	JobRequest request = new JobRequest();
     	request.setTitle("Software Engineer");
     	request.setCompanyName("Google");
     	request.setDescription("Good job");
@@ -51,7 +51,7 @@ class JobControllerTest {
     	request.setExperience(2);
     	request.setSalary(50000.0);
 
-        JobResponseDto response = new JobResponseDto();
+        JobResponse response = new JobResponse();
         response.setId(1L);
         response.setTitle("Software Engineer");
 
@@ -71,7 +71,7 @@ class JobControllerTest {
     @Test
     void testGetAllJobs() throws Exception {
 
-        JobResponseDto job = new JobResponseDto();
+        JobResponse job = new JobResponse();
         job.setId(1L);
 
         when(jobService.getAllJobs(0, 10, "createdAt", "desc"))
@@ -86,7 +86,7 @@ class JobControllerTest {
     @Test
     void testGetJobById() throws Exception {
 
-        JobResponseDto job = new JobResponseDto();
+        JobResponse job = new JobResponse();
         job.setId(1L);
 
         when(jobService.getJobById(1L)).thenReturn(job);
@@ -100,7 +100,7 @@ class JobControllerTest {
     @Test
     void testUpdateJob() throws Exception {
 
-        JobRequestDto request = new JobRequestDto();
+        JobRequest request = new JobRequest();
         request.setTitle("Updated Job");
         request.setCompanyName("Google");
         request.setDescription("Good job");
@@ -108,7 +108,7 @@ class JobControllerTest {
         request.setExperience(2);
         request.setSalary(50000.0);
 
-        JobResponseDto response = new JobResponseDto();
+        JobResponse response = new JobResponse();
         response.setId(1L);
         response.setTitle("Updated Job");
 
@@ -140,9 +140,9 @@ class JobControllerTest {
     @Test
     void testSearchJobs() throws Exception {
 
-        JobFilterDto filter = new JobFilterDto();
+        JobFilter filter = new JobFilter();
 
-        JobResponseDto job = new JobResponseDto();
+        JobResponse job = new JobResponse();
         job.setId(1L);
 
         when(jobService.searchJobs(filter, 0, 10, "createdAt", "desc"))
@@ -170,7 +170,7 @@ class JobControllerTest {
     @Test
     void testCreateJob_Unauthorized() throws Exception {
 
-        JobRequestDto request = new JobRequestDto();
+        JobRequest request = new JobRequest();
         request.setTitle("Software Engineer");
         request.setCompanyName("Google");
 
@@ -198,7 +198,7 @@ class JobControllerTest {
     @Test
     void testUpdateJob_Unauthorized() throws Exception {
 
-        JobRequestDto request = new JobRequestDto();
+        JobRequest request = new JobRequest();
         request.setTitle("Updated Job");
 
         doThrow(new UnauthorizedException("You are not allowed to update this job"))
@@ -214,7 +214,7 @@ class JobControllerTest {
     @Test
     void testUpdateJob_NotFound() throws Exception {
 
-        JobRequestDto request = new JobRequestDto();
+        JobRequest request = new JobRequest();
         request.setTitle("Updated Job");
 
         doThrow(new JobNotFoundException("Job not found with id: 999"))
@@ -252,15 +252,15 @@ class JobControllerTest {
     @Test
     void testSearchJobs_WithFilters() throws Exception {
 
-        JobFilterDto filter = new JobFilterDto();
+        JobFilter filter = new JobFilter();
         filter.setTitle("Developer");
         filter.setLocation("Bangalore");
 
-        JobResponseDto job = new JobResponseDto();
+        JobResponse job = new JobResponse();
         job.setId(1L);
         job.setTitle("Developer");
 
-        when(jobService.searchJobs(any(JobFilterDto.class), eq(0), eq(10), eq("createdAt"), eq("desc")))
+        when(jobService.searchJobs(any(JobFilter.class), eq(0), eq(10), eq("createdAt"), eq("desc")))
                 .thenReturn(new PageImpl<>(List.of(job)));
 
         mockMvc.perform(post("/api/jobs/search")
@@ -274,11 +274,11 @@ class JobControllerTest {
     @Test
     void testGetAllJobs_WithPagination() throws Exception {
 
-        JobResponseDto job1 = new JobResponseDto();
+        JobResponse job1 = new JobResponse();
         job1.setId(1L);
         job1.setTitle("Job 1");
 
-        JobResponseDto job2 = new JobResponseDto();
+        JobResponse job2 = new JobResponse();
         job2.setId(2L);
         job2.setTitle("Job 2");
 
@@ -296,7 +296,7 @@ class JobControllerTest {
     @Test
     void testCreateJob_MissingTitle() throws Exception {
 
-        JobRequestDto request = new JobRequestDto();
+        JobRequest request = new JobRequest();
         // Title is missing
         request.setCompanyName("Google");
         request.setDescription("Good job");

@@ -1,0 +1,34 @@
+<!-- ── RECRUITMENT PERSPECTIVE ───────────────────────── -->
+<div class="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12 animate-fade-in-up">
+  <div>
+    <h1 class="text-5xl font-bold text-text-primary tracking-tighter mb-3">Recruiter Dashboard</h1>
+    <p class="text-lg font-medium text-text-secondary opacity-70">Optimize your hiring pipeline and track
+      candidate flow.</p>
+  </div>
+  <a routerLink="/jobs/create/new"
+    class="btn-celestial !py-4 !px-8 !text-sm !shadow-2xl hover:scale-105 transition-all">
+    Post a New Job
+  </a>
+</div>
+
+<!-- Recruitment Insights Stats -->
+<app-recruiter-stats></app-recruiter-stats>
+
+<!-- Quick Review & Market Pulse Section -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-10 mb-16">
+  <!-- Quick Review Deck -->
+  <div class="lg:col-span-2">
+    <app-quick-review-queue></app-quick-review-queue>
+  </div>
+
+  <!-- Market Pulse Widget -->
+  <div class="lg:col-span-1">
+    <app-market-pulse-helper></app-market-pulse-helper>
+  </div>
+</div>
+
+<!-- Job Postings Table -->
+<app-recent-postings-table></app-recent-postings-table>
+
+<!-- Recent Candidates Table -->
+<app-recent-candidates-table></app-recent-candidates-table>

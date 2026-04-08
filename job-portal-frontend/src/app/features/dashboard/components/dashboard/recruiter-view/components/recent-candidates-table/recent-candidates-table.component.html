@@ -1,0 +1,67 @@
+<!-- Recent Candidates Table -->
+<div class="celestial-card overflow-hidden">
+  <div class="px-8 py-6 border-b border-glass-border bg-bg-secondary flex items-center justify-between">
+    <h3 class="text-xl font-bold text-text-primary">Recent Candidates</h3>
+    <a routerLink="/applications/recruiter" class="text-xs font-bold text-energy-indigo">View All Candidates</a>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-left">
+      <thead>
+        <tr class="bg-bg-secondary">
+          <th class="px-8 py-4 text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em]">Candidate
+          </th>
+          <th class="px-8 py-4 text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em]">Applied For
+          </th>
+          <th class="px-8 py-4 text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em]">Date</th>
+          <th class="px-8 py-4 text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] text-right">
+            Status</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-glass-border">
+        @for (app of recentApplicationsForJobs; track app.id) {
+        <tr class="hover:bg-bg-secondary transition-colors group">
+          <td class="px-8 py-6">
+            <div class="flex items-center gap-3">
+              <div
+                class="w-8 h-8 rounded-lg bg-energy-indigo/10 text-energy-indigo flex items-center justify-center font-bold text-xs">
+                {{ app.applicantName.charAt(0) }}
+              </div>
+              <div>
+                <p class="font-bold text-text-primary text-sm">{{ app.applicantName }}</p>
+                <p class="text-[10px] text-text-muted font-bold uppercase tracking-wider">{{ app.applicantEmail
+                  }}</p>
+              </div>
+            </div>
+          </td>
+          <td class="px-8 py-6">
+            <p class="text-sm font-bold text-text-primary">{{ app.jobTitle || 'Job #' + app.jobId }}</p>
+          </td>
+          <td class="px-8 py-6">
+            <p class="text-xs font-bold text-text-secondary">{{ app.appliedAt | date:'MMM d' }}</p>
+            <p class="text-[9px] font-bold text-text-muted mt-1">{{ app.appliedAt | date:'HH:mm':'+0530' }} IST
+            </p>
+          </td>
+          <td class="px-8 py-6 text-right">
+            <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border transition-colors" [ngClass]="{
+                    'bg-blue-500/10 text-blue-500 border-blue-500/20': app.status === 'APPLIED',
+                    'bg-orange-500/10 text-orange-500 border-orange-500/20': app.status === 'UNDER_REVIEW',
+                    'bg-green-500/10 text-green-500 border-green-500/20': app.status === 'SHORTLISTED',
+                    'bg-red-500/10 text-red-500 border-red-500/20': app.status === 'REJECTED'
+                  }">
+              {{ app.status }}
+            </span>
+          </td>
+        </tr>
+        }
+        @if (recentApplicationsForJobs.length === 0) {
+        <tr>
+          <td colspan="4" class="px-8 py-12 text-center">
+            <p class="text-sm font-bold text-text-secondary opacity-40">No recent applications found.</p>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,24 @@
+<!-- ── JOB SEEKER PERSPECTIVE ─────────────────────────── -->
+<div class="mb-12">
+  <h1 class="text-5xl font-bold text-text-primary tracking-tighter mb-3">Hello, {{ user?.name?.split(' ')[0] }}</h1>
+  <p class="text-lg font-medium text-text-secondary opacity-70">Manage your applications and track market trends.
+  </p>
+</div>
+
+<!-- Application Stats -->
+<app-job-seeker-stats></app-job-seeker-stats>
+
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-10 mb-16">
+  <!-- Recommended Jobs (Left Column) -->
+  <div class="xl:col-span-2">
+    <app-recommended-jobs></app-recommended-jobs>
+  </div>
+
+  <!-- Recent Activity (Right Column) -->
+  <div class="xl:col-span-1">
+    <app-recent-activity></app-recent-activity>
+  </div>
+</div>
+
+<!-- Job Market Insights -->
+<app-market-pulse></app-market-pulse>

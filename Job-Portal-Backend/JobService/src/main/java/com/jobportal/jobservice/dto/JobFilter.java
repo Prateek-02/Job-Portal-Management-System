@@ -4,7 +4,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class JobFilterDto {
+public class JobFilter {
     private String title;
     private String location;
     private String companyName;

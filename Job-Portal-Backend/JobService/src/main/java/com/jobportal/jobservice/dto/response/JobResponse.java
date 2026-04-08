@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-public class JobResponseDto {
+public class JobResponse {
     private Long id;
     private String title;
     private String companyName;

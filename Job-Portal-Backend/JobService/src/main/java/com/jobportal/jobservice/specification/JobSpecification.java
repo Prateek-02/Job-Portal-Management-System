@@ -1,6 +1,6 @@
 package com.jobportal.jobservice.specification;
 
-import com.jobportal.jobservice.dto.JobFilterDto;
+import com.jobportal.jobservice.dto.JobFilter;
 import com.jobportal.jobservice.entity.Job;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
@@ -10,7 +10,7 @@ import java.util.List;
 
 public class JobSpecification {
 
-    public static Specification<Job> getFilteredJobs(JobFilterDto filter) {
+    public static Specification<Job> getFilteredJobs(JobFilter filter) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 

@@ -13,7 +13,7 @@ export const roleGuard: CanActivateFn = (route, state) => {
     return true;
   }
 
-  // Redirect non-admin users attempting to access admin routes
-  router.navigate(['/jobs']);
+
+  router.navigate(['/404']);
   return false;
 };

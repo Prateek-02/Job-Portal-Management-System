@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.jobportal.jobservice.dto.JobFilterDto;
-import com.jobportal.jobservice.dto.request.JobRequestDto;
-import com.jobportal.jobservice.dto.response.JobResponseDto;
+import com.jobportal.jobservice.dto.JobFilter;
+import com.jobportal.jobservice.dto.request.JobRequest;
+import com.jobportal.jobservice.dto.response.JobResponse;
 import com.jobportal.jobservice.service.JobService;
 
 import jakarta.validation.Valid;
@@ -37,15 +37,15 @@ public class JobController {
     private final JobService jobService;
 
     @PostMapping
-    public ResponseEntity<JobResponseDto> createJob(
-            @Valid @RequestBody JobRequestDto dto,
+    public ResponseEntity<JobResponse> createJob(
+            @Valid @RequestBody JobRequest dto,
             @RequestHeader("X-User-Id") Long recruiterId,
             @RequestHeader("X-User-Role") String role) {
 
         log.info("Create Job API | recruiterId: {} | role: {} | title: {}",
                 recruiterId, role, dto.getTitle());
 
-        JobResponseDto response =
+        JobResponse response =
                 jobService.createJob(dto, recruiterId, role);
 
         log.info("Job created | jobId: {} | recruiterId: {}",
@@ -55,7 +55,7 @@ public class JobController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<JobResponseDto>> getAllJobs(
+    public ResponseEntity<Page<JobResponse>> getAllJobs(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
@@ -64,7 +64,7 @@ public class JobController {
         log.info("Get jobs | page: {} | size: {} | sortBy: {} | direction: {}",
                 page, size, sortBy, direction);
 
-        Page<JobResponseDto> response =
+        Page<JobResponse> response =
                 jobService.getAllJobs(page, size, sortBy, direction);
 
         log.debug("Jobs fetched | count: {}", response.getNumberOfElements());
@@ -73,11 +73,11 @@ public class JobController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<JobResponseDto> getJobById(@PathVariable Long id) {
+    public ResponseEntity<JobResponse> getJobById(@PathVariable Long id) {
 
         log.info("Get job | jobId: {}", id);
 
-        JobResponseDto response = jobService.getJobById(id);
+        JobResponse response = jobService.getJobById(id);
 
         log.info("Job fetched | jobId: {}", id);
 
@@ -85,14 +85,14 @@ public class JobController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<JobResponseDto> updateJob(
+    public ResponseEntity<JobResponse> updateJob(
             @PathVariable Long id,
-            @Valid @RequestBody JobRequestDto dto,
+            @Valid @RequestBody JobRequest dto,
             @RequestHeader("X-User-Id") Long recruiterId) {
 
         log.info("Update job | jobId: {} | recruiterId: {}", id, recruiterId);
 
-        JobResponseDto response =
+        JobResponse response =
                 jobService.updateJob(id, dto, recruiterId);
 
         log.info("Job updated | jobId: {}", id);
@@ -116,8 +116,8 @@ public class JobController {
     }
 
     @PostMapping("/search")
-    public ResponseEntity<Page<JobResponseDto>> searchJobs(
-            @RequestBody JobFilterDto filter,
+    public ResponseEntity<Page<JobResponse>> searchJobs(
+            @RequestBody JobFilter filter,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
@@ -126,7 +126,7 @@ public class JobController {
         log.info("Search jobs | page: {} | size: {} | filter: {}",
                 page, size, filter);
 
-        Page<JobResponseDto> response =
+        Page<JobResponse> response =
                 jobService.searchJobs(filter, page, size, sortBy, direction);
 
         log.debug("Search result count: {}", response.getNumberOfElements());
@@ -148,14 +148,14 @@ public class JobController {
     }
 
     @GetMapping("/recruiter/{recruiterId}")
-    public ResponseEntity<List<JobResponseDto>> getJobsByRecruiter(
+    public ResponseEntity<List<JobResponse>> getJobsByRecruiter(
             @PathVariable Long recruiterId) {
         log.info("Get jobs by recruiter | recruiterId: {}", recruiterId);
         return ResponseEntity.ok(jobService.getJobsByRecruiter(recruiterId));
     }
 
     @GetMapping("/stats/market-pulse")
-    public ResponseEntity<com.jobportal.jobservice.dto.response.MarketStatsDto> getMarketPulseStats() {
+    public ResponseEntity<com.jobportal.jobservice.dto.response.MarketStatsResponse> getMarketPulseStats() {
         log.info("Get market pulse stats API called");
         return ResponseEntity.ok(jobService.getMarketPulseStats());
     }

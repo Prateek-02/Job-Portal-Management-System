@@ -1,0 +1,76 @@
+<!-- Job Market Insights -->
+<h3 class="text-2xl font-bold text-text-primary mb-8">Job Market Pulse</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+  <!-- Avg Salary Trend -->
+  <div class="celestial-card p-10 group overflow-hidden relative">
+    <div class="absolute inset-0 bg-energy-indigo/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+    <div class="relative flex flex-col justify-between h-full">
+      <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary mb-8 opacity-50">Avg Salary
+        Trend</div>
+      <div class="flex items-end justify-between">
+        <div>
+          <div class="text-4xl font-bold text-text-primary mb-2">{{ formatSalary(marketStats?.averageSalary || 840000)
+            }}</div>
+          <div class="flex items-center gap-1.5 text-energy-emerald">
+            <span class="text-xs font-bold">↑ {{ marketStats?.salaryGrowthYoy || '4.2' }}% YOY</span>
+          </div>
+        </div>
+        <!-- Sparkline -->
+        <svg class="w-32 h-10 overflow-visible" viewBox="0 0 100 40">
+          <path [attr.d]="'M ' + salaryTrendPoints" fill="none" stroke="url(#lineGradient)" stroke-width="3"
+            stroke-linecap="round" stroke-linejoin="round" class="drop-shadow-lg" />
+          <defs>
+            <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#a18cd1" />
+              <stop offset="100%" stop-color="#fbc2eb" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Market Demand -->
+  <div class="celestial-card p-10 group overflow-hidden relative border-none inner-glow">
+    <div class="relative flex flex-col justify-between h-full">
+      <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary mb-8 opacity-50">Market
+        Demand</div>
+      <div class="flex items-end justify-between">
+        <div>
+          <div class="text-4xl font-black text-text-primary mb-2">{{ marketStats?.marketDemandStatus || 'High' }}
+          </div>
+          <p class="text-[10px] font-bold uppercase tracking-widest text-energy-indigo">Peaking Now</p>
+        </div>
+        <!-- Sparkline (Demand) -->
+        <svg class="w-32 h-10 overflow-visible" viewBox="0 0 100 40">
+          <polyline [attr.points]="marketDemandPoints" fill="none" stroke="#a18cd1" stroke-width="2"
+            stroke-dasharray="4 4" />
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- In-Demand Skills -->
+  <div class="celestial-card p-10 group relative border-none inner-glow">
+    <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary mb-6 opacity-50">In-Demand
+      Skills</div>
+    <div class="space-y-6">
+      @if (topSkills.length > 0) {
+      @for (skill of topSkills; track skill.name) {
+      <div>
+        <div class="flex justify-between text-[10px] font-black uppercase tracking-widest text-text-primary mb-2">
+          <span>{{ skill.name }}</span>
+          <span>{{ skill.level }}%</span>
+        </div>
+        <div class="h-1.5 w-full bg-glass-bg rounded-full overflow-hidden">
+          <div class="h-full bg-energy-indigo rounded-full transition-all duration-1000"
+            [style.width]="skill.level + '%'"></div>
+        </div>
+      </div>
+      }
+      } @else {
+      <div class="text-xs font-bold text-text-muted py-4 italic">Analyzing market skills...</div>
+      }
+    </div>
+  </div>
+</div>

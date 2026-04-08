@@ -1,0 +1,14 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.energy-sphere {
+  background: radial-gradient(circle at center, var(--color-royal-blue), transparent 70%);
+  opacity: 0.15;
+}
+
+.energy-sphere-2 {
+  background: radial-gradient(circle at center, var(--color-energy-emerald), transparent 70%);
+  opacity: 0.1;
+}

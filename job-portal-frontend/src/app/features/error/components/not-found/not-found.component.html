@@ -1,0 +1,29 @@
+<div class="fixed inset-0 min-h-screen flex items-center justify-center overflow-hidden p-6">
+  <!-- Animated Background Spheres (matching MainLayout/AuthLayout vibe) -->
+  <div class="energy-sphere-container">
+    <div class="energy-sphere"></div>
+    <div class="energy-sphere-2"></div>
+  </div>
+
+  <!-- Note: max-w-none is used for full width, with some horizontal padding -->
+  <div class="celestial-card w-full max-w-[90vw] p-16 text-center relative z-10 animate-fade-in-up">
+    <div class="mb-12 relative">
+      <!-- 404 Text with Aura Gradient -->
+      <h1 class="text-aura text-[12rem] font-black mb-0 leading-none tracking-tighter opacity-10 blur-[2px] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 select-none uppercase">404</h1>
+      <h1 class="text-aura text-9xl font-black relative z-10 drop-shadow-2xl">404</h1>
+    </div>
+
+    <h2 class="text-5xl font-bold mb-6 tracking-tight">Career Opportunity Not Found</h2>
+    <p class="text-text-secondary text-xl mb-12 max-w-3xl mx-auto leading-relaxed opacity-90 font-medium">
+      We couldn't find the vacancy or path you were looking for. The position may have been filled, the listing expired, or the page moved to a new location within our portal.
+    </p>
+
+    <!-- Visual Divider -->
+    <div class="max-w-md mx-auto h-px bg-gradient-to-r from-transparent via-glass-border to-transparent opacity-50 mb-12"></div>
+
+    <!-- Subtle data-driven detail -->
+    <div class="opacity-40">
+      <p class="text-sm font-mono uppercase tracking-[0.3em]">System Signal: VACANCY_NOT_FOUND | Status Code: 404</p>
+    </div>
+  </div>
+</div>

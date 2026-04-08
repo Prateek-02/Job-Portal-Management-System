@@ -11,11 +11,11 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class MarketStatsDto {
+public class MarketStatsResponse {
     private Double averageSalary;
     private Double salaryGrowthYoy;
     private List<Double> salaryTrend; // Last 5-6 data points for sparkline
     private List<Double> demandTrend; // Last 5-6 data points for sparkline
-    private List<SkillStatDto> topSkills;
+    private List<SkillStatResponse> topSkills;
     private String marketDemandStatus; // "Low", "Medium", "High", "Peaking"
 }

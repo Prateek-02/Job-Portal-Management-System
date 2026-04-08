@@ -66,6 +66,13 @@ export const routes: Routes = [
     loadChildren: () => import('./features/admin/admin.routes').then(m => m.ADMIN_ROUTES)
   },
 
+  // ── Error pages ─────────────────────────────────────────────
+  {
+    path: '404',
+    loadComponent: () => import('./features/error/components/not-found/not-found.component')
+      .then(m => m.NotFoundComponent)
+  },
+
   // ── Fallback ─────────────────────────────────────────────────
-  { path: '**', redirectTo: '/jobs' }
+  { path: '**', redirectTo: '/404' }
 ];

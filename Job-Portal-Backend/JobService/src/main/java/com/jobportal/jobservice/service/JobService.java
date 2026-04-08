@@ -1,29 +1,29 @@
 package com.jobportal.jobservice.service;
 
-import com.jobportal.jobservice.dto.JobFilterDto;
-import com.jobportal.jobservice.dto.request.JobRequestDto;
-import com.jobportal.jobservice.dto.response.JobResponseDto;
+import com.jobportal.jobservice.dto.JobFilter;
+import com.jobportal.jobservice.dto.request.JobRequest;
+import com.jobportal.jobservice.dto.response.JobResponse;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 public interface JobService {
-    JobResponseDto createJob(JobRequestDto dto, Long recruiterId, String role);
+    JobResponse createJob(JobRequest dto, Long recruiterId, String role);
     
-    Page<JobResponseDto> getAllJobs(int page, int size, String sortBy, String direction);
+    Page<JobResponse> getAllJobs(int page, int size, String sortBy, String direction);
     
-    JobResponseDto getJobById(Long id);
+    JobResponse getJobById(Long id);
     
-    JobResponseDto updateJob(Long id, JobRequestDto dto, Long recruiterId);
+    JobResponse updateJob(Long id, JobRequest dto, Long recruiterId);
     
     void deleteJob(Long id, Long recruiterId);
     
-    Page<JobResponseDto> searchJobs(JobFilterDto filter, int page, int size, String sortBy, String direction);
+    Page<JobResponse> searchJobs(JobFilter filter, int page, int size, String sortBy, String direction);
     
     // Delete all jobs by recruiterId
     void deleteRecruiterJobs(Long recruiterId);
     
-    List<JobResponseDto> getJobsByRecruiter(Long recruiterId);
+    List<JobResponse> getJobsByRecruiter(Long recruiterId);
 
-    com.jobportal.jobservice.dto.response.MarketStatsDto getMarketPulseStats();
+    com.jobportal.jobservice.dto.response.MarketStatsResponse getMarketPulseStats();
 }

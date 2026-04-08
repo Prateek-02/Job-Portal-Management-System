@@ -1,7 +1,7 @@
 package com.jobportal.jobservice.service;
 
-import com.jobportal.jobservice.dto.request.JobRequestDto;
-import com.jobportal.jobservice.dto.response.JobResponseDto;
+import com.jobportal.jobservice.dto.request.JobRequest;
+import com.jobportal.jobservice.dto.response.JobResponse;
 import com.jobportal.jobservice.entity.Job;
 import com.jobportal.jobservice.exceptions.JobNotFoundException;
 import com.jobportal.jobservice.exceptions.UnauthorizedException;
@@ -39,21 +39,21 @@ class JobServiceImplTest {
 
 
     // Test Data
-    private JobRequestDto jobRequestDto;
-    private JobResponseDto jobResponseDto;
+    private JobRequest JobRequest;
+    private JobResponse JobResponse;
     private Job job;
 
     @BeforeEach
     void setUp() {
 
         // Job Request
-        jobRequestDto = new JobRequestDto();
-        jobRequestDto.setTitle("Backend Developer");
-        jobRequestDto.setCompanyName("Google");
-        jobRequestDto.setLocation("Bangalore");
-        jobRequestDto.setSalary(1500000.0);
-        jobRequestDto.setExperience(3);
-        jobRequestDto.setDescription(
+        JobRequest = new JobRequest();
+        JobRequest.setTitle("Backend Developer");
+        JobRequest.setCompanyName("Google");
+        JobRequest.setLocation("Bangalore");
+        JobRequest.setSalary(1500000.0);
+        JobRequest.setExperience(3);
+        JobRequest.setDescription(
                 "Looking for Java developer");
 
         // Job Entity
@@ -69,14 +69,14 @@ class JobServiceImplTest {
         job.setCreatedAt(LocalDateTime.now());
 
         // Job Response
-        jobResponseDto = new JobResponseDto();
-        jobResponseDto.setId(1L);
-        jobResponseDto.setTitle("Backend Developer");
-        jobResponseDto.setCompanyName("Google");
-        jobResponseDto.setLocation("Bangalore");
-        jobResponseDto.setSalary(1500000.0);
-        jobResponseDto.setExperience(3);
-        jobResponseDto.setRecruiterId(1L);
+        JobResponse = new JobResponse();
+        JobResponse.setId(1L);
+        JobResponse.setTitle("Backend Developer");
+        JobResponse.setCompanyName("Google");
+        JobResponse.setLocation("Bangalore");
+        JobResponse.setSalary(1500000.0);
+        JobResponse.setExperience(3);
+        JobResponse.setRecruiterId(1L);
     }
 
     // CREATE JOB TESTS
@@ -84,17 +84,17 @@ class JobServiceImplTest {
     @Test
     void createJob_Success() {
         // Arrange
-        when(modelMapper.map(any(JobRequestDto.class),
+        when(modelMapper.map(any(JobRequest.class),
                 eq(Job.class))).thenReturn(job);
         when(jobRepository.save(any(Job.class)))
                 .thenReturn(job);
         when(modelMapper.map(any(Job.class),
-                eq(JobResponseDto.class)))
-                .thenReturn(jobResponseDto);
+                eq(JobResponse.class)))
+                .thenReturn(JobResponse);
 
         // Act
-        JobResponseDto response =
-                jobService.createJob(jobRequestDto, 1L,
+        JobResponse response =
+                jobService.createJob(JobRequest, 1L,
                         "RECRUITER");
 
         // Assert
@@ -113,7 +113,7 @@ class JobServiceImplTest {
     void createJob_NotRecruiter_ThrowsException() {
         // Act & Assert
         assertThatThrownBy(() ->
-                jobService.createJob(jobRequestDto,
+                jobService.createJob(JobRequest,
                         1L, "JOB_SEEKER"))
                 .isInstanceOf(UnauthorizedException.class)
                 .hasMessageContaining(
@@ -132,11 +132,11 @@ class JobServiceImplTest {
         when(jobRepository.findById(anyLong()))
                 .thenReturn(Optional.of(job));
         when(modelMapper.map(any(Job.class),
-                eq(JobResponseDto.class)))
-                .thenReturn(jobResponseDto);
+                eq(JobResponse.class)))
+                .thenReturn(JobResponse);
 
         // Act
-        JobResponseDto response = jobService.getJobById(1L);
+        JobResponse response = jobService.getJobById(1L);
 
         // Assert
         assertThat(response).isNotNull();
@@ -168,17 +168,17 @@ class JobServiceImplTest {
 
         // ← Add this — mock the map(dto, job) call
         doNothing().when(modelMapper)
-                .map(any(JobRequestDto.class), any(Job.class));
+                .map(any(JobRequest.class), any(Job.class));
 
         when(jobRepository.save(any(Job.class)))
                 .thenReturn(job);
         when(modelMapper.map(any(Job.class),
-                eq(JobResponseDto.class)))
-                .thenReturn(jobResponseDto);
+                eq(JobResponse.class)))
+                .thenReturn(JobResponse);
 
         // Act
-        JobResponseDto response =
-                jobService.updateJob(1L, jobRequestDto, 1L);
+        JobResponse response =
+                jobService.updateJob(1L, JobRequest, 1L);
 
         // Assert
         assertThat(response).isNotNull();
@@ -199,7 +199,7 @@ class JobServiceImplTest {
 
         // Act & Assert
         assertThatThrownBy(() ->
-                jobService.updateJob(1L, jobRequestDto, 2L))
+                jobService.updateJob(1L, JobRequest, 2L))
                 .isInstanceOf(UnauthorizedException.class)
                 .hasMessageContaining(
                         "You are not allowed to update");
@@ -217,7 +217,7 @@ class JobServiceImplTest {
 
         // Act & Assert
         assertThatThrownBy(() ->
-                jobService.updateJob(999L, jobRequestDto, 1L))
+                jobService.updateJob(999L, JobRequest, 1L))
                 .isInstanceOf(JobNotFoundException.class)
                 .hasMessageContaining("Job not found with id");
     }
@@ -287,17 +287,17 @@ class JobServiceImplTest {
         when(jobRepository.findAll(any(org.springframework.data.domain.Pageable.class)))
                 .thenReturn(new org.springframework.data.domain.PageImpl<>(java.util.Arrays.asList(job1, job2)));
         
-        when(modelMapper.map(any(Job.class), eq(JobResponseDto.class)))
+        when(modelMapper.map(any(Job.class), eq(JobResponse.class)))
                 .thenAnswer(invocation -> {
                     Job j = invocation.getArgument(0);
-                    JobResponseDto dto = new JobResponseDto();
+                    JobResponse dto = new JobResponse();
                     dto.setId(j.getId());
                     dto.setTitle(j.getTitle());
                     return dto;
                 });
 
         // Act
-        org.springframework.data.domain.Page<JobResponseDto> response =
+        org.springframework.data.domain.Page<JobResponse> response =
                 jobService.getAllJobs(0, 10, "createdAt", "desc");
 
         // Assert
@@ -312,11 +312,11 @@ class JobServiceImplTest {
         when(jobRepository.findAll(any(org.springframework.data.domain.Pageable.class)))
                 .thenReturn(new org.springframework.data.domain.PageImpl<>(java.util.Collections.emptyList()));
         
-        when(modelMapper.map(any(Job.class), eq(JobResponseDto.class)))
-                .thenReturn(new JobResponseDto());
+        when(modelMapper.map(any(Job.class), eq(JobResponse.class)))
+                .thenReturn(new JobResponse());
 
         // Act
-        org.springframework.data.domain.Page<JobResponseDto> response =
+        org.springframework.data.domain.Page<JobResponse> response =
                 jobService.getAllJobs(0, 10, "createdAt", "asc");
 
         // Assert
@@ -330,7 +330,7 @@ class JobServiceImplTest {
     @SuppressWarnings("unchecked")
     void searchJobs_Success() {
         // Arrange
-        com.jobportal.jobservice.dto.JobFilterDto filter = new com.jobportal.jobservice.dto.JobFilterDto();
+        com.jobportal.jobservice.dto.JobFilter filter = new com.jobportal.jobservice.dto.JobFilter();
         
         Job job = new Job();
         job.setId(1L);
@@ -341,11 +341,11 @@ class JobServiceImplTest {
                 any(org.springframework.data.domain.Pageable.class)))
                 .thenReturn(new org.springframework.data.domain.PageImpl<>(java.util.Arrays.asList(job)));
         
-        when(modelMapper.map(any(Job.class), eq(JobResponseDto.class)))
-                .thenReturn(jobResponseDto);
+        when(modelMapper.map(any(Job.class), eq(JobResponse.class)))
+                .thenReturn(JobResponse);
 
         // Act
-        org.springframework.data.domain.Page<JobResponseDto> response =
+        org.springframework.data.domain.Page<JobResponse> response =
                 jobService.searchJobs(filter, 0, 10, "createdAt", "desc");
 
         // Assert
