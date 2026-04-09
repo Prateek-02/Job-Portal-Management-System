@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import { Job } from '../../../../../../../models/job.model';
 import { ApiService } from '../../../../../../../core/services/api.service';
 import { AuthService } from '../../../../../../../core/services/auth.service';
-import { catchError, of } from 'rxjs';
+import { DashboardPollingService } from '../../../../../../../core/services/dashboard-polling.service';
 
 @Component({
   selector: 'app-recent-postings-table',
@@ -17,24 +17,25 @@ export class RecentPostingsTableComponent implements OnInit {
 
   constructor(
     private apiService: ApiService,
+    private pollingService: DashboardPollingService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.authService.currentUser$.subscribe(user => {
-      if (user && user.id) {
-        this.loadPostedJobs(user.id);
+      if (user && user.id && user.role === 'RECRUITER') {
+        this.subscribeToPolling();
       }
     });
   }
 
-  private loadPostedJobs(userId: number): void {
-    this.apiService.getJobsByRecruiter(userId).pipe(
-      catchError(() => of([]))
-    ).subscribe(jobs => {
-      this.myPostedJobs = jobs.slice(0, 5); // Show top 5 recent jobs
-      this.cdr.detectChanges();
+  private subscribeToPolling(): void {
+    this.pollingService.recruiterData$.subscribe((data: any) => {
+      if (data.jobs) {
+        this.myPostedJobs = [...data.jobs].slice(0, 5);
+        this.cdr.detectChanges();
+      }
     });
   }
 

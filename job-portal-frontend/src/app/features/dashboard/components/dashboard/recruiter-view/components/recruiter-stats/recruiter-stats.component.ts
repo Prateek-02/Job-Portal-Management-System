@@ -2,9 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Job } from '../../../../../../../models/job.model';
 import { JobApplicationResponse } from '../../../../../../../models/application.model';
-import { ApiService } from '../../../../../../../core/services/api.service';
 import { AuthService } from '../../../../../../../core/services/auth.service';
-import { forkJoin, catchError, of } from 'rxjs';
+import { DashboardPollingService } from '../../../../../../../core/services/dashboard-polling.service';
 
 @Component({
   selector: 'app-recruiter-stats',
@@ -21,41 +20,31 @@ export class RecruiterStatsComponent implements OnInit {
   interviewCount = 0;
 
   constructor(
-    private apiService: ApiService,
+    private pollingService: DashboardPollingService,
     private authService: AuthService
   ) {}
 
   ngOnInit(): void {
     this.authService.currentUser$.subscribe(user => {
-      if (user && user.id) {
-        this.loadStats(user.id);
+      if (user && user.id && user.role === 'RECRUITER') {
+        this.subscribeToPolling();
       }
     });
   }
 
-  private loadStats(userId: number): void {
-    this.apiService.getJobsByRecruiter(userId).pipe(
-      catchError(() => of([]))
-    ).subscribe(jobs => {
-      this.myPostedJobs = jobs;
-      if (jobs.length > 0) {
-        const appRequests = jobs.map(job =>
-          this.apiService.getJobApplications(job.id).pipe(catchError(() => of([])))
+  private subscribeToPolling(): void {
+    this.pollingService.recruiterData$.subscribe((data: any) => {
+      if (data.jobs && data.applications) {
+        this.myPostedJobs = data.jobs;
+        this.recentApplicationsForJobs = data.applications;
+        
+        this.calculateAppVelocity(data.applications);
+        this.pendingApplications = data.applications.filter((app: any) => 
+          app.status === 'APPLIED' || app.status === 'UNDER_REVIEW'
         );
-
-        forkJoin(appRequests).subscribe(responses => {
-          let allApplications: JobApplicationResponse[] = [];
-          responses.forEach(apps => {
-            if (Array.isArray(apps)) {
-              allApplications = [...allApplications, ...apps];
-            }
-          });
-
-          this.calculateAppVelocity(allApplications);
-          this.recentApplicationsForJobs = allApplications;
-          this.pendingApplications = allApplications.filter(app => app.status === 'APPLIED' || app.status === 'UNDER_REVIEW');
-          this.interviewCount = allApplications.filter(app => app.status === 'SHORTLISTED').length;
-        });
+        this.interviewCount = data.applications.filter((app: any) => 
+          app.status === 'SHORTLISTED'
+        ).length;
       }
     });
   }

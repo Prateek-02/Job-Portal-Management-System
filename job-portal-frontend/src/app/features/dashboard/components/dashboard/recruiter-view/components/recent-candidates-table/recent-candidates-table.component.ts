@@ -2,10 +2,9 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { JobApplicationResponse } from '../../../../../../../models/application.model';
-import { ApiService } from '../../../../../../../core/services/api.service';
 import { AuthService } from '../../../../../../../core/services/auth.service';
 import { NotificationService } from '../../../../../../notifications/services/notification.service';
-import { forkJoin, catchError, of } from 'rxjs';
+import { DashboardPollingService } from '../../../../../../../core/services/dashboard-polling.service';
 
 @Component({
   selector: 'app-recent-candidates-table',
@@ -17,7 +16,7 @@ export class RecentCandidatesTableComponent implements OnInit {
   recentApplicationsForJobs: JobApplicationResponse[] = [];
 
   constructor(
-    private apiService: ApiService,
+    private pollingService: DashboardPollingService,
     private authService: AuthService,
     private notificationService: NotificationService,
     private cdr: ChangeDetectorRef
@@ -25,46 +24,22 @@ export class RecentCandidatesTableComponent implements OnInit {
 
   ngOnInit(): void {
     this.authService.currentUser$.subscribe(user => {
-      if (user && user.id) {
-        this.loadRecentCandidates(user.id);
+      if (user && user.id && user.role === 'RECRUITER') {
+        this.subscribeToPolling(user.id);
       }
     });
   }
 
-  private loadRecentCandidates(userId: number): void {
-    this.apiService.getJobsByRecruiter(userId).pipe(
-      catchError(() => of([]))
-    ).subscribe(jobs => {
-      if (jobs.length > 0) {
-        const appRequests = jobs.map(job =>
-          this.apiService.getJobApplications(job.id).pipe(catchError(() => of([])))
-        );
+  private subscribeToPolling(userId: number): void {
+    this.pollingService.recruiterData$.subscribe((data: any) => {
+      if (data.applications) {
+        // Sort by ID descending and slice the top 5
+        this.recentApplicationsForJobs = [...data.applications]
+          .sort((a, b) => b.id - a.id)
+          .slice(0, 5);
 
-        forkJoin(appRequests).subscribe(responses => {
-          let allApplications: JobApplicationResponse[] = [];
-          responses.forEach(apps => {
-            if (Array.isArray(apps)) {
-              allApplications = [...allApplications, ...apps];
-            }
-          });
-
-          // Sort by ID descending and slice
-          this.recentApplicationsForJobs = allApplications
-            .sort((a, b) => b.id - a.id)
-            .slice(0, 5);
-
-          // Map Job Titles (assuming they aren't already included or need verification)
-          this.recentApplicationsForJobs.forEach(app => {
-            const relatedJob = jobs.find(j => j.id === app.jobId);
-            if (relatedJob) {
-              app.jobTitle = relatedJob.title;
-              app.companyName = relatedJob.companyName;
-            }
-          });
-
-          this.checkNewApplicants(userId, this.recentApplicationsForJobs);
-          this.cdr.detectChanges();
-        });
+        this.checkNewApplicants(userId, data.applications);
+        this.cdr.detectChanges();
       }
     });
   }
