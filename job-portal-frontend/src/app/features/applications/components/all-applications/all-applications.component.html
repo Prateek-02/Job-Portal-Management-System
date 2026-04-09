@@ -93,7 +93,7 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-glass-border">
-            @for (app of applications; track app.id) {
+            @for (app of pagedApplications; track app.id) {
               <tr class="hover:bg-bg-secondary transition-all group">
                 <td class="px-10 py-8">
                   <div class="flex items-center gap-6">
@@ -156,6 +156,16 @@
           </tbody>
         </table>
       </div>
+
+      <!-- Pagination -->
+      <app-pagination
+        [currentPage]="currentPage"
+        [totalPages]="totalPages"
+        [totalElements]="applications.length"
+        [pageSize]="pageSize"
+        (pageChange)="onPageChange($event)"
+        class="block px-6 pb-6">
+      </app-pagination>
     }
   </div>
 </div>

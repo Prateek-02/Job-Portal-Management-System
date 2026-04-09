@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApplicationResponse } from '../../../../../../../models/application.model';
 import { ApiService } from '../../../../../../../core/services/api.service';
 import { AuthService } from '../../../../../../../core/services/auth.service';
 import { NotificationService } from '../../../../../../notifications/services/notification.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-job-seeker-stats',
@@ -11,11 +13,13 @@ import { NotificationService } from '../../../../../../notifications/services/no
   imports: [CommonModule],
   templateUrl: './job-seeker-stats.component.html'
 })
-export class JobSeekerStatsComponent implements OnInit {
+export class JobSeekerStatsComponent implements OnInit, OnDestroy {
   myApplications: ApplicationResponse[] = [];
   appliedCount = 0;
   interviewCount = 0;
   rejectedCount = 0;
+
+  private destroy$ = new Subject<void>();
 
   constructor(
     private apiService: ApiService,
@@ -24,15 +28,20 @@ export class JobSeekerStatsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.authService.currentUser$.subscribe(user => {
+    this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe(user => {
       if (user && user.id) {
         this.loadStats(user.id);
       }
     });
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   private loadStats(userId: number): void {
-    this.apiService.getMyApplications().subscribe(apps => {
+    this.apiService.getMyApplications().pipe(takeUntil(this.destroy$)).subscribe(apps => {
       this.myApplications = apps;
       this.appliedCount = apps.length;
       this.interviewCount = apps.filter(a => a.status === 'SHORTLISTED').length;
@@ -44,11 +53,11 @@ export class JobSeekerStatsComponent implements OnInit {
   private checkStatusChanges(userId: number, apps: ApplicationResponse[]): void {
     const metadataKey = `jp_app_metadata_${userId}`;
     const appMetadata: Record<number, string> = JSON.parse(localStorage.getItem(metadataKey) || '{}');
-    
+
     let changed = false;
     apps.forEach((app: ApplicationResponse) => {
       const lastStatus = appMetadata[app.id];
-      
+
       if (lastStatus === undefined || lastStatus !== app.status) {
         const statusMsg: Record<string, string> = {
           SHORTLISTED: `🎉 Great news! Your application for ${app.job.title} at ${app.job.companyName} has been shortlisted.`,
@@ -64,7 +73,7 @@ export class JobSeekerStatsComponent implements OnInit {
             SHORTLISTED: 'Shortlisted', REJECTED: 'Rejected'
           };
           const title = isFirstSeen ? 'Application Submitted' : `Application ${statusLabels[app.status] || app.status}`;
-          
+
           this.notificationService.push(
             'APPLICATION_STATUS',
             title,

@@ -52,7 +52,7 @@
   <!-- Applicants List -->
   @if (!isLoading && applications.length > 0) {
     <div class="space-y-8 animate-fade-in-up">
-      @for (app of applications; track app.id) {
+      @for (app of pagedApplications; track app.id) {
         <div class="glass-card p-8 group relative overflow-hidden">
           <!-- Left Gradient Border overlay effect -->
           <div class="absolute left-0 top-0 bottom-0 w-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style="background: linear-gradient(180deg, #A18CD1, #FBC2EB)"></div>
@@ -126,6 +126,15 @@
         </div>
       }
     </div>
+
+    <!-- Pagination -->
+    <app-pagination
+      [currentPage]="currentPage"
+      [totalPages]="totalPages"
+      [totalElements]="applications.length"
+      [pageSize]="pageSize"
+      (pageChange)="onPageChange($event)">
+    </app-pagination>
   }
 
 </div>

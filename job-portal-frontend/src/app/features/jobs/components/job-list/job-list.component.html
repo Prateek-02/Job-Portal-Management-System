@@ -185,35 +185,13 @@
     </div>
 
     <!-- Pagination -->
-    @if (totalPages > 1) {
-      <div class="mt-16 pt-10 border-t border-glass-border flex justify-center items-center gap-4">
-        <button [disabled]="currentPage === 0" (click)="loadJobs(currentPage - 1)"
-          class="w-12 h-12 rounded-2xl flex items-center justify-center border border-glass-border bg-bg-primary text-text-primary hover:bg-bg-secondary disabled:opacity-20 disabled:cursor-not-allowed transition-all shadow-sm">
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" /></svg>
-        </button>
-
-        <div class="flex items-center gap-2">
-          @for (page of pages; track page) {
-            <button (click)="goToPage(page)"
-              class="w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-sm transition-all shadow-sm"
-              [class.bg-bg-accent]="currentPage === page" 
-              [class.text-white]="currentPage === page"
-              [class.shadow-xl]="currentPage === page" 
-              [class.border]="currentPage !== page"
-              [class.border-glass-border]="currentPage !== page" 
-              [class.bg-bg-primary]="currentPage !== page"
-              [class.text-text-primary]="currentPage !== page" 
-              [class.hover:bg-bg-secondary]="currentPage !== page">
-              {{ page + 1 }}
-            </button>
-          }
-        </div>
-
-        <button [disabled]="currentPage === totalPages - 1" (click)="goToPage(currentPage + 1)"
-          class="w-12 h-12 rounded-2xl flex items-center justify-center border border-glass-border bg-bg-primary text-text-primary hover:bg-bg-secondary disabled:opacity-20 disabled:cursor-not-allowed transition-all shadow-sm">
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" /></svg>
-        </button>
-      </div>
-    }
+    <app-pagination
+      [currentPage]="currentPage"
+      [totalPages]="totalPages"
+      [totalElements]="totalElements"
+      [pageSize]="pageSize"
+      (pageChange)="goToPage($event)">
+    </app-pagination>
   }
+
 </div>

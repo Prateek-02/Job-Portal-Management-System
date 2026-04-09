@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Job } from '../../../../../../../models/job.model';
 import { JobApplicationResponse } from '../../../../../../../models/application.model';
 import { AuthService } from '../../../../../../../core/services/auth.service';
 import { DashboardPollingService } from '../../../../../../../core/services/dashboard-polling.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-recruiter-stats',
@@ -11,7 +13,7 @@ import { DashboardPollingService } from '../../../../../../../core/services/dash
   imports: [CommonModule],
   templateUrl: './recruiter-stats.component.html'
 })
-export class RecruiterStatsComponent implements OnInit {
+export class RecruiterStatsComponent implements OnInit, OnDestroy {
   myPostedJobs: Job[] = [];
   totalAppsLast7Days = 0;
   appVelocityPoints = '';
@@ -19,30 +21,37 @@ export class RecruiterStatsComponent implements OnInit {
   recentApplicationsForJobs: JobApplicationResponse[] = [];
   interviewCount = 0;
 
+  private destroy$ = new Subject<void>();
+
   constructor(
     private pollingService: DashboardPollingService,
     private authService: AuthService
   ) {}
 
   ngOnInit(): void {
-    this.authService.currentUser$.subscribe(user => {
+    this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe(user => {
       if (user && user.id && user.role === 'RECRUITER') {
         this.subscribeToPolling();
       }
     });
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   private subscribeToPolling(): void {
-    this.pollingService.recruiterData$.subscribe((data: any) => {
+    this.pollingService.recruiterData$.pipe(takeUntil(this.destroy$)).subscribe((data: any) => {
       if (data.jobs && data.applications) {
         this.myPostedJobs = data.jobs;
         this.recentApplicationsForJobs = data.applications;
-        
+
         this.calculateAppVelocity(data.applications);
-        this.pendingApplications = data.applications.filter((app: any) => 
+        this.pendingApplications = data.applications.filter((app: any) =>
           app.status === 'APPLIED' || app.status === 'UNDER_REVIEW'
         );
-        this.interviewCount = data.applications.filter((app: any) => 
+        this.interviewCount = data.applications.filter((app: any) =>
           app.status === 'SHORTLISTED'
         ).length;
       }

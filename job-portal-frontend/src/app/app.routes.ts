@@ -68,6 +68,11 @@ export const routes: Routes = [
 
   // ── Error pages ─────────────────────────────────────────────
   {
+    path: 'error/:code',
+    loadComponent: () => import('./features/error/components/error-page/error-page.component')
+      .then(m => m.ErrorPageComponent)
+  },
+  {
     path: '404',
     loadComponent: () => import('./features/error/components/not-found/not-found.component')
       .then(m => m.NotFoundComponent)

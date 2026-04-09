@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -6,6 +6,8 @@ import { ApiService } from '../../../../core/services/api.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { Job } from '../../../../models/job.model';
 import { getFriendlyError } from '../../../../core/utils/error-handler.util';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-job-detail',
@@ -13,7 +15,7 @@ import { getFriendlyError } from '../../../../core/utils/error-handler.util';
   imports: [CommonModule, ReactiveFormsModule, RouterLink, DatePipe],
   templateUrl: './job-detail.component.html'
 })
-export class JobDetailComponent implements OnInit {
+export class JobDetailComponent implements OnInit, OnDestroy {
   job: Job | null = null;
   isLoading = true;
   errorMessage = '';
@@ -25,6 +27,8 @@ export class JobDetailComponent implements OnInit {
   isApplying = false;
   applyError = '';
   applySuccess = false;
+
+  private destroy$ = new Subject<void>();
 
   constructor(
     private route: ActivatedRoute,
@@ -38,7 +42,7 @@ export class JobDetailComponent implements OnInit {
   ngOnInit(): void {
     this.applyForm = this.fb.group({ resume: [null, Validators.required] });
 
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const id = Number(params.get('id'));
       if (id) {
         this.loadJob(id);
@@ -46,14 +50,16 @@ export class JobDetailComponent implements OnInit {
     });
   }
 
-
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   loadJob(id: number): void {
     this.isLoading = true;
-    this.apiService.getJobById(id).subscribe({
+    this.apiService.getJobById(id).pipe(takeUntil(this.destroy$)).subscribe({
       next: (job) => {
         this.job = job;
-
         this.isLoading = false;
         this.cdr.detectChanges();
       },
@@ -90,7 +96,7 @@ export class JobDetailComponent implements OnInit {
     this.isApplying = true;
     this.applyError = '';
 
-    this.apiService.applyForJob(this.job.id, this.selectedFile).subscribe({
+    this.apiService.applyForJob(this.job.id, this.selectedFile).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.isApplying = false;
         this.applySuccess = true;

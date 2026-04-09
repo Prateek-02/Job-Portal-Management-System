@@ -1,9 +1,10 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { JobApplicationResponse } from '../../../../../../../models/application.model';
 import { ApiService } from '../../../../../../../core/services/api.service';
 import { AuthService } from '../../../../../../../core/services/auth.service';
-import { forkJoin, catchError, of } from 'rxjs';
+import { forkJoin, catchError, of, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-quick-review-queue',
@@ -11,8 +12,10 @@ import { forkJoin, catchError, of } from 'rxjs';
   imports: [CommonModule, DatePipe],
   templateUrl: './quick-review-queue.component.html'
 })
-export class QuickReviewQueueComponent implements OnInit {
+export class QuickReviewQueueComponent implements OnInit, OnDestroy {
   pendingApplications: JobApplicationResponse[] = [];
+
+  private destroy$ = new Subject<void>();
 
   constructor(
     private apiService: ApiService,
@@ -21,23 +24,29 @@ export class QuickReviewQueueComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.authService.currentUser$.subscribe(user => {
+    this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe(user => {
       if (user && user.id) {
         this.loadPendingApplications(user.id);
       }
     });
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   private loadPendingApplications(userId: number): void {
     this.apiService.getJobsByRecruiter(userId).pipe(
-      catchError(() => of([]))
+      catchError(() => of([])),
+      takeUntil(this.destroy$)
     ).subscribe(jobs => {
       if (jobs.length > 0) {
         const appRequests = jobs.map(job =>
           this.apiService.getJobApplications(job.id).pipe(catchError(() => of([])))
         );
 
-        forkJoin(appRequests).subscribe(responses => {
+        forkJoin(appRequests).pipe(takeUntil(this.destroy$)).subscribe(responses => {
           let allApplications: JobApplicationResponse[] = [];
           responses.forEach(apps => {
             if (Array.isArray(apps)) {
@@ -45,11 +54,10 @@ export class QuickReviewQueueComponent implements OnInit {
             }
           });
 
-          // Sort by ID descending (recent first) and filter by APPLIED/UNDER_REVIEW
           this.pendingApplications = allApplications
             .filter(app => app.status === 'APPLIED' || app.status === 'UNDER_REVIEW')
             .sort((a, b) => b.id - a.id);
-          
+
           this.cdr.detectChanges();
         });
       }
@@ -57,10 +65,8 @@ export class QuickReviewQueueComponent implements OnInit {
   }
 
   onUpdateStatus(app: JobApplicationResponse, status: 'SHORTLISTED' | 'REJECTED'): void {
-    this.apiService.updateApplicationStatus(app.id, status).subscribe({
+    this.apiService.updateApplicationStatus(app.id, status).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
-        // Remove locally with a small animation delay if needed, 
-        // but for now just immediate filter
         this.pendingApplications = this.pendingApplications.filter(a => a.id !== app.id);
         this.cdr.detectChanges();
       }

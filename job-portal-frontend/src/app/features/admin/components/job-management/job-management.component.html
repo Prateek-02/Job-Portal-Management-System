@@ -2,7 +2,7 @@
   <div class="flex items-center justify-between mb-8">
     <div>
       <h1 class="text-3xl font-bold text-text-primary">Manage Jobs</h1>
-      <p class="text-text-secondary mt-1">{{ totalElements }} total job listings</p>
+      <p class="text-text-secondary mt-1">{{ totalElements }} total job listings &mdash; Page {{ currentPage + 1 }} of {{ totalPages || 1 }}</p>
     </div>
   </div>
 
@@ -43,7 +43,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (job of jobs; track job.id) {
+            @for (job of pagedJobs; track job.id) {
               <tr class="border-b border-glass-border hover:bg-bg-secondary transition-colors">
                 <td class="px-6 py-4 text-text-primary font-bold text-sm max-w-xs truncate tracking-tight">{{ job.title }}</td>
                 <td class="px-6 py-4 text-text-secondary font-medium text-sm">{{ job.companyName }}</td>
@@ -71,5 +71,15 @@
         </table>
       </div>
     </div>
+
+    <!-- Pagination -->
+    <app-pagination
+      [currentPage]="currentPage"
+      [totalPages]="totalPages"
+      [totalElements]="jobs.length"
+      [pageSize]="pageSize"
+      (pageChange)="onPageChange($event)"
+      class="block px-6 pb-6">
+    </app-pagination>
   }
 </div>

@@ -1,21 +1,43 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../../../core/services/api.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { ApplicationResponse, ApplicationStatus } from '../../../../models/application.model';
 import { getFriendlyError } from '../../../../core/utils/error-handler.util';
+import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-my-applications',
   standalone: true,
-  imports: [CommonModule, RouterLink, DatePipe],
+  imports: [CommonModule, RouterLink, DatePipe, PaginationComponent],
   templateUrl: './my-applications.component.html'
 })
-export class MyApplicationsComponent implements OnInit {
+export class MyApplicationsComponent implements OnInit, OnDestroy {
   applications: ApplicationResponse[] = [];
   isLoading = true;
   errorMessage = '';
+
+  private destroy$ = new Subject<void>();
+
+  // Pagination
+  currentPage = 0;
+  pageSize = 5;
+
+  get totalPages(): number {
+    return Math.ceil(this.applications.length / this.pageSize);
+  }
+
+  get pagedApplications(): ApplicationResponse[] {
+    const start = this.currentPage * this.pageSize;
+    return this.applications.slice(start, start + this.pageSize);
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage = page;
+  }
 
   constructor(
     private apiService: ApiService,
@@ -23,14 +45,19 @@ export class MyApplicationsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.apiService.getMyApplications().subscribe({
-      next: (res) => { 
-        this.applications = res || []; 
-        this.isLoading = false; 
+    this.apiService.getMyApplications().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (res) => {
+        this.applications = res || [];
+        this.isLoading = false;
         this.checkStatuses(this.applications);
       },
       error: (err) => { this.errorMessage = getFriendlyError(err, 'load_applications'); this.isLoading = false; }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private checkStatuses(apps: ApplicationResponse[]): void {
@@ -39,7 +66,7 @@ export class MyApplicationsComponent implements OnInit {
 
     const metadataKey = `jp_app_metadata_${user.id}`;
     const appMetadata: Record<number, string> = JSON.parse(localStorage.getItem(metadataKey) || '{}');
-    
+
     let changed = false;
     apps.forEach(app => {
       if (appMetadata[app.id] !== app.status) {

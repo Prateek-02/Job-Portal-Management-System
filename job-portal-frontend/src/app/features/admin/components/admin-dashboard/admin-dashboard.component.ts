@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
- import { ApiService } from '../../../../core/services/api.service';
+import { ApiService } from '../../../../core/services/api.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { NotificationService } from '../../../notifications/services/notification.service';
 import { AdminReports, AdminUserResponse } from '../../../../models/api-response.model';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -12,9 +14,11 @@ import { AdminReports, AdminUserResponse } from '../../../../models/api-response
   imports: [CommonModule, RouterLink],
   templateUrl: './admin-dashboard.component.html'
 })
-export class AdminDashboardComponent implements OnInit {
-   reports: AdminReports | null = null;
+export class AdminDashboardComponent implements OnInit, OnDestroy {
+  reports: AdminReports | null = null;
   isLoading = true;
+
+  private destroy$ = new Subject<void>();
 
   constructor(
     private apiService: ApiService,
@@ -22,8 +26,8 @@ export class AdminDashboardComponent implements OnInit {
     private notificationService: NotificationService
   ) {}
 
-   ngOnInit(): void {
-    this.apiService.getAdminReports().subscribe({
+  ngOnInit(): void {
+    this.apiService.getAdminReports().pipe(takeUntil(this.destroy$)).subscribe({
       next: (r) => { this.reports = r; this.isLoading = false; },
       error: () => { this.isLoading = false; }
     });
@@ -31,19 +35,23 @@ export class AdminDashboardComponent implements OnInit {
     this.checkNewUsers();
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   private checkNewUsers(): void {
     const admin = this.authService.getCurrentUser();
     if (!admin || !admin.id) return;
 
-    this.apiService.getAdminUsers().subscribe({
+    this.apiService.getAdminUsers().pipe(takeUntil(this.destroy$)).subscribe({
       next: (users: AdminUserResponse[]) => {
         const seenKey = `jp_seen_users_${admin.id}`;
         const seenIds: number[] = JSON.parse(localStorage.getItem(seenKey) || '[]');
-        
+
         let newCount = 0;
         users.forEach(user => {
           if (!seenIds.includes(user.id)) {
-            // Only push notification if this is not the very first time we are loading users
             if (seenIds.length > 0) {
               this.notificationService.push(
                 'USER_REGISTERED',

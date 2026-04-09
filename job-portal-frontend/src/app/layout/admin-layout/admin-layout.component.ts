@@ -1,7 +1,8 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { CacheService } from '../../core/services/cache.service';
 import { NotificationService } from '../../features/notifications/services/notification.service';
 import { NotificationPanelComponent } from '../../features/notifications/components/notification-panel/notification-panel.component';
 import { ThemeToggleComponent } from '../../shared/components/theme-toggle/theme-toggle.component';
@@ -18,8 +19,18 @@ export class AdminLayoutComponent {
 
   constructor(
     public authService: AuthService,
-    public notificationService: NotificationService
+    public notificationService: NotificationService,
+    private router: Router,
+    private cacheService: CacheService
   ) {}
+
+  refreshData(): void {
+    this.cacheService.clearAll();
+    const currentUrl = this.router.url;
+    this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+      this.router.navigate([currentUrl]);
+    });
+  }
 
   toggleNotifications(event?: Event): void {
     if (event) event.stopPropagation();

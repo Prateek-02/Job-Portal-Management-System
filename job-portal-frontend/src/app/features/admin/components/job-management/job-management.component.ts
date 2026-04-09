@@ -1,30 +1,50 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe, CurrencyPipe } from '@angular/common';
 import { ApiService } from '../../../../core/services/api.service';
 import { AdminJobResponse } from '../../../../models/api-response.model';
 import { getFriendlyError } from '../../../../core/utils/error-handler.util';
+import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-job-management',
   standalone: true,
-  imports: [CommonModule, DatePipe],
+  imports: [CommonModule, DatePipe, PaginationComponent],
   templateUrl: './job-management.component.html'
 })
-export class JobManagementComponent implements OnInit {
+export class JobManagementComponent implements OnInit, OnDestroy {
   jobs: AdminJobResponse[] = [];
   isLoading = true;
   deletingId: number | null = null;
   errorMessage = '';
-  totalPages = 0;
   totalElements = 0;
+
+  private destroy$ = new Subject<void>();
+
+  // Pagination
+  currentPage = 0;
+  pageSize = 10;
+
+  get totalPages(): number {
+    return Math.ceil(this.jobs.length / this.pageSize);
+  }
+
+  get pagedJobs(): AdminJobResponse[] {
+    const start = this.currentPage * this.pageSize;
+    return this.jobs.slice(start, start + this.pageSize);
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage = page;
+  }
 
   constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
-    this.apiService.getAdminJobs().subscribe({
+    this.apiService.getAdminJobs().pipe(takeUntil(this.destroy$)).subscribe({
       next: (data) => {
         this.jobs = data.content || [];
-        this.totalPages = data.totalPages;
         this.totalElements = data.totalElements;
         this.isLoading = false;
       },
@@ -39,5 +59,10 @@ export class JobManagementComponent implements OnInit {
       next: () => { this.jobs = this.jobs.filter(j => j.id !== id); this.deletingId = null; },
       error: (err) => { this.deletingId = null; alert(getFriendlyError(err, 'delete_job')); }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

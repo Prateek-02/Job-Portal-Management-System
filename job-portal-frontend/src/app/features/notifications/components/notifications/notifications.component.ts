@@ -1,8 +1,10 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { NotificationService } from '../../services/notification.service';
 import { AppNotification } from '../../../../models/notification.model';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-notifications',
@@ -10,9 +12,11 @@ import { AppNotification } from '../../../../models/notification.model';
   imports: [CommonModule],
   templateUrl: './notifications.component.html'
 })
-export class NotificationsComponent implements OnInit {
+export class NotificationsComponent implements OnInit, OnDestroy {
   notifications: AppNotification[] = [];
   currentFilter: 'all' | 'read' | 'unread' = 'all';
+
+  private destroy$ = new Subject<void>();
 
   constructor(
     public notificationService: NotificationService,
@@ -21,10 +25,15 @@ export class NotificationsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.notificationService.notifications$.subscribe(n => {
+    this.notificationService.notifications$.pipe(takeUntil(this.destroy$)).subscribe(n => {
       this.notifications = n;
       this.cdr.detectChanges();
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   get filteredNotifications(): AppNotification[] {

@@ -7,6 +7,7 @@
     </div>
     <h1 class="text-6xl font-bold text-text-primary tracking-tighter">My Applications</h1>
     <p class="text-xl font-medium text-text-secondary opacity-60 mt-4 leading-relaxed">View and track the status of all your job applications.</p>
+    <p class="text-sm font-bold text-text-muted uppercase tracking-widest mt-2">{{ applications.length }} application{{ applications.length !== 1 ? 's' : '' }} total</p>
   </div>
 
   @if (errorMessage) {
@@ -45,7 +46,7 @@
 
   @if (!isLoading && applications.length > 0) {
     <div class="space-y-8 animate-fade-in-up">
-      @for (app of applications; track app.id) {
+      @for (app of pagedApplications; track app.id) {
         <div class="celestial-card p-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8 group inner-glow relative overflow-hidden">
           <div class="absolute -top-32 -left-32 w-64 h-64 bg-energy-violet/5 blur-[100px] rounded-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
@@ -94,5 +95,14 @@
         </div>
       }
     </div>
+
+    <!-- Pagination -->
+    <app-pagination
+      [currentPage]="currentPage"
+      [totalPages]="totalPages"
+      [totalElements]="applications.length"
+      [pageSize]="pageSize"
+      (pageChange)="onPageChange($event)">
+    </app-pagination>
   }
 </div>

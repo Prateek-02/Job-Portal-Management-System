@@ -1,0 +1,68 @@
+<div *ngIf="totalPages > 1" class="flex flex-col sm:flex-row items-center justify-between gap-6 mt-10 pt-8 border-t border-glass-border">
+
+  <!-- Info text -->
+  <p class="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em] order-2 sm:order-1">
+    Showing {{ startItem }}–{{ endItem }} of {{ totalElements }} results
+  </p>
+
+  <!-- Pagination Controls -->
+  <div class="flex items-center gap-2 order-1 sm:order-2">
+
+    <!-- Previous -->
+    <button
+      [disabled]="currentPage === 0"
+      (click)="goTo(currentPage - 1)"
+      class="w-10 h-10 rounded-xl flex items-center justify-center border border-glass-border bg-bg-primary text-text-primary hover:bg-bg-secondary disabled:opacity-20 disabled:cursor-not-allowed transition-all shadow-sm"
+      title="Previous page">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+      </svg>
+    </button>
+
+    <!-- First page + ellipsis -->
+    <ng-container *ngIf="visiblePages[0] > 0">
+      <button (click)="goTo(0)"
+        class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm border border-glass-border bg-bg-primary text-text-primary hover:bg-bg-secondary transition-all shadow-sm">
+        1
+      </button>
+      <span *ngIf="visiblePages[0] > 1" class="text-text-muted text-sm font-bold px-1">…</span>
+    </ng-container>
+
+    <!-- Visible page numbers -->
+    <button *ngFor="let page of visiblePages"
+      (click)="goTo(page)"
+      class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm transition-all shadow-sm"
+      [class.bg-bg-accent]="currentPage === page"
+      [class.text-white]="currentPage === page"
+      [class.shadow-xl]="currentPage === page"
+      [class.scale-110]="currentPage === page"
+      [class.border]="currentPage !== page"
+      [class.border-glass-border]="currentPage !== page"
+      [class.bg-bg-primary]="currentPage !== page"
+      [class.text-text-primary]="currentPage !== page"
+      [class.hover:bg-bg-secondary]="currentPage !== page">
+      {{ page + 1 }}
+    </button>
+
+    <!-- Last page + ellipsis -->
+    <ng-container *ngIf="visiblePages[visiblePages.length - 1] < totalPages - 1">
+      <span *ngIf="visiblePages[visiblePages.length - 1] < totalPages - 2" class="text-text-muted text-sm font-bold px-1">…</span>
+      <button (click)="goTo(totalPages - 1)"
+        class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm border border-glass-border bg-bg-primary text-text-primary hover:bg-bg-secondary transition-all shadow-sm">
+        {{ totalPages }}
+      </button>
+    </ng-container>
+
+    <!-- Next -->
+    <button
+      [disabled]="currentPage === totalPages - 1"
+      (click)="goTo(currentPage + 1)"
+      class="w-10 h-10 rounded-xl flex items-center justify-center border border-glass-border bg-bg-primary text-text-primary hover:bg-bg-secondary disabled:opacity-20 disabled:cursor-not-allowed transition-all shadow-sm"
+      title="Next page">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+      </svg>
+    </button>
+
+  </div>
+</div>

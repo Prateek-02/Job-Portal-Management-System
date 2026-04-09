@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../../../../../../core/services/api.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-market-pulse',
@@ -8,16 +10,18 @@ import { ApiService } from '../../../../../../../core/services/api.service';
   imports: [CommonModule],
   templateUrl: './market-pulse.component.html'
 })
-export class MarketPulseComponent implements OnInit {
+export class MarketPulseComponent implements OnInit, OnDestroy {
   marketStats: any = null;
   salaryTrendPoints = '';
   marketDemandPoints = '';
   topSkills: any[] = [];
 
+  private destroy$ = new Subject<void>();
+
   constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
-    this.apiService.getMarketPulseStats().subscribe(stats => {
+    this.apiService.getMarketPulseStats().pipe(takeUntil(this.destroy$)).subscribe(stats => {
       if (stats) {
         this.marketStats = stats;
         this.topSkills = stats.topSkills || [];
@@ -25,6 +29,11 @@ export class MarketPulseComponent implements OnInit {
         this.marketDemandPoints = this.mapTrendToPoints(stats.demandTrend);
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private mapTrendToPoints(data: number[], width = 100, height = 40): string {

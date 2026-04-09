@@ -2,6 +2,7 @@ import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { CacheService } from '../../../core/services/cache.service';
 import { NotificationService } from '../../../features/notifications/services/notification.service';
 import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
 import { NotificationPanelComponent } from '../../../features/notifications/components/notification-panel/notification-panel.component';
@@ -22,8 +23,17 @@ export class NavbarComponent implements OnInit {
   constructor(
     public authService: AuthService, 
     public notificationService: NotificationService, 
-    private router: Router
+    private router: Router,
+    private cacheService: CacheService
   ) {}
+
+  refreshData(): void {
+    this.cacheService.clearAll();
+    const currentUrl = this.router.url;
+    this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+      this.router.navigate([currentUrl]);
+    });
+  }
 
   ngOnInit(): void {
     this.authService.currentUser$.subscribe((user: any) => {

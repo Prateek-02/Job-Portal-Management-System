@@ -47,7 +47,7 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-glass-border">
-            @for (job of jobs; track job.id) {
+            @for (job of pagedJobs; track job.id) {
               <tr class="hover:bg-bg-secondary transition-all group">
                 <td class="px-10 py-8">
                   <div class="flex items-center gap-6">
@@ -88,5 +88,15 @@
         </table>
       </div>
     }
+
+    <!-- Pagination -->
+    <app-pagination
+      [currentPage]="currentPage"
+      [totalPages]="totalPages"
+      [totalElements]="jobs.length"
+      [pageSize]="pageSize"
+      (pageChange)="onPageChange($event)"
+      class="block px-4 pb-4">
+    </app-pagination>
   </div>
 </div>

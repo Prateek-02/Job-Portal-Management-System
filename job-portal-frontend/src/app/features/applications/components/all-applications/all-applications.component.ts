@@ -1,17 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../../../core/services/api.service';
 import { ApplicationStatus, JobApplicationResponse } from '../../../../models/application.model';
 import { getFriendlyError } from '../../../../core/utils/error-handler.util';
+import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-all-applications',
   standalone: true,
-  imports: [CommonModule, RouterLink, DatePipe],
+  imports: [CommonModule, RouterLink, DatePipe, PaginationComponent],
   templateUrl: './all-applications.component.html'
 })
-export class AllApplicationsComponent implements OnInit {
+export class AllApplicationsComponent implements OnInit, OnDestroy {
   applications: JobApplicationResponse[] = [];
   isLoading = true;
   errorMessage = '';
@@ -19,16 +22,41 @@ export class AllApplicationsComponent implements OnInit {
 
   readonly statuses: ApplicationStatus[] = ['APPLIED', 'UNDER_REVIEW', 'SHORTLISTED', 'REJECTED'];
 
+  private destroy$ = new Subject<void>();
+
+  // Pagination
+  currentPage = 0;
+  pageSize = 10;
+
+  get totalPages(): number {
+    return Math.ceil(this.applications.length / this.pageSize);
+  }
+
+  get pagedApplications(): JobApplicationResponse[] {
+    const start = this.currentPage * this.pageSize;
+    return this.applications.slice(start, start + this.pageSize);
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage = page;
+  }
+
   constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
     this.loadApplications();
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   loadApplications(): void {
     this.isLoading = true;
     this.errorMessage = '';
-    this.apiService.getAllRecruiterApplications().subscribe({
+    this.currentPage = 0;
+    this.apiService.getAllRecruiterApplications().pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         this.applications = res || [];
         this.isLoading = false;
@@ -46,9 +74,9 @@ export class AllApplicationsComponent implements OnInit {
 
   updateStatus(app: JobApplicationResponse, status: ApplicationStatus): void {
     if (app.status === status) return;
-    
+
     this.updatingId = app.id;
-    this.apiService.updateApplicationStatus(app.id, status).subscribe({
+    this.apiService.updateApplicationStatus(app.id, status).pipe(takeUntil(this.destroy$)).subscribe({
       next: (updated) => {
         app.status = updated.status;
         this.updatingId = null;

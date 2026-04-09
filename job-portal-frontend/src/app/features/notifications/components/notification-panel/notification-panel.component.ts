@@ -1,8 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { NotificationService } from '../../services/notification.service';
 import { AppNotification } from '../../../../models/notification.model';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-notification-panel',
@@ -11,16 +13,23 @@ import { AppNotification } from '../../../../models/notification.model';
   templateUrl: './notification-panel.component.html',
   styleUrls: ['./notification-panel.component.css']
 })
-export class NotificationPanelComponent {
+export class NotificationPanelComponent implements OnDestroy {
   notifications: AppNotification[] = [];
+
+  private destroy$ = new Subject<void>();
 
   constructor(
     public notificationService: NotificationService,
     private router: Router
   ) {
-    this.notificationService.notifications$.subscribe(n => {
-      this.notifications = n.slice(0, 5); // Show only top 5
+    this.notificationService.notifications$.pipe(takeUntil(this.destroy$)).subscribe(n => {
+      this.notifications = n.slice(0, 5);
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   markRead(id: string): void {

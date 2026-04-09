@@ -1,10 +1,12 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { JobApplicationResponse } from '../../../../../../../models/application.model';
 import { AuthService } from '../../../../../../../core/services/auth.service';
 import { NotificationService } from '../../../../../../notifications/services/notification.service';
 import { DashboardPollingService } from '../../../../../../../core/services/dashboard-polling.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-recent-candidates-table',
@@ -12,8 +14,10 @@ import { DashboardPollingService } from '../../../../../../../core/services/dash
   imports: [CommonModule, RouterLink, DatePipe],
   templateUrl: './recent-candidates-table.component.html'
 })
-export class RecentCandidatesTableComponent implements OnInit {
+export class RecentCandidatesTableComponent implements OnInit, OnDestroy {
   recentApplicationsForJobs: JobApplicationResponse[] = [];
+
+  private destroy$ = new Subject<void>();
 
   constructor(
     private pollingService: DashboardPollingService,
@@ -23,17 +27,21 @@ export class RecentCandidatesTableComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.authService.currentUser$.subscribe(user => {
+    this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe(user => {
       if (user && user.id && user.role === 'RECRUITER') {
         this.subscribeToPolling(user.id);
       }
     });
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   private subscribeToPolling(userId: number): void {
-    this.pollingService.recruiterData$.subscribe((data: any) => {
+    this.pollingService.recruiterData$.pipe(takeUntil(this.destroy$)).subscribe((data: any) => {
       if (data.applications) {
-        // Sort by ID descending and slice the top 5
         this.recentApplicationsForJobs = [...data.applications]
           .sort((a, b) => b.id - a.id)
           .slice(0, 5);

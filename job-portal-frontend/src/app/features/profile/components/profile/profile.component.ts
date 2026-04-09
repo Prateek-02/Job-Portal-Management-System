@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ApiService } from '../../../../core/services/api.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { User } from '../../../../models/user.model';
 import { getFriendlyError } from '../../../../core/utils/error-handler.util';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-profile',
@@ -12,7 +14,7 @@ import { getFriendlyError } from '../../../../core/utils/error-handler.util';
   imports: [CommonModule, ReactiveFormsModule, DatePipe],
   templateUrl: './profile.component.html'
 })
-export class ProfileComponent implements OnInit {
+export class ProfileComponent implements OnInit, OnDestroy {
   user: User | null = null;
   profileForm!: FormGroup;
 
@@ -22,6 +24,8 @@ export class ProfileComponent implements OnInit {
   isUploadingImage = false;
   successMessage = '';
   errorMessage = '';
+
+  private destroy$ = new Subject<void>();
 
   constructor(
     private apiService: ApiService,
@@ -40,9 +44,14 @@ export class ProfileComponent implements OnInit {
     this.loadProfile();
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   loadProfile(): void {
     this.isLoading = true;
-    this.apiService.getProfile().subscribe({
+    this.apiService.getProfile().pipe(takeUntil(this.destroy$)).subscribe({
       next: (user: User) => {
         this.user = user;
         this.profileForm.patchValue({
@@ -71,13 +80,13 @@ export class ProfileComponent implements OnInit {
     if (this.profileForm.invalid) { this.profileForm.markAllAsTouched(); return; }
     this.isSaving = true;
 
-    this.apiService.updateProfile(this.profileForm.value).subscribe({
+    this.apiService.updateProfile(this.profileForm.value).pipe(takeUntil(this.destroy$)).subscribe({
       next: (updated: User) => {
         this.user = updated;
         this.isEditing = false;
         this.isSaving = false;
         this.successMessage = 'Profile updated successfully!';
-        this.authService.refreshProfile().subscribe();
+        this.authService.refreshProfile().pipe(takeUntil(this.destroy$)).subscribe();
         setTimeout(() => this.successMessage = '', 3000);
       },
       error: (err: any) => { this.isSaving = false; this.errorMessage = getFriendlyError(err, 'update_profile'); }
@@ -91,12 +100,12 @@ export class ProfileComponent implements OnInit {
       formData.append('image', input.files[0]);
       this.isUploadingImage = true;
 
-      this.apiService.uploadProfileImage(this.user.id, formData).subscribe({
+      this.apiService.uploadProfileImage(this.user.id, formData).pipe(takeUntil(this.destroy$)).subscribe({
         next: (updated: User) => {
           this.user = updated;
           this.isUploadingImage = false;
           this.successMessage = 'Profile picture updated!';
-          this.authService.refreshProfile().subscribe();
+          this.authService.refreshProfile().pipe(takeUntil(this.destroy$)).subscribe();
           setTimeout(() => this.successMessage = '', 3000);
         },
         error: (err: any) => { this.isUploadingImage = false; this.errorMessage = getFriendlyError(err, 'upload_image'); }
