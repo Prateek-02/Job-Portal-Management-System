@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
+import { CanComponentDeactivate } from '../../../../core/guards/can-deactivate.guard';
 import { ApiService } from '../../../../core/services/api.service';
 import { Job, JobRequest } from '../../../../models/job.model';
 import { getFriendlyError } from '../../../../core/utils/error-handler.util';
@@ -13,7 +14,7 @@ import { Editor, Toolbar, NgxEditorModule } from 'ngx-editor';
   imports: [CommonModule, ReactiveFormsModule, RouterLink, NgxEditorModule],
   templateUrl: './create-job.component.html'
 })
-export class CreateJobComponent implements OnInit, OnDestroy {
+export class CreateJobComponent implements OnInit, OnDestroy, CanComponentDeactivate {
   jobForm: FormGroup;
   isSubmitting = false;
   isEditMode = false;
@@ -56,6 +57,13 @@ export class CreateJobComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.editor.destroy();
+  }
+
+  canDeactivate(): boolean {
+    if (this.jobForm.dirty && !this.isSubmitting) {
+      return confirm('You have unsaved changes! Are you sure you want to discard them and leave this page?');
+    }
+    return true;
   }
 
   loadJobDetails(): void {

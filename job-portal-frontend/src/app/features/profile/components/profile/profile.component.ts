@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { CanComponentDeactivate } from '../../../../core/guards/can-deactivate.guard';
 import { ApiService } from '../../../../core/services/api.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { User } from '../../../../models/user.model';
@@ -14,7 +15,7 @@ import { takeUntil } from 'rxjs/operators';
   imports: [CommonModule, ReactiveFormsModule, DatePipe],
   templateUrl: './profile.component.html'
 })
-export class ProfileComponent implements OnInit, OnDestroy {
+export class ProfileComponent implements OnInit, OnDestroy, CanComponentDeactivate {
   user: User | null = null;
   profileForm!: FormGroup;
 
@@ -47,6 +48,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  canDeactivate(): boolean {
+    if (this.isEditing && this.profileForm.dirty && !this.isSaving) {
+      return confirm('You have unsaved changes to your profile! Are you sure you want to discard them and leave?');
+    }
+    return true;
   }
 
   loadProfile(): void {
