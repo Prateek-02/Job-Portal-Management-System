@@ -14,10 +14,10 @@ public class SecurityConfig {
     public SecurityWebFilterChain securityWebFilterChain(
             ServerHttpSecurity http) {
         http
-            .csrf(csrf -> csrf.disable())
-            .authorizeExchange(auth -> auth
-                .anyExchange().permitAll()
-            );
+                .cors(org.springframework.security.config.Customizer.withDefaults())
+                .csrf(csrf -> csrf.disable())
+                .authorizeExchange(auth -> auth
+                        .anyExchange().permitAll());
         return http.build();
     }
 }

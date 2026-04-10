@@ -271,6 +271,16 @@
   
 }
 
+/* Global Cursor & Interaction Helpers */
+button, 
+[role="button"],
+.profile-container,
+.profile-container *,
+[title="Refresh Data"],
+[title="Refresh Data"] * {
+  cursor: pointer !important;
+}
+
 
 @keyframes sphere-pulse {
   0%, 100% { transform: scale(1) translate(0, 0); opacity: 0.15; }
