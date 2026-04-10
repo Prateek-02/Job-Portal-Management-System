@@ -1,7 +1,7 @@
 package com.jobportal.applicationservice.controller;
 
 import java.io.IOException;
-import java.util.List;
+
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.jobportal.applicationservice.dto.request.ApplicationRequest;
 import com.jobportal.applicationservice.dto.response.ApplicationResponse;
 import com.jobportal.applicationservice.dto.response.JobApplicationResponse;
+import com.jobportal.applicationservice.dto.response.PageResponse;
 import com.jobportal.applicationservice.enums.ApplicationStatus;
 import com.jobportal.applicationservice.service.ApplicationService;
 import com.jobportal.applicationservice.service.CloudinaryService;
@@ -68,38 +69,40 @@ public class ApplicationController {
 
     // VIEW USER APPLICATIONS
     @GetMapping("/user/viewApplications")
-    public ResponseEntity<List<ApplicationResponse>> getUserApplications(
+    public ResponseEntity<PageResponse<ApplicationResponse>> getUserApplications(
             @RequestHeader("X-User-Id") Long userId,
-            @RequestHeader("X-User-Role") String role) {
+            @RequestHeader("X-User-Role") String role,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "appliedAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction) {
 
-        log.info("Fetch user applications API called | userId: {} | role: {}", userId, role);
+        log.info("Fetch user applications API called | userId: {} | role: {} | page: {}", userId, role, page);
 
-        List<ApplicationResponse> applications =
-                service.getUserApplications(userId, role);
+        PageResponse<ApplicationResponse> response =
+                service.getUserApplications(userId, role, page, size, sortBy, direction);
 
-        log.debug("User applications fetched | userId: {} | count: {}",
-                userId, applications.size());
-
-        return ResponseEntity.ok(applications);
+        return ResponseEntity.ok(response);
     }
 
     // VIEW JOB APPLICATIONS (Recruiter)
     @GetMapping("/jobApplications/{jobId}")
-    public ResponseEntity<List<JobApplicationResponse>> getJobApplications(
+    public ResponseEntity<PageResponse<JobApplicationResponse>> getJobApplications(
             @PathVariable Long jobId,
             @RequestHeader("X-User-Id") Long recruiterId,
-            @RequestHeader("X-User-Role") String role) {
+            @RequestHeader("X-User-Role") String role,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "appliedAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction) {
 
-        log.info("Fetch job applications API called | jobId: {} | recruiterId: {} | role: {}",
-                jobId, recruiterId, role);
+        log.info("Fetch job applications API called | jobId: {} | recruiterId: {} | page: {}",
+                jobId, recruiterId, page);
 
-        List<JobApplicationResponse> applications =
-                service.getJobApplications(jobId, role, recruiterId);
+        PageResponse<JobApplicationResponse> response =
+                service.getJobApplications(jobId, role, recruiterId, page, size, sortBy, direction);
 
-        log.debug("Job applications fetched | jobId: {} | count: {}",
-                jobId, applications.size());
-
-        return ResponseEntity.ok(applications);
+        return ResponseEntity.ok(response);
     }
 
     // UPDATE APPLICATION STATUS
@@ -152,16 +155,18 @@ public class ApplicationController {
 
     // VIEW ALL APPLICATIONS (Recruiter)
     @GetMapping("/recruiter")
-    public ResponseEntity<List<JobApplicationResponse>> getAllApplicationsForRecruiter(
+    public ResponseEntity<PageResponse<JobApplicationResponse>> getAllApplicationsForRecruiter(
             @RequestHeader("X-User-Id") Long recruiterId,
-            @RequestHeader("X-User-Role") String role) {
+            @RequestHeader("X-User-Role") String role,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "appliedAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction) {
         
-        log.info("Fetch all recruiter applications API called | recruiterId: {} | role: {}", recruiterId, role);
+        log.info("Fetch all recruiter applications API called | recruiterId: {} | role: {} | page: {}", recruiterId, role, page);
         
-        List<JobApplicationResponse> applications = service.getAllApplicationsForRecruiter(recruiterId, role);
+        PageResponse<JobApplicationResponse> response = service.getAllApplicationsForRecruiter(recruiterId, role, page, size, sortBy, direction);
         
-        log.debug("Total recruiter applications fetched | count: {}", applications.size());
-        
-        return ResponseEntity.ok(applications);
+        return ResponseEntity.ok(response);
     }
 }

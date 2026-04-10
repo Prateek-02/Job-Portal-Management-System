@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.PageImpl;
+
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -74,8 +74,11 @@ class JobControllerTest {
         JobResponse job = new JobResponse();
         job.setId(1L);
 
+        com.jobportal.jobservice.dto.response.PageResponse<JobResponse> pageResponse = new com.jobportal.jobservice.dto.response.PageResponse<>();
+        pageResponse.setContent(List.of(job));
+
         when(jobService.getAllJobs(0, 10, "createdAt", "desc"))
-                .thenReturn(new PageImpl<>(List.of(job)));
+                .thenReturn(pageResponse);
 
         mockMvc.perform(get("/api/jobs"))
                 .andExpect(status().isOk())
@@ -145,8 +148,11 @@ class JobControllerTest {
         JobResponse job = new JobResponse();
         job.setId(1L);
 
+        com.jobportal.jobservice.dto.response.PageResponse<JobResponse> pageResponse = new com.jobportal.jobservice.dto.response.PageResponse<>();
+        pageResponse.setContent(List.of(job));
+
         when(jobService.searchJobs(filter, 0, 10, "createdAt", "desc"))
-                .thenReturn(new PageImpl<>(List.of(job)));
+                .thenReturn(pageResponse);
 
         mockMvc.perform(post("/api/jobs/search")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -260,8 +266,11 @@ class JobControllerTest {
         job.setId(1L);
         job.setTitle("Developer");
 
+        com.jobportal.jobservice.dto.response.PageResponse<JobResponse> pageResponse = new com.jobportal.jobservice.dto.response.PageResponse<>();
+        pageResponse.setContent(List.of(job));
+
         when(jobService.searchJobs(any(JobFilter.class), eq(0), eq(10), eq("createdAt"), eq("desc")))
-                .thenReturn(new PageImpl<>(List.of(job)));
+                .thenReturn(pageResponse);
 
         mockMvc.perform(post("/api/jobs/search")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -282,14 +291,19 @@ class JobControllerTest {
         job2.setId(2L);
         job2.setTitle("Job 2");
 
+        com.jobportal.jobservice.dto.response.PageResponse<JobResponse> pageResponse = new com.jobportal.jobservice.dto.response.PageResponse<>();
+        pageResponse.setContent(List.of(job1, job2));
+        pageResponse.setPageNumber(1);
+        pageResponse.setPageSize(5);
+        pageResponse.setTotalElements(2);
+
         when(jobService.getAllJobs(1, 5, "salary", "asc"))
-                .thenReturn(new PageImpl<>(List.of(job1, job2), 
-                        org.springframework.data.domain.PageRequest.of(1, 5), 2));
+                .thenReturn(pageResponse);
 
         mockMvc.perform(get("/api/jobs?page=1&size=5&sortBy=salary&direction=asc"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.number").value(1))
-                .andExpect(jsonPath("$.size").value(5))
+                .andExpect(jsonPath("$.pageNumber").value(1))
+                .andExpect(jsonPath("$.pageSize").value(5))
                 .andExpect(jsonPath("$.totalElements").value(2));
     }
 

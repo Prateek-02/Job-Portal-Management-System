@@ -8,10 +8,14 @@ import org.modelmapper.ModelMapper;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
+
 import org.springframework.cache.annotation.Caching;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import com.jobportal.applicationservice.client.JobClient;
 import com.jobportal.applicationservice.client.UserClient;
@@ -128,11 +132,10 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    @Cacheable(value = "userApplications", key = "#userId")
-    public List<ApplicationResponse> getUserApplications(
-            Long userId, String role) {
+    public PageResponse<ApplicationResponse> getUserApplications(
+            Long userId, String role, int page, int size, String sortBy, String direction) {
 
-        log.info("Fetching user applications | userId: {} | role: {}", userId, role);
+        log.info("Fetching user applications | userId: {} | role: {} | page: {}", userId, role, page);
 
         if (!role.equalsIgnoreCase("JOB_SEEKER")) {
             log.warn("Unauthorized access to user applications | userId: {} | role: {}", userId, role);
@@ -140,8 +143,15 @@ public class ApplicationServiceImpl implements ApplicationService {
                     "Access Denied! Only Job Seekers can view their applications.");
         }
 
-        List<ApplicationResponse> result = applicationRepository.findByUserId(userId)
-                .stream()
+        Sort sort = direction.equalsIgnoreCase("desc") ?
+                Sort.by(sortBy).descending() :
+                Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<JobApplication> pageData = applicationRepository.findByUserId(userId, pageable);
+
+        List<ApplicationResponse> content = pageData.getContent().stream()
                 .map(app -> {
                     ApplicationResponse response =
                             modelMapper.map(app, ApplicationResponse.class);
@@ -160,17 +170,23 @@ public class ApplicationServiceImpl implements ApplicationService {
                 })
                 .collect(Collectors.toList());
 
-        log.debug("Applications fetched | userId: {} | count: {}", userId, result.size());
-
-        return result;
+        return PageResponse.<ApplicationResponse>builder()
+                .content(content)
+                .pageNumber(pageData.getNumber())
+                .pageSize(pageData.getSize())
+                .totalElements(pageData.getTotalElements())
+                .totalPages(pageData.getTotalPages())
+                .last(pageData.isLast())
+                .first(pageData.isFirst())
+                .empty(pageData.isEmpty())
+                .build();
     }
 
     @Override
-    @Cacheable(value = "jobApplications", key = "#jobId")
-    public List<JobApplicationResponse> getJobApplications(
-            Long jobId, String role, Long recruiterId) {
+    public PageResponse<JobApplicationResponse> getJobApplications(
+            Long jobId, String role, Long recruiterId, int page, int size, String sortBy, String direction) {
 
-        log.info("Fetching job applications | jobId: {} | recruiterId: {}", jobId, recruiterId);
+        log.info("Fetching job applications | jobId: {} | recruiterId: {} | page: {}", jobId, recruiterId, page);
 
         if (!role.equalsIgnoreCase("RECRUITER")) {
             log.warn("Unauthorized access to job applications | recruiterId: {} | role: {}", recruiterId, role);
@@ -186,37 +202,49 @@ public class ApplicationServiceImpl implements ApplicationService {
                     "Access Denied! You can view applications for your own jobs.");
         }
 
-        List<JobApplicationResponse> result =
-                applicationRepository.findByJobId(jobId)
-                        .stream()
-                        .map(app -> {
-                            JobApplicationResponse response = new JobApplicationResponse();
-                            response.setId(app.getId());
-                            response.setUserId(app.getUserId());
-                            response.setJobId(app.getJobId());
-                            response.setResumeUrl(app.getResumeUrl());
-                            response.setStatus(app.getStatus());
-                            response.setAppliedAt(app.getAppliedAt());
-                            response.setJobTitle(job.getTitle());
-                            response.setCompanyName(job.getCompanyName());
+        Sort sort = direction.equalsIgnoreCase("desc") ?
+                Sort.by(sortBy).descending() :
+                Sort.by(sortBy).ascending();
 
-                            try {
-                                UserResponse user =
-                                        fetchUserByIdWithCircuitBreaker(app.getUserId());
-                                response.setApplicantName(user.getName());
-                                response.setApplicantEmail(user.getEmail());
-                            } catch (Exception e) {
-                                log.warn("Failed to fetch applicant details | userId: {}", app.getUserId());
-                                response.setApplicantName("N/A");
-                                response.setApplicantEmail("N/A");
-                            }
-                            return response;
-                        })
-                        .collect(Collectors.toList());
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<JobApplication> pageData = applicationRepository.findByJobId(jobId, pageable);
 
-        log.debug("Job applications fetched | jobId: {} | count: {}", jobId, result.size());
+        List<JobApplicationResponse> content = pageData.getContent().stream()
+                .map(app -> {
+                    JobApplicationResponse response = new JobApplicationResponse();
+                    response.setId(app.getId());
+                    response.setUserId(app.getUserId());
+                    response.setJobId(app.getJobId());
+                    response.setResumeUrl(app.getResumeUrl());
+                    response.setStatus(app.getStatus());
+                    response.setAppliedAt(app.getAppliedAt());
+                    response.setJobTitle(job.getTitle());
+                    response.setCompanyName(job.getCompanyName());
 
-        return result;
+                    try {
+                        UserResponse user =
+                                fetchUserByIdWithCircuitBreaker(app.getUserId());
+                        response.setApplicantName(user.getName());
+                        response.setApplicantEmail(user.getEmail());
+                    } catch (Exception e) {
+                        log.warn("Failed to fetch applicant details | userId: {}", app.getUserId());
+                        response.setApplicantName("N/A");
+                        response.setApplicantEmail("N/A");
+                    }
+                    return response;
+                })
+                .collect(Collectors.toList());
+
+        return PageResponse.<JobApplicationResponse>builder()
+                .content(content)
+                .pageNumber(pageData.getNumber())
+                .pageSize(pageData.getSize())
+                .totalElements(pageData.getTotalElements())
+                .totalPages(pageData.getTotalPages())
+                .last(pageData.isLast())
+                .first(pageData.isFirst())
+                .empty(pageData.isEmpty())
+                .build();
     }
 
     @Override
@@ -349,24 +377,32 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public List<JobApplicationResponse> getAllApplicationsForRecruiter(Long recruiterId, String role) {
-        log.info("Fetching all applications for recruiter | recruiterId: {}", recruiterId);
+    public PageResponse<JobApplicationResponse> getAllApplicationsForRecruiter(
+            Long recruiterId, String role, int page, int size, String sortBy, String direction) {
+        log.info("Fetching all applications for recruiter | recruiterId: {} | page: {}", recruiterId, page);
 
         if (!role.equalsIgnoreCase("RECRUITER")) {
             log.warn("Unauthorized access to recruiter applications | recruiterId: {} | role: {}", recruiterId, role);
             throw new UnauthorizedException("Access Denied! Only Recruiters can view applications.");
         }
 
-        // 1. Fetch all jobs posted by this recruiter from JobService
-        List<JobResponse> recruiterJobs = jobClient.getJobsByRecruiter(recruiterId);
+        // 1. Fetch all jobs posted by this recruiter from JobService (using a large size to get all, or we could paginate this too)
+        // Here we use the provided pagination for the AGGREGATED list, but we need all jobs first.
+        // For simplicity, we fetch up to 1000 jobs.
+        PageResponse<JobResponse> recruiterJobsPage = jobClient.getJobsByRecruiter(recruiterId, 0, 1000, "createdAt", "desc");
+        List<JobResponse> recruiterJobs = recruiterJobsPage.getContent();
         
         List<JobApplicationResponse> allApplications = new ArrayList<>();
 
-        // 2. For each job, fetch applications and map them using the existing getJobApplications method
+        // 2. For each job, fetch applications
+        // Note: This approach is NOT ideal for large datasets (N+1 query problem).
+        // Ideally, we'd have a findByJobIdIn method in the repository.
         for (JobResponse job : recruiterJobs) {
             try {
-                List<JobApplicationResponse> jobApps = getJobApplications(job.getId(), role, recruiterId);
-                allApplications.addAll(jobApps);
+                // Fetching ALL applications for each job to aggregate them.
+                // We use a large size 1000 to get them all for the local sort/page.
+                PageResponse<JobApplicationResponse> jobApps = getJobApplications(job.getId(), role, recruiterId, 0, 1000, "appliedAt", "desc");
+                allApplications.addAll(jobApps.getContent());
             } catch (Exception e) {
                 log.warn("Failed to fetch applications for jobId: {} | recruiterId: {}", job.getId(), recruiterId);
             }
@@ -375,8 +411,23 @@ public class ApplicationServiceImpl implements ApplicationService {
         // 3. Sort by applied date descending
         allApplications.sort((a, b) -> b.getAppliedAt().compareTo(a.getAppliedAt()));
 
-        log.info("Total applications fetched for recruiter: {} | count: {}", recruiterId, allApplications.size());
-        return allApplications;
+        // 4. Manually paginate the aggregated list
+        int start = Math.min(page * size, allApplications.size());
+        int end = Math.min(start + size, allApplications.size());
+        List<JobApplicationResponse> pagedList = allApplications.subList(start, end);
+
+        int totalPages = (int) Math.ceil((double) allApplications.size() / size);
+
+        return PageResponse.<JobApplicationResponse>builder()
+                .content(pagedList)
+                .pageNumber(page)
+                .pageSize(size)
+                .totalElements(allApplications.size())
+                .totalPages(totalPages)
+                .last(page >= totalPages - 1)
+                .first(page == 0)
+                .empty(allApplications.isEmpty())
+                .build();
     }
 }
 

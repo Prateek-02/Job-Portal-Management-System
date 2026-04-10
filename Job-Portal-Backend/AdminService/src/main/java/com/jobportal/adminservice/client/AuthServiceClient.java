@@ -1,6 +1,6 @@
 package com.jobportal.adminservice.client;
 
-import java.util.List;
+
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +13,12 @@ import com.jobportal.adminservice.dto.response.UserResponse;
 public interface AuthServiceClient {
 
     @GetMapping("/api/auth/users")
-    List<UserResponse> getAllUsers(@RequestHeader("X-Internal-Secret") String secret);
+    com.jobportal.adminservice.dto.response.PageResponse<UserResponse> getAllUsers(
+            @RequestHeader("X-Internal-Secret") String secret,
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "0") int page,
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "10") int size,
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "id") String sortBy,
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "desc") String direction);
 
     @GetMapping("/api/auth/users/{id}")
     UserResponse getUserById(@PathVariable Long id,

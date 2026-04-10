@@ -297,12 +297,12 @@ class JobServiceImplTest {
                 });
 
         // Act
-        org.springframework.data.domain.Page<JobResponse> response =
+        com.jobportal.jobservice.dto.response.PageResponse<JobResponse> response =
                 jobService.getAllJobs(0, 10, "createdAt", "desc");
 
         // Assert
         assertThat(response).isNotNull();
-        assertThat(response.getNumberOfElements()).isEqualTo(2);
+        assertThat(response.getContent().size()).isEqualTo(2);
         assertThat(response.getContent().get(0).getId()).isEqualTo(1L);
     }
 
@@ -316,7 +316,7 @@ class JobServiceImplTest {
                 .thenReturn(new JobResponse());
 
         // Act
-        org.springframework.data.domain.Page<JobResponse> response =
+        com.jobportal.jobservice.dto.response.PageResponse<JobResponse> response =
                 jobService.getAllJobs(0, 10, "createdAt", "asc");
 
         // Assert
@@ -345,12 +345,12 @@ class JobServiceImplTest {
                 .thenReturn(JobResponse);
 
         // Act
-        org.springframework.data.domain.Page<JobResponse> response =
+        com.jobportal.jobservice.dto.response.PageResponse<JobResponse> response =
                 jobService.searchJobs(filter, 0, 10, "createdAt", "desc");
 
         // Assert
         assertThat(response).isNotNull();
-        assertThat(response.getNumberOfElements()).isEqualTo(1);
+        assertThat(response.getContent().size()).isEqualTo(1);
         
         verify(jobRepository, times(1)).findAll(any(org.springframework.data.jpa.domain.Specification.class), 
                 any(org.springframework.data.domain.Pageable.class));

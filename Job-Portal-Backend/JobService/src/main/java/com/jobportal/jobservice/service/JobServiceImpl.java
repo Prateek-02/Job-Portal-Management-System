@@ -27,6 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.jobportal.jobservice.dto.response.PageResponse;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -35,6 +37,23 @@ public class JobServiceImpl implements JobService {
     private final JobRepository jobRepository;
     private final ModelMapper modelMapper;
     private final RabbitTemplate rabbitTemplate;
+
+    private <T, E> PageResponse<T> convertToPageResponse(Page<E> pageData, Class<T> responseType) {
+        List<T> content = pageData.getContent().stream()
+                .map(entity -> modelMapper.map(entity, responseType))
+                .collect(Collectors.toList());
+
+        return PageResponse.<T>builder()
+                .content(content)
+                .pageNumber(pageData.getNumber())
+                .pageSize(pageData.getSize())
+                .totalElements(pageData.getTotalElements())
+                .totalPages(pageData.getTotalPages())
+                .last(pageData.isLast())
+                .first(pageData.isFirst())
+                .empty(pageData.isEmpty())
+                .build();
+    }
 
     @Override
     @CacheEvict(value = "jobs", allEntries = true)
@@ -79,7 +98,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Page<JobResponse> getAllJobs(int page, int size,
+    public PageResponse<JobResponse> getAllJobs(int page, int size,
                                            String sortBy, String direction) {
 
         log.info("Get jobs | page: {} | size: {} | sortBy: {} | direction: {}",
@@ -91,12 +110,11 @@ public class JobServiceImpl implements JobService {
 
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<JobResponse> result = jobRepository.findAll(pageable)
-                .map(job -> modelMapper.map(job, JobResponse.class));
+        Page<Job> result = jobRepository.findAll(pageable);
 
         log.debug("Jobs fetched | count: {}", result.getNumberOfElements());
 
-        return result;
+        return convertToPageResponse(result, JobResponse.class);
     }
 
     @Override
@@ -165,9 +183,9 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Page<JobResponse> searchJobs(JobFilter filter,
-                                          int page, int size,
-                                          String sortBy, String direction) {
+    public PageResponse<JobResponse> searchJobs(JobFilter filter,
+                                           int page, int size,
+                                           String sortBy, String direction) {
 
         log.info("Search jobs | page: {} | size: {} | filter: {}",
                 page, size, filter);
@@ -178,13 +196,12 @@ public class JobServiceImpl implements JobService {
 
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<JobResponse> result = jobRepository.findAll(
-                JobSpecification.getFilteredJobs(filter), pageable)
-                .map(job -> modelMapper.map(job, JobResponse.class));
+        Page<Job> result = jobRepository.findAll(
+                JobSpecification.getFilteredJobs(filter), pageable);
 
         log.debug("Search result count: {}", result.getNumberOfElements());
 
-        return result;
+        return convertToPageResponse(result, JobResponse.class);
     }
 
     @Override
@@ -199,11 +216,17 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public List<JobResponse> getJobsByRecruiter(Long recruiterId) {
-        log.info("Fetching jobs for recruiter | recruiterId: {}", recruiterId);
-        return jobRepository.findByRecruiterId(recruiterId).stream()
-                .map(job -> modelMapper.map(job, JobResponse.class))
-                .collect(Collectors.toList());
+    public PageResponse<JobResponse> getJobsByRecruiter(Long recruiterId, int page, int size, String sortBy, String direction) {
+        log.info("Fetching jobs for recruiter | recruiterId: {} | page: {}", recruiterId, page);
+        
+        Sort sort = direction.equalsIgnoreCase("desc") ?
+                Sort.by(sortBy).descending() :
+                Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Job> result = jobRepository.findByRecruiterId(recruiterId, pageable);
+        
+        return convertToPageResponse(result, JobResponse.class);
     }
 
     @Override

@@ -49,8 +49,13 @@ export class ApiService {
     return this.http.post<User>(`${this.apiUrl}/auth/users/${userId}/profile-image`, formData);
   }
 
-  getAllUsers(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiUrl}/auth/users`);
+  getAllUsers(page = 0, size = 10, sortBy = 'id', direction = 'desc'): Observable<PageResponse<User>> {
+    const params = new HttpParams()
+      .set('page', page)
+      .set('size', size)
+      .set('sortBy', sortBy)
+      .set('direction', direction);
+    return this.http.get<PageResponse<User>>(`${this.apiUrl}/auth/users`, { params });
   }
 
   getUserById(id: number): Observable<User> {
@@ -95,8 +100,13 @@ export class ApiService {
 
   // ============ JOB ENDPOINTS (CONTINUED) ============
   
-  getJobsByRecruiter(recruiterId: number): Observable<Job[]> {
-    return this.http.get<Job[]>(`${this.apiUrl}/jobs/recruiter/${recruiterId}`);
+  getJobsByRecruiter(recruiterId: number, page = 0, size = 10, sortBy = 'createdAt', direction = 'desc'): Observable<PageResponse<Job>> {
+    const params = new HttpParams()
+      .set('page', page)
+      .set('size', size)
+      .set('sortBy', sortBy)
+      .set('direction', direction);
+    return this.http.get<PageResponse<Job>>(`${this.apiUrl}/jobs/recruiter/${recruiterId}`, { params });
   }
 
   getMarketPulseStats(): Observable<any> {
@@ -112,16 +122,31 @@ export class ApiService {
     return this.http.post<ApplicationResponse>(`${this.apiUrl}/applications/apply`, formData);
   }
 
-  getMyApplications(): Observable<ApplicationResponse[]> {
-    return this.http.get<ApplicationResponse[]>(`${this.apiUrl}/applications/user/viewApplications`);
+  getMyApplications(page = 0, size = 10, sortBy = 'appliedAt', direction = 'desc'): Observable<PageResponse<ApplicationResponse>> {
+    const params = new HttpParams()
+      .set('page', page)
+      .set('size', size)
+      .set('sortBy', sortBy)
+      .set('direction', direction);
+    return this.http.get<PageResponse<ApplicationResponse>>(`${this.apiUrl}/applications/user/viewApplications`, { params });
   }
 
-  getJobApplications(jobId: number): Observable<JobApplicationResponse[]> {
-    return this.http.get<JobApplicationResponse[]>(`${this.apiUrl}/applications/jobApplications/${jobId}`);
+  getJobApplications(jobId: number, page = 0, size = 10, sortBy = 'appliedAt', direction = 'desc'): Observable<PageResponse<JobApplicationResponse>> {
+    const params = new HttpParams()
+      .set('page', page)
+      .set('size', size)
+      .set('sortBy', sortBy)
+      .set('direction', direction);
+    return this.http.get<PageResponse<JobApplicationResponse>>(`${this.apiUrl}/applications/jobApplications/${jobId}`, { params });
   }
 
-  getAllRecruiterApplications(): Observable<JobApplicationResponse[]> {
-    return this.http.get<JobApplicationResponse[]>(`${this.apiUrl}/applications/recruiter`);
+  getAllRecruiterApplications(page = 0, size = 10, sortBy = 'appliedAt', direction = 'desc'): Observable<PageResponse<JobApplicationResponse>> {
+    const params = new HttpParams()
+      .set('page', page)
+      .set('size', size)
+      .set('sortBy', sortBy)
+      .set('direction', direction);
+    return this.http.get<PageResponse<JobApplicationResponse>>(`${this.apiUrl}/applications/recruiter`, { params });
   }
 
   updateApplicationStatus(appId: number, status: ApplicationStatus): Observable<ApplicationResponse> {
@@ -143,8 +168,13 @@ export class ApiService {
 
   // ============ ADMIN ENDPOINTS ============
 
-  getAdminUsers(): Observable<AdminUserResponse[]> {
-    return this.http.get<AdminUserResponse[]>(`${this.apiUrl}/admin/users`);
+  getAdminUsers(page = 0, size = 10, sortBy = 'id', direction = 'desc'): Observable<AdminPageResponse<AdminUserResponse>> {
+    const params = new HttpParams()
+      .set('page', page)
+      .set('size', size)
+      .set('sortBy', sortBy)
+      .set('direction', direction);
+    return this.http.get<AdminPageResponse<AdminUserResponse>>(`${this.apiUrl}/admin/users`, { params });
   }
 
   getAdminUserById(id: number): Observable<AdminUserResponse> {
@@ -155,8 +185,13 @@ export class ApiService {
     return this.http.delete<{ message: string }>(`${this.apiUrl}/admin/users/${id}`);
   }
 
-  getAdminJobs(): Observable<AdminPageResponse> {
-    return this.http.get<AdminPageResponse>(`${this.apiUrl}/admin/jobs`);
+  getAdminJobs(page = 0, size = 10, sortBy = 'createdAt', direction = 'desc'): Observable<AdminPageResponse<AdminJobResponse>> {
+    const params = new HttpParams()
+      .set('page', page)
+      .set('size', size)
+      .set('sortBy', sortBy)
+      .set('direction', direction);
+    return this.http.get<AdminPageResponse<AdminJobResponse>>(`${this.apiUrl}/admin/jobs`, { params });
   }
 
   getAdminJobById(id: number): Observable<AdminJobResponse> {

@@ -4,18 +4,18 @@ import com.jobportal.adminservice.dto.response.JobResponse;
 import com.jobportal.adminservice.dto.response.PageResponse;
 import com.jobportal.adminservice.dto.response.UserResponse;
 
-import java.util.List;
+
 import java.util.Map;
 
 public interface AdminService {
 
     // User Management
-    List<UserResponse> getAllUsers();
+    PageResponse<UserResponse> getAllUsers(int page, int size, String sortBy, String direction);
     UserResponse getUserById(Long id);
     void deleteUser(Long id);
 
     // Job Management
-    PageResponse getAllJobs();
+    PageResponse<JobResponse> getAllJobs(int page, int size, String sortBy, String direction);
     JobResponse getJobById(Long id);
 
     // Reports

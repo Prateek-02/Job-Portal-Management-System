@@ -4,16 +4,15 @@ import com.jobportal.applicationservice.dto.request.ApplicationRequest;
 import com.jobportal.applicationservice.dto.response.ApplicationResponse;
 import com.jobportal.applicationservice.dto.response.JobApplicationResponse;
 import com.jobportal.applicationservice.enums.ApplicationStatus;
-
-import java.util.List;
+import com.jobportal.applicationservice.dto.response.PageResponse;
 
 public interface ApplicationService {
 
     ApplicationResponse applyForJob(ApplicationRequest request, Long userId, String role, String resumeUrl);
 
-    List<ApplicationResponse> getUserApplications(Long userId, String role);
+    PageResponse<ApplicationResponse> getUserApplications(Long userId, String role, int page, int size, String sortBy, String direction);
 
-    List<JobApplicationResponse> getJobApplications(Long jobId, String role, Long recruiterId);
+    PageResponse<JobApplicationResponse> getJobApplications(Long jobId, String role, Long recruiterId, int page, int size, String sortBy, String direction);
 
     ApplicationResponse updateStatus(Long applicationId, ApplicationStatus status, Long recruiterId, String role);
 
@@ -23,5 +22,5 @@ public interface ApplicationService {
 
     Long getTotalApplications();
 
-    List<JobApplicationResponse> getAllApplicationsForRecruiter(Long recruiterId, String role);
+    PageResponse<JobApplicationResponse> getAllApplicationsForRecruiter(Long recruiterId, String role, int page, int size, String sortBy, String direction);
 }

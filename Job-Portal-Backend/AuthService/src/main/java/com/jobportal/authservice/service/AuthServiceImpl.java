@@ -228,18 +228,34 @@ public class AuthServiceImpl implements AuthService {
 
     // GET ALL USERS
     @Override
-    public List<UserResponse> getAllUsers() {
+    public com.jobportal.authservice.dto.response.PageResponse<UserResponse> getAllUsers(int page, int size, String sortBy, String direction) {
 
-        log.info("Fetching all users");
+        log.info("Fetching all users | page: {} | size: {}", page, size);
 
-        List<UserResponse> users = userRepository.findAll()
-                .stream()
+        org.springframework.data.domain.Sort sort = direction.equalsIgnoreCase("desc") ?
+                org.springframework.data.domain.Sort.by(sortBy).descending() :
+                org.springframework.data.domain.Sort.by(sortBy).ascending();
+
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, sort);
+
+        org.springframework.data.domain.Page<User> pageData = userRepository.findAll(pageable);
+
+        List<UserResponse> content = pageData.getContent().stream()
                 .map(user -> modelMapper.map(user, UserResponse.class))
                 .collect(Collectors.toList());
 
-        log.debug("Total users fetched: {}", users.size());
+        log.debug("Users fetched | page: {} | total: {}", page, pageData.getTotalElements());
 
-        return users;
+        return com.jobportal.authservice.dto.response.PageResponse.<UserResponse>builder()
+                .content(content)
+                .pageNumber(pageData.getNumber())
+                .pageSize(pageData.getSize())
+                .totalElements(pageData.getTotalElements())
+                .totalPages(pageData.getTotalPages())
+                .last(pageData.isLast())
+                .first(pageData.isFirst())
+                .empty(pageData.isEmpty())
+                .build();
     }
 
     // GET USER BY ID

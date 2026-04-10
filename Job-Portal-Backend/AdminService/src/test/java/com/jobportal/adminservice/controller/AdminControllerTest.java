@@ -36,12 +36,15 @@ class AdminControllerTest {
         UserResponse user = new UserResponse();
         user.setId(1L);
 
-        when(adminService.getAllUsers()).thenReturn(List.of(user));
+        PageResponse<UserResponse> response = new PageResponse<>();
+        response.setContent(List.of(user));
+
+        when(adminService.getAllUsers(0, 10, "id", "desc")).thenReturn(response);
 
         mockMvc.perform(get("/api/admin/users")
                         .header("X-User-Role", "ADMIN"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1));
+                .andExpect(jsonPath("$.content[0].id").value(1));
     }
 
     // GET USER BY ID
@@ -76,9 +79,9 @@ class AdminControllerTest {
     @Test
     void testGetAllJobs() throws Exception {
 
-        PageResponse response = new PageResponse();
+        PageResponse<JobResponse> response = new PageResponse<>();
 
-        when(adminService.getAllJobs()).thenReturn(response);
+        when(adminService.getAllJobs(0, 10, "createdAt", "desc")).thenReturn(response);
 
         mockMvc.perform(get("/api/admin/jobs")
                         .header("X-User-Role", "ADMIN"))
@@ -173,12 +176,15 @@ class AdminControllerTest {
         UserResponse user = new UserResponse();
         user.setId(1L);
 
-        when(adminService.getAllUsers()).thenReturn(List.of(user));
+        PageResponse<UserResponse> response = new PageResponse<>();
+        response.setContent(List.of(user));
+
+        when(adminService.getAllUsers(0, 10, "id", "desc")).thenReturn(response);
 
         mockMvc.perform(get("/api/admin/users")
                         .header("X-User-Role", "ADMIN"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1));
+                .andExpect(jsonPath("$.content[0].id").value(1));
     }
 
     @Test

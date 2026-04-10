@@ -8,6 +8,9 @@ import static org.mockito.Mockito.*;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.function.Supplier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -196,20 +199,21 @@ class ApplicationServiceImplTest {
 
     @Test
     void getUserApplications_success() {
-        when(repository.findByUserId(1L)).thenReturn(java.util.List.of(entity));
+        Page<JobApplication> pageArgs = new PageImpl<>(java.util.List.of(entity));
+        when(repository.findByUserId(eq(1L), any(Pageable.class))).thenReturn(pageArgs);
         when(mapper.map(any(), eq(ApplicationResponse.class))).thenReturn(response);
         when(jobClient.getJobById(anyLong())).thenReturn(job);
 
-        java.util.List<ApplicationResponse> res = service.getUserApplications(1L, "JOB_SEEKER");
+        PageResponse<ApplicationResponse> res = service.getUserApplications(1L, "JOB_SEEKER", 0, 10, "appliedAt", "desc");
 
-        assertThat(res).hasSize(1);
-        verify(repository).findByUserId(1L);
+        assertThat(res.getContent()).hasSize(1);
+        verify(repository).findByUserId(eq(1L), any(Pageable.class));
     }
 
     @Test
     void getUserApplications_notJobSeeker() {
         assertThatThrownBy(() ->
-                service.getUserApplications(1L, "RECRUITER"))
+                service.getUserApplications(1L, "RECRUITER", 0, 10, "appliedAt", "desc"))
                 .isInstanceOf(UnauthorizedException.class);
     }
 
@@ -217,23 +221,24 @@ class ApplicationServiceImplTest {
 
     @Test
     void getJobApplications_success() {
-        when(repository.findByJobId(1L)).thenReturn(java.util.List.of(entity));
+        Page<JobApplication> pageArgs = new PageImpl<>(java.util.List.of(entity));
+        when(repository.findByJobId(eq(1L), any(Pageable.class))).thenReturn(pageArgs);
         when(mapper.map(any(), eq(com.jobportal.applicationservice.dto.response.JobApplicationResponse.class)))
                 .thenReturn(new com.jobportal.applicationservice.dto.response.JobApplicationResponse());
         when(jobClient.getJobById(1L)).thenReturn(job);
         when(userClient.getUserById(1L, SECRET)).thenReturn(user);
 
-        java.util.List<com.jobportal.applicationservice.dto.response.JobApplicationResponse> res =
-                service.getJobApplications(1L, "RECRUITER", 1L);
+        PageResponse<com.jobportal.applicationservice.dto.response.JobApplicationResponse> res =
+                service.getJobApplications(1L, "RECRUITER", 1L, 0, 10, "appliedAt", "desc");
 
-        assertThat(res).isNotEmpty();
-        verify(repository).findByJobId(1L);
+        assertThat(res.getContent()).isNotEmpty();
+        verify(repository).findByJobId(eq(1L), any(Pageable.class));
     }
 
     @Test
     void getJobApplications_unauthorized() {
         assertThatThrownBy(() ->
-                service.getJobApplications(1L, "JOB_SEEKER", 1L))
+                service.getJobApplications(1L, "JOB_SEEKER", 1L, 0, 10, "appliedAt", "desc"))
                 .isInstanceOf(UnauthorizedException.class);
     }
 }

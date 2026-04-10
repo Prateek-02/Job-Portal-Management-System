@@ -47,7 +47,8 @@ class AdminServiceImplTest {
     private UserResponse recruiter;
     private List<UserResponse> users;
     private JobResponse jobResponse;
-    private PageResponse pageResponse;
+    private PageResponse<JobResponse> jobPageResponse;
+    private PageResponse<UserResponse> userPageResponse;
 
     private static final String INTERNAL_SECRET = "test-secret";
 
@@ -72,20 +73,24 @@ class AdminServiceImplTest {
         jobResponse = new JobResponse();
         jobResponse.setId(1L);
 
-        pageResponse = new PageResponse();
-        pageResponse.setTotalElements(5);
+        userPageResponse = new PageResponse<>();
+        userPageResponse.setContent(users);
+        userPageResponse.setTotalElements(users.size());
+
+        jobPageResponse = new PageResponse<>();
+        jobPageResponse.setTotalElements(5);
     }
 
     @Test
     void getAllUsers_Success() {
-        when(authServiceClient.getAllUsers(anyString()))
-                .thenReturn(users);
+        when(authServiceClient.getAllUsers(anyString(), anyInt(), anyInt(), anyString(), anyString()))
+                .thenReturn(userPageResponse);
 
-        List<UserResponse> response = adminService.getAllUsers();
+        PageResponse<UserResponse> response = adminService.getAllUsers(0, 10, "id", "desc");
 
-        assertThat(response).hasSize(2);
+        assertThat(response.getContent()).hasSize(2);
 
-        verify(authServiceClient).getAllUsers(INTERNAL_SECRET);
+        verify(authServiceClient).getAllUsers(INTERNAL_SECRET, 0, 10, "id", "desc");
     }
 
     @Test
@@ -112,14 +117,14 @@ class AdminServiceImplTest {
 
     @Test
     void getAllJobs_Success() {
-        when(jobServiceClient.getAllJobs())
-                .thenReturn(pageResponse);
+        when(jobServiceClient.getAllJobs(anyInt(), anyInt(), anyString(), anyString()))
+                .thenReturn(jobPageResponse);
 
-        PageResponse response = adminService.getAllJobs();
+        PageResponse<JobResponse> response = adminService.getAllJobs(0, 10, "createdAt", "desc");
 
         assertThat(response.getTotalElements()).isEqualTo(5);
 
-        verify(jobServiceClient).getAllJobs();
+        verify(jobServiceClient).getAllJobs(0, 10, "createdAt", "desc");
     }
 
     @Test
@@ -136,11 +141,11 @@ class AdminServiceImplTest {
 
     @Test
     void getReports_Success() {
-        when(authServiceClient.getAllUsers(anyString()))
-                .thenReturn(users);
+        when(authServiceClient.getAllUsers(anyString(), anyInt(), anyInt(), anyString(), anyString()))
+                .thenReturn(userPageResponse);
 
-        when(jobServiceClient.getAllJobs())
-                .thenReturn(pageResponse);
+        when(jobServiceClient.getAllJobs(anyInt(), anyInt(), anyString(), anyString()))
+                .thenReturn(jobPageResponse);
 
         when(applicationServiceClient.getTotalApplications())
                 .thenReturn(10L);
@@ -151,8 +156,8 @@ class AdminServiceImplTest {
         assertThat(reports.get("totalJobs")).isEqualTo(5L);
         assertThat(reports.get("totalApplications")).isEqualTo(10L);
 
-        verify(authServiceClient).getAllUsers(INTERNAL_SECRET);
-        verify(jobServiceClient).getAllJobs();
+        verify(authServiceClient).getAllUsers(eq(INTERNAL_SECRET), eq(0), eq(1000), eq("id"), eq("desc"));
+        verify(jobServiceClient).getAllJobs(eq(0), eq(1000), eq("createdAt"), eq("desc"));
         verify(applicationServiceClient).getTotalApplications();
     }
 }

@@ -1,7 +1,7 @@
 package com.jobportal.authservice.service;
 
 import java.io.IOException;
-import java.util.List;
+
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,7 +31,7 @@ public interface AuthService {
     UserResponse updateProfile(Long userId, UpdateProfileRequest request);
 
     // Get all users
-    List<UserResponse> getAllUsers();
+    com.jobportal.authservice.dto.response.PageResponse<UserResponse> getAllUsers(int page, int size, String sortBy, String direction);
 
     // Get user by ID
     UserResponse getUserById(Long id);

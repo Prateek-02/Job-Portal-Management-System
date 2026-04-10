@@ -21,14 +21,16 @@ export interface AdminJobResponse {
   createdAt: string;
 }
 
-// Admin page response (for jobs)
-export interface AdminPageResponse {
-  content: AdminJobResponse[];
+// Admin page response (generic)
+export interface AdminPageResponse<T> {
+  content: T[];
   totalPages: number;
   totalElements: number;
-  size: number;
-  number: number;
+  pageSize: number;
+  pageNumber: number;
   last: boolean;
+  first: boolean;
+  empty: boolean;
 }
 
 // Admin reports - Map<String, Object> from backend

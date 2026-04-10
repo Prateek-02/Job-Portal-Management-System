@@ -1,7 +1,7 @@
 package com.jobportal.authservice.controller;
 
 import java.io.IOException;
-import java.util.List;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -95,13 +95,18 @@ public class AuthController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<List<UserResponse>> getAllUsers() {
+    public ResponseEntity<com.jobportal.authservice.dto.response.PageResponse<UserResponse>> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction) {
 
-        log.info("Fetch all users API called");
+        log.info("Fetch all users API called | page: {} | size: {}", page, size);
 
-        List<UserResponse> users = authService.getAllUsers();
+        com.jobportal.authservice.dto.response.PageResponse<UserResponse> response = 
+                authService.getAllUsers(page, size, sortBy, direction);
 
-        return ResponseEntity.ok(users);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/users/{id}")

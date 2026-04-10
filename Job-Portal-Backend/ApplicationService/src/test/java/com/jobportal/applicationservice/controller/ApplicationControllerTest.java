@@ -80,14 +80,17 @@ class ApplicationControllerTest {
         ApplicationResponse response = new ApplicationResponse();
         response.setId(1L);
 
-        when(service.getUserApplications(1L, "JOB_SEEKER"))
-                .thenReturn(List.of(response));
+        com.jobportal.applicationservice.dto.response.PageResponse<ApplicationResponse> pageResponse = new com.jobportal.applicationservice.dto.response.PageResponse<>();
+        pageResponse.setContent(List.of(response));
+
+        when(service.getUserApplications(eq(1L), eq("JOB_SEEKER"), org.mockito.ArgumentMatchers.anyInt(), org.mockito.ArgumentMatchers.anyInt(), org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyString()))
+                .thenReturn(pageResponse);
 
         mockMvc.perform(get("/api/applications/user/viewApplications")
                         .header("X-User-Id", 1L)
                         .header("X-User-Role", "JOB_SEEKER"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1));
+                .andExpect(jsonPath("$.content[0].id").value(1));
     }
 
     // GET JOB APPLICATIONS
@@ -97,14 +100,17 @@ class ApplicationControllerTest {
         JobApplicationResponse response = new JobApplicationResponse();
         response.setId(1L);
 
-        when(service.getJobApplications(1L, "RECRUITER", 10L))
-                .thenReturn(List.of(response));
+        com.jobportal.applicationservice.dto.response.PageResponse<JobApplicationResponse> pageResponse = new com.jobportal.applicationservice.dto.response.PageResponse<>();
+        pageResponse.setContent(List.of(response));
+
+        when(service.getJobApplications(eq(1L), eq("RECRUITER"), eq(10L), org.mockito.ArgumentMatchers.anyInt(), org.mockito.ArgumentMatchers.anyInt(), org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyString()))
+                .thenReturn(pageResponse);
 
         mockMvc.perform(get("/api/applications/jobApplications/1")
                         .header("X-User-Id", 10L)
                         .header("X-User-Role", "RECRUITER"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1));
+                .andExpect(jsonPath("$.content[0].id").value(1));
     }
 
     // UPDATE STATUS
@@ -203,7 +209,7 @@ class ApplicationControllerTest {
     @Test
     void testGetUserApplications_Unauthorized() throws Exception {
 
-        when(service.getUserApplications(1L, "RECRUITER"))
+        when(service.getUserApplications(eq(1L), eq("RECRUITER"), org.mockito.ArgumentMatchers.anyInt(), org.mockito.ArgumentMatchers.anyInt(), org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyString()))
                 .thenThrow(new UnauthorizedException(
                         "Access Denied! Only Job Seekers can view their applications."));
 

@@ -338,19 +338,21 @@ class AuthServiceImplTest {
                 java.util.List<User> users = java.util.List.of(user);
                 com.jobportal.authservice.dto.response.UserResponse userResponse = new com.jobportal.authservice.dto.response.UserResponse();
 
-                when(userRepository.findAll())
-                                .thenReturn(users);
+                org.springframework.data.domain.Page<User> pageData = new org.springframework.data.domain.PageImpl<>(users);
+
+                when(userRepository.findAll(any(org.springframework.data.domain.Pageable.class)))
+                                .thenReturn(pageData);
                 when(modelMapper.map(any(User.class),
                                 eq(com.jobportal.authservice.dto.response.UserResponse.class)))
                                 .thenReturn(userResponse);
 
                 // Act
-                java.util.List<com.jobportal.authservice.dto.response.UserResponse> response = authService
-                                .getAllUsers();
+                com.jobportal.authservice.dto.response.PageResponse<com.jobportal.authservice.dto.response.UserResponse> response = authService
+                                .getAllUsers(0, 10, "id", "desc");
 
                 // Assert
                 assertThat(response).isNotNull();
-                assertThat(response.size()).isEqualTo(1);
-                verify(userRepository, times(1)).findAll();
+                assertThat(response.getContent().size()).isEqualTo(1);
+                verify(userRepository, times(1)).findAll(any(org.springframework.data.domain.Pageable.class));
         }
 }

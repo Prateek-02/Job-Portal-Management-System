@@ -115,11 +115,14 @@ class AuthControllerTest {
                 user.setId(1L);
                 user.setEmail("test@gmail.com");
 
-                when(authService.getAllUsers()).thenReturn(List.of(user));
+                com.jobportal.authservice.dto.response.PageResponse<UserResponse> pageResponse = new com.jobportal.authservice.dto.response.PageResponse<>();
+                pageResponse.setContent(List.of(user));
+
+                when(authService.getAllUsers(anyInt(), anyInt(), anyString(), anyString())).thenReturn(pageResponse);
 
                 mockMvc.perform(get("/api/auth/users"))
                                 .andExpect(status().isOk())
-                                .andExpect(jsonPath("$[0].email").value("test@gmail.com"));
+                                .andExpect(jsonPath("$.content[0].email").value("test@gmail.com"));
         }
 
         // GET USER BY ID

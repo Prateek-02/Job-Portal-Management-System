@@ -11,7 +11,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface JobServiceClient {
 
     @GetMapping("/api/jobs")
-    PageResponse getAllJobs();
+    PageResponse<JobResponse> getAllJobs(
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "0") int page,
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "10") int size,
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "createdAt") String sortBy,
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "desc") String direction);
 
     @GetMapping("/api/jobs/{id}")
     JobResponse getJobById(@PathVariable Long id);

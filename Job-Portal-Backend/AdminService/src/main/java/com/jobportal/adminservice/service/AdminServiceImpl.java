@@ -34,21 +34,21 @@ public class AdminServiceImpl implements AdminService {
     private String internalSecret;
 
     @Override
-    public List<UserResponse> getAllUsers() {
+    public PageResponse<UserResponse> getAllUsers(int page, int size, String sortBy, String direction) {
 
-        log.info("Fetching all users from AuthService");
+        log.info("Fetching all users from AuthService | page: {} | size: {}", page, size);
 
-        List<UserResponse> users =
+        PageResponse<UserResponse> response =
                 circuitBreakerFactory.create("adminAuthService")
-                        .run(() -> authServiceClient.getAllUsers(internalSecret),
+                        .run(() -> authServiceClient.getAllUsers(internalSecret, page, size, sortBy, direction),
                                 throwable -> {
                                     log.error("AuthService unavailable while fetching users", throwable);
                                     throw new RuntimeException("AuthService is unavailable. Please try again.");
                                 });
 
-        log.debug("Users fetched | count: {}", users.size());
+        log.debug("Users fetched | count: {}", response.getContent().size());
 
-        return users;
+        return response;
     }
 
     @Override
@@ -106,13 +106,13 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public PageResponse getAllJobs() {
+    public PageResponse<JobResponse> getAllJobs(int page, int size, String sortBy, String direction) {
 
-        log.info("Fetching all jobs from JobService");
+        log.info("Fetching all jobs from JobService | page: {} | size: {}", page, size);
 
-        PageResponse jobs =
+        PageResponse<JobResponse> jobs =
                 circuitBreakerFactory.create("adminJobService")
-                        .run(jobServiceClient::getAllJobs,
+                        .run(() -> jobServiceClient.getAllJobs(page, size, sortBy, direction),
                                 throwable -> {
                                     log.error("JobService unavailable while fetching jobs", throwable);
                                     throw new RuntimeException("JobService is unavailable. Please try again.");
@@ -150,15 +150,16 @@ public class AdminServiceImpl implements AdminService {
 
         log.info("Generating platform reports");
 
-        List<UserResponse> users =
+        PageResponse<UserResponse> usersPage =
                 circuitBreakerFactory.create("adminAuthService")
-                        .run(() -> authServiceClient.getAllUsers(internalSecret),
+                        .run(() -> authServiceClient.getAllUsers(internalSecret, 0, 1000, "id", "desc"),
                                 throwable -> {
                                     log.error("AuthService unavailable while building reports", throwable);
                                     throw new RuntimeException("AuthService is unavailable. Cannot build reports.");
                                 });
 
-        long totalUsers = users.size();
+        List<UserResponse> users = usersPage.getContent();
+        long totalUsers = usersPage.getTotalElements();
         long jobSeekers = users.stream()
                 .filter(u -> u.getRole().equalsIgnoreCase("JOB_SEEKER"))
                 .count();
@@ -166,8 +167,8 @@ public class AdminServiceImpl implements AdminService {
                 .filter(u -> u.getRole().equalsIgnoreCase("RECRUITER"))
                 .count();
 
-        PageResponse jobsPage = circuitBreakerFactory.create("adminJobService")
-                .run(jobServiceClient::getAllJobs,
+        PageResponse<JobResponse> jobsPage = circuitBreakerFactory.create("adminJobService")
+                .run(() -> jobServiceClient.getAllJobs(0, 1000, "createdAt", "desc"),
                         throwable -> {
                             log.error("JobService unavailable while building reports", throwable);
                             throw new RuntimeException("JobService is unavailable. Cannot build reports.");
