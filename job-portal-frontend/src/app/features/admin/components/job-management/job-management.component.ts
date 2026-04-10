@@ -25,27 +25,30 @@ export class JobManagementComponent implements OnInit, OnDestroy {
   // Pagination
   currentPage = 0;
   pageSize = 10;
-
-  get totalPages(): number {
-    return Math.ceil(this.jobs.length / this.pageSize);
-  }
+  totalPages = 0;
 
   get pagedJobs(): AdminJobResponse[] {
-    const start = this.currentPage * this.pageSize;
-    return this.jobs.slice(start, start + this.pageSize);
+    return this.jobs;
   }
 
   onPageChange(page: number): void {
     this.currentPage = page;
+    this.loadJobs();
   }
 
   constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
-    this.apiService.getAdminJobs().pipe(takeUntil(this.destroy$)).subscribe({
+    this.loadJobs();
+  }
+
+  loadJobs(): void {
+    this.isLoading = true;
+    this.apiService.getAdminJobs(this.currentPage, this.pageSize).pipe(takeUntil(this.destroy$)).subscribe({
       next: (data) => {
-        this.jobs = data.content || [];
-        this.totalElements = data.totalElements;
+        this.jobs = data?.content || [];
+        this.totalElements = data?.totalElements || 0;
+        this.totalPages = data?.totalPages || 0;
         this.isLoading = false;
       },
       error: (err) => { this.errorMessage = getFriendlyError(err, 'load_jobs'); this.isLoading = false; }

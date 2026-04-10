@@ -110,7 +110,7 @@ export class JobListComponent implements OnInit, OnDestroy {
       next: (res: PageResponse<Job>) => {
         this.jobs = res.content || [];
         this.totalPages = res.totalPages;
-        this.currentPage = res.number;
+        this.currentPage = res.pageNumber;
         this.totalElements = res.totalElements;
         this.isLoading = false;
         this.cdr.detectChanges();

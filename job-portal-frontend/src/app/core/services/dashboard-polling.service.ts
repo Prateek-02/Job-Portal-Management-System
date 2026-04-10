@@ -81,25 +81,29 @@ export class DashboardPollingService implements OnDestroy {
     applications: JobApplicationResponse[]
   }> {
     return this.apiService.getJobsByRecruiter(userId).pipe(
-      switchMap(jobs => {
+      switchMap((res: any) => {
+        const jobs: Job[] = res?.content || [];
         if (!jobs || jobs.length === 0) {
           return of({ jobs: [], applications: [] });
         }
         
         const appRequests = jobs.map(job => 
           this.apiService.getJobApplications(job.id).pipe(
-            map(apps => apps.map(app => ({ 
-              ...app, 
-              jobTitle: job.title, 
-              companyName: job.companyName 
-            }))),
+            map((pageObj: any) => {
+              const apps: JobApplicationResponse[] = pageObj?.content || [];
+              return apps.map(app => ({ 
+                ...app, 
+                jobTitle: job.title, 
+                companyName: job.companyName 
+              }));
+            }),
             catchError(() => of([]))
           )
         );
 
         return forkJoin(appRequests).pipe(
-          map(responses => {
-            const allApps = responses.reduce((acc, curr) => [...acc, ...curr], []);
+          map((responses: any[]) => {
+            const allApps = responses.reduce((acc: any, curr: any) => [...acc, ...curr], []);
             return { jobs, applications: allApps };
           })
         );

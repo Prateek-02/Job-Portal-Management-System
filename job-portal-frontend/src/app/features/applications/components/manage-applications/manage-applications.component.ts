@@ -30,18 +30,16 @@ export class ManageApplicationsComponent implements OnInit, OnDestroy {
   // Pagination
   currentPage = 0;
   pageSize = 10;
-
-  get totalPages(): number {
-    return Math.ceil(this.applications.length / this.pageSize);
-  }
+  totalElements = 0;
+  totalPages = 0;
 
   get pagedApplications(): JobApplicationResponse[] {
-    const start = this.currentPage * this.pageSize;
-    return this.applications.slice(start, start + this.pageSize);
+    return this.applications;
   }
 
   onPageChange(page: number): void {
     this.currentPage = page;
+    this.loadApplications();
   }
 
   constructor(private route: ActivatedRoute, private apiService: ApiService) {}
@@ -49,7 +47,9 @@ export class ManageApplicationsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       this.jobId = Number(params.get('jobId'));
-      this.loadData();
+      this.currentPage = 0;
+      this.loadJob();
+      this.loadApplications();
     });
   }
 
@@ -58,15 +58,22 @@ export class ManageApplicationsComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  loadData(): void {
-    this.isLoading = true;
-    this.currentPage = 0;
+  loadJob(): void {
     this.apiService.getJobById(this.jobId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (j) => this.job = j,
       error: () => {}
     });
-    this.apiService.getJobApplications(this.jobId).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (res) => { this.applications = res || []; this.isLoading = false; },
+  }
+
+  loadApplications(): void {
+    this.isLoading = true;
+    this.apiService.getJobApplications(this.jobId, this.currentPage, this.pageSize).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (res) => { 
+        this.applications = res?.content || []; 
+        this.totalElements = res?.totalElements || 0;
+        this.totalPages = res?.totalPages || 0;
+        this.isLoading = false; 
+      },
       error: (err) => { this.errorMessage = getFriendlyError(err, 'load_applications'); this.isLoading = false; }
     });
   }

@@ -10,7 +10,7 @@
       <h1 class="text-4xl font-extrabold text-[#1A1A1A] tracking-tight">Manage Candidates</h1>
       @if (job) {
         <p class="text-[#4A4A4A] font-bold mt-2 text-lg">
-          {{ applications.length }} applicant(s) for <span class="text-[#A18CD1]">{{ job.title }}</span>
+          {{ totalElements }} applicant(s) for <span class="text-[#A18CD1]">{{ job.title }}</span>
         </p>
       }
     </div>
@@ -131,7 +131,7 @@
     <app-pagination
       [currentPage]="currentPage"
       [totalPages]="totalPages"
-      [totalElements]="applications.length"
+      [totalElements]="totalElements"
       [pageSize]="pageSize"
       (pageChange)="onPageChange($event)">
     </app-pagination>

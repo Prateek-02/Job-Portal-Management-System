@@ -45,7 +45,8 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     if (!admin || !admin.id) return;
 
     this.apiService.getAdminUsers().pipe(takeUntil(this.destroy$)).subscribe({
-      next: (users: AdminUserResponse[]) => {
+      next: (res: any) => {
+        const users: AdminUserResponse[] = res?.content || [];
         const seenKey = `jp_seen_users_${admin.id}`;
         const seenIds: number[] = JSON.parse(localStorage.getItem(seenKey) || '[]');
 

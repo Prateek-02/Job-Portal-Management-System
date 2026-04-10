@@ -6,8 +6,8 @@
       <div class="inline-block px-4 py-1.5 rounded-full bg-energy-emerald/10 border border-energy-emerald/20 text-energy-emerald text-[10px] font-bold uppercase tracking-[0.3em] mb-4">
         Candidate Management
       </div>
-      <h1 class="text-6xl font-bold text-text-primary tracking-tighter">Candidate Pool</h1>
-      <p class="text-xl font-medium text-text-secondary opacity-60 mt-4 leading-relaxed">View and manage all candidates for your job postings.</p>
+      <h1 class="text-5xl font-bold text-text-primary mb-2 tracking-tighter">Recruitment Hub</h1>
+      <p class="text-sm font-bold text-text-muted mt-2 tracking-widest uppercase">{{ totalElements }} Total Applications</p>
     </div>
     <div class="flex items-center gap-4">
       <button (click)="loadApplications()" class="w-14 h-14 rounded-2xl bg-bg-secondary border border-glass-border text-text-muted hover:text-text-primary hover:border-text-primary/40 flex items-center justify-center transition-all shadow-sm">
@@ -161,7 +161,7 @@
       <app-pagination
         [currentPage]="currentPage"
         [totalPages]="totalPages"
-        [totalElements]="applications.length"
+        [totalElements]="totalElements"
         [pageSize]="pageSize"
         (pageChange)="onPageChange($event)"
         class="block px-6 pb-6">

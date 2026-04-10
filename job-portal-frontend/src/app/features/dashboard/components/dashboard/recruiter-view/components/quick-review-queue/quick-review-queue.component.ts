@@ -38,17 +38,19 @@ export class QuickReviewQueueComponent implements OnInit, OnDestroy {
 
   private loadPendingApplications(userId: number): void {
     this.apiService.getJobsByRecruiter(userId).pipe(
-      catchError(() => of([])),
+      catchError(() => of(null)),
       takeUntil(this.destroy$)
-    ).subscribe(jobs => {
+    ).subscribe((res: any) => {
+      const jobs = res?.content || [];
       if (jobs.length > 0) {
-        const appRequests = jobs.map(job =>
-          this.apiService.getJobApplications(job.id).pipe(catchError(() => of([])))
+        const appRequests = jobs.map((job: any) =>
+          this.apiService.getJobApplications(job.id).pipe(catchError(() => of(null)))
         );
 
-        forkJoin(appRequests).pipe(takeUntil(this.destroy$)).subscribe(responses => {
+        forkJoin(appRequests).pipe(takeUntil(this.destroy$)).subscribe((responses: any) => {
           let allApplications: JobApplicationResponse[] = [];
-          responses.forEach(apps => {
+          responses.forEach((pageObj: any) => {
+            const apps = pageObj?.content || [];
             if (Array.isArray(apps)) {
               allApplications = [...allApplications, ...apps];
             }

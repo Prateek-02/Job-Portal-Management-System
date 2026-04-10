@@ -2,7 +2,7 @@
   <div class="flex items-center justify-between mb-8">
     <div>
       <h1 class="text-3xl font-bold text-text-primary">Manage Users</h1>
-      <p class="text-text-secondary mt-1">{{ users.length }} registered users &mdash; Page {{ currentPage + 1 }} of {{ totalPages || 1 }}</p>
+      <p class="text-text-secondary mt-1">{{ totalElements }} registered users &mdash; Page {{ currentPage + 1 }} of {{ totalPages || 1 }}</p>
     </div>
   </div>
 
@@ -90,7 +90,7 @@
     <app-pagination
       [currentPage]="currentPage"
       [totalPages]="totalPages"
-      [totalElements]="users.length"
+      [totalElements]="totalElements"
       [pageSize]="pageSize"
       (pageChange)="onPageChange($event)"
       class="block px-6 pb-6">

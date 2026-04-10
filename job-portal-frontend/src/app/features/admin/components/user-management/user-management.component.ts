@@ -24,25 +24,33 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   // Pagination
   currentPage = 0;
   pageSize = 10;
-
-  get totalPages(): number {
-    return Math.ceil(this.users.length / this.pageSize);
-  }
+  totalElements = 0;
+  totalPages = 0;
 
   get pagedUsers(): AdminUserResponse[] {
-    const start = this.currentPage * this.pageSize;
-    return this.users.slice(start, start + this.pageSize);
+    return this.users;
   }
 
   onPageChange(page: number): void {
     this.currentPage = page;
+    this.loadUsers();
   }
 
   constructor(private apiService: ApiService) { }
 
   ngOnInit(): void {
-    this.apiService.getAdminUsers().pipe(takeUntil(this.destroy$)).subscribe({
-      next: (data) => { this.users = data || []; this.isLoading = false; },
+    this.loadUsers();
+  }
+
+  loadUsers(): void {
+    this.isLoading = true;
+    this.apiService.getAdminUsers(this.currentPage, this.pageSize).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (data: any) => { 
+        this.users = data?.content || []; 
+        this.totalElements = data?.totalElements || 0;
+        this.totalPages = data?.totalPages || 0;
+        this.isLoading = false; 
+      },
       error: (err) => { this.errorMessage = getFriendlyError(err, 'load_users'); this.isLoading = false; }
     });
   }

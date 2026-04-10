@@ -24,18 +24,16 @@ export class MyJobsComponent implements OnInit, OnDestroy {
   // Pagination
   currentPage = 0;
   pageSize = 8;
-
-  get totalPages(): number {
-    return Math.ceil(this.jobs.length / this.pageSize);
-  }
+  totalElements = 0;
+  totalPages = 0;
 
   get pagedJobs(): Job[] {
-    const start = this.currentPage * this.pageSize;
-    return this.jobs.slice(start, start + this.pageSize);
+    return this.jobs;
   }
 
   onPageChange(page: number): void {
     this.currentPage = page;
+    this.loadMyJobs();
   }
 
   constructor(
@@ -61,11 +59,13 @@ export class MyJobsComponent implements OnInit, OnDestroy {
 
   loadMyJobs(): void {
     this.isLoading = true;
-    this.apiService.getJobsByRecruiter(this.user.id).pipe(
-      catchError(() => of([])),
+    this.apiService.getJobsByRecruiter(this.user.id, this.currentPage, this.pageSize).pipe(
+      catchError(() => of(null)),
       takeUntil(this.destroy$)
-    ).subscribe(jobs => {
-      this.jobs = jobs;
+    ).subscribe(res => {
+      this.jobs = res?.content || [];
+      this.totalElements = res?.totalElements || 0;
+      this.totalPages = res?.totalPages || 0;
       this.isLoading = false;
       this.cdr.detectChanges();
     });

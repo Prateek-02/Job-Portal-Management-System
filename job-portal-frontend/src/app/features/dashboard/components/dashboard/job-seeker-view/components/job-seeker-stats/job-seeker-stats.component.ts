@@ -41,9 +41,10 @@ export class JobSeekerStatsComponent implements OnInit, OnDestroy {
   }
 
   private loadStats(userId: number): void {
-    this.apiService.getMyApplications().pipe(takeUntil(this.destroy$)).subscribe(apps => {
+    this.apiService.getMyApplications().pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
+      const apps: ApplicationResponse[] = res?.content || [];
       this.myApplications = apps;
-      this.appliedCount = apps.length;
+      this.appliedCount = res?.totalElements || 0;
       this.interviewCount = apps.filter(a => a.status === 'SHORTLISTED').length;
       this.rejectedCount = apps.filter(a => a.status === 'REJECTED').length;
       this.checkStatusChanges(userId, apps);

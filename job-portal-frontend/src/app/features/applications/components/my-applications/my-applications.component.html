@@ -7,7 +7,7 @@
     </div>
     <h1 class="text-6xl font-bold text-text-primary tracking-tighter">My Applications</h1>
     <p class="text-xl font-medium text-text-secondary opacity-60 mt-4 leading-relaxed">View and track the status of all your job applications.</p>
-    <p class="text-sm font-bold text-text-muted uppercase tracking-widest mt-2">{{ applications.length }} application{{ applications.length !== 1 ? 's' : '' }} total</p>
+    <p class="text-sm font-bold text-text-muted uppercase tracking-widest mt-2">{{ totalElements }} application{{ totalElements !== 1 ? 's' : '' }} total</p>
   </div>
 
   @if (errorMessage) {
@@ -100,7 +100,7 @@
     <app-pagination
       [currentPage]="currentPage"
       [totalPages]="totalPages"
-      [totalElements]="applications.length"
+      [totalElements]="totalElements"
       [pageSize]="pageSize"
       (pageChange)="onPageChange($event)">
     </app-pagination>

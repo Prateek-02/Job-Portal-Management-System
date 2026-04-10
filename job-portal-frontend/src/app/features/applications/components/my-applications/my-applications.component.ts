@@ -25,18 +25,16 @@ export class MyApplicationsComponent implements OnInit, OnDestroy {
   // Pagination
   currentPage = 0;
   pageSize = 5;
-
-  get totalPages(): number {
-    return Math.ceil(this.applications.length / this.pageSize);
-  }
+  totalElements = 0;
+  totalPages = 0;
 
   get pagedApplications(): ApplicationResponse[] {
-    const start = this.currentPage * this.pageSize;
-    return this.applications.slice(start, start + this.pageSize);
+    return this.applications;
   }
 
   onPageChange(page: number): void {
     this.currentPage = page;
+    this.loadApplications();
   }
 
   constructor(
@@ -45,9 +43,16 @@ export class MyApplicationsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.apiService.getMyApplications().pipe(takeUntil(this.destroy$)).subscribe({
+    this.loadApplications();
+  }
+
+  loadApplications(): void {
+    this.isLoading = true;
+    this.apiService.getMyApplications(this.currentPage, this.pageSize).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
-        this.applications = res || [];
+        this.applications = res?.content || [];
+        this.totalElements = res?.totalElements || 0;
+        this.totalPages = res?.totalPages || 0;
         this.isLoading = false;
         this.checkStatuses(this.applications);
       },
