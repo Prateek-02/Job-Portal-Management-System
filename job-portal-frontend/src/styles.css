@@ -277,7 +277,11 @@ button,
 .profile-container,
 .profile-container *,
 [title="Refresh Data"],
-[title="Refresh Data"] * {
+[title="Refresh Data"] *,
+app-theme-toggle,
+app-theme-toggle *,
+.refresh-btn,
+.refresh-btn * {
   cursor: pointer !important;
 }
 
