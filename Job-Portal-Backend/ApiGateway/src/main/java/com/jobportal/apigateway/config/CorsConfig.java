@@ -22,8 +22,13 @@ public class CorsConfig {
 
         CorsConfiguration config = new CorsConfiguration();
 
-        // Reads from .env → FRONTEND_URL via Spring property binding
-        config.setAllowedOrigins(List.of(frontendUrl));
+        // Split by comma and trim each origin to support multiple URLs from .env
+        if (frontendUrl != null && !frontendUrl.isEmpty()) {
+            List<String> origins = Arrays.stream(frontendUrl.split(","))
+                    .map(String::trim)
+                    .toList();
+            config.setAllowedOrigins(origins);
+        }
 
         config.setAllowedMethods(Arrays.asList(
                 "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"
