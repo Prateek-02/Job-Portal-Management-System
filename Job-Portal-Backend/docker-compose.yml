@@ -154,6 +154,11 @@ services:
       CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
 
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      JAVA_OPTS: "-Xms512m -Xmx768m"
+    deploy:
+      resources:
+        limits:
+          memory: 1G
     depends_on:
       - mysql
       - rabbitmq
