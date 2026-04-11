@@ -34,11 +34,11 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       REDIS_HOST: redis
       REDIS_PASSWORD: ${REDIS_PASSWORD}
-      JAVA_OPTS: "-Xms512m -Xmx768m"
+      JAVA_OPTS: "-Xms256m -Xmx512m"
     deploy:
       resources:
         limits:
-          memory: 1G
+          memory: 768M
     depends_on:
       eureka-server:
         condition: service_started
@@ -64,10 +64,15 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
     ports:
       - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     deploy:
       resources:
         limits:
-          memory: 1G
+          memory: 768M
     networks:
       - jobportal-network
 
@@ -85,6 +90,11 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     deploy:
       resources:
         limits:
@@ -103,7 +113,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 768M
+          memory: 512M
     networks:
       - jobportal-network
 
@@ -154,16 +164,20 @@ services:
       CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
 
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
-      JAVA_OPTS: "-Xms512m -Xmx768m"
+      JAVA_OPTS: "-Xms256m -Xmx512m"
     deploy:
       resources:
         limits:
-          memory: 1G
+          memory: 768M
     depends_on:
-      - mysql
-      - rabbitmq
-      - eureka-server
-      - zipkin
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+      zipkin:
+        condition: service_started
     networks:
       - jobportal-network
 
@@ -186,17 +200,22 @@ services:
       INTERNAL_SECRET: ${INTERNAL_SECRET}
 
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
-      JAVA_OPTS: "-Xms512m -Xmx768m"
+      JAVA_OPTS: "-Xms256m -Xmx512m"
     deploy:
       resources:
         limits:
-          memory: 1G
+          memory: 768M
     depends_on:
-      - mysql
-      - rabbitmq
-      - eureka-server
-      - redis
-      - zipkin
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+      redis:
+        condition: service_healthy
+      zipkin:
+        condition: service_started
     networks:
       - jobportal-network
 
@@ -223,17 +242,22 @@ services:
       CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
 
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
-      JAVA_OPTS: "-Xms512m -Xmx768m"
+      JAVA_OPTS: "-Xms256m -Xmx512m"
     deploy:
       resources:
         limits:
-          memory: 1G
+          memory: 768M
     depends_on:
-      - mysql
-      - rabbitmq
-      - eureka-server
-      - redis
-      - zipkin
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+      redis:
+        condition: service_healthy
+      zipkin:
+        condition: service_started
     networks:
       - jobportal-network
 
@@ -254,16 +278,20 @@ services:
       INTERNAL_SECRET: ${INTERNAL_SECRET}
 
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
-      JAVA_OPTS: "-Xms512m -Xmx768m"
+      JAVA_OPTS: "-Xms256m -Xmx512m"
     deploy:
       resources:
         limits:
-          memory: 1G
+          memory: 768M
     depends_on:
-      - mysql
-      - rabbitmq
-      - eureka-server
-      - zipkin
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+      zipkin:
+        condition: service_started
     networks:
       - jobportal-network
 
@@ -286,15 +314,18 @@ services:
       SPRING_MAIL_PASSWORD: ${MAIL_PASSWORD}
 
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
-      JAVA_OPTS: "-Xms512m -Xmx768m"
+      JAVA_OPTS: "-Xms256m -Xmx512m"
     deploy:
       resources:
         limits:
-          memory: 1G
+          memory: 768M
     depends_on:
-      - rabbitmq
-      - eureka-server
-      - zipkin
+      rabbitmq:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+      zipkin:
+        condition: service_started
     networks:
       - jobportal-network
 
@@ -317,7 +348,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 512M
+          memory: 384M
     networks:
       - jobportal-network
 
@@ -334,13 +365,13 @@ services:
       GF_USERS_ALLOW_SIGN_UP: 'false'
     volumes:
       - grafana-data:/var/lib/grafana
-      - ./grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+      - ./grafana-datasources.yml:/etc/grafana/provisioning/datasource/datasources.yml
     depends_on:
       - prometheus
     deploy:
       resources:
         limits:
-          memory: 512M
+          memory: 384M
     networks:
       - jobportal-network
 
