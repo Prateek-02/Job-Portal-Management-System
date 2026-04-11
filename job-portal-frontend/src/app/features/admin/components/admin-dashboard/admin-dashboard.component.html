@@ -1,6 +1,6 @@
-<div class="p-8">
-  <div class="mb-8">
-    <h1 class="text-3xl font-bold text-text-primary">Dashboard Overview</h1>
+<div class="p-4 md:p-6">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-text-primary">Dashboard Overview</h1>
     <p class="text-text-secondary mt-1">System-wide statistics and metrics</p>
   </div>
 
@@ -19,8 +19,8 @@
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 animate-fade-in-up">
 
     <!-- Total Users -->
-    <div class="celestial-card p-10 group hover:shadow-2xl transition-all">
-      <div class="flex items-center justify-between mb-8">
+    <div class="celestial-card p-6 md:p-8 group hover:shadow-2xl transition-all">
+      <div class="flex items-center justify-between mb-6">
         <div
           class="w-14 h-14 rounded-2xl bg-royal-blue/10 flex items-center justify-center group-hover:bg-royal-blue/20 transition-all shadow-inner">
           <svg class="w-7 h-7 text-royal-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -31,8 +31,8 @@
         <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary opacity-40">System Core</div>
       </div>
       <div class="text-xs font-bold text-text-secondary uppercase tracking-widest mb-1 opacity-60">Total Users</div>
-      <div class="text-5xl font-bold text-text-primary tracking-tighter mb-6">{{ reports.totalUsers ?? '0' }}</div>
-      <div class="pt-6 border-t border-glass-border">
+      <div class="text-[40px] leading-tight font-bold text-text-primary tracking-tighter mb-4">{{ reports.totalUsers ?? '0' }}</div>
+      <div class="pt-4 border-t border-glass-border">
         <a routerLink="/admin/users"
           class="text-[10px] font-black text-royal-blue uppercase tracking-[0.15em] flex items-center gap-2 hover:gap-3 transition-all group/link">
           Manage Users
@@ -44,8 +44,8 @@
     </div>
 
     <!-- Job Seekers -->
-    <div class="celestial-card p-10 group hover:shadow-2xl transition-all border-l-4 border-l-energy-emerald/30">
-      <div class="flex items-center justify-between mb-8">
+    <div class="celestial-card p-6 md:p-8 group hover:shadow-2xl transition-all border-l-4 border-l-energy-emerald/30">
+      <div class="flex items-center justify-between mb-6">
         <div
           class="w-14 h-14 rounded-2xl bg-energy-emerald/10 flex items-center justify-center group-hover:bg-energy-emerald/20 transition-all shadow-inner">
           <svg class="w-7 h-7 text-energy-emerald" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -56,15 +56,15 @@
         <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-energy-emerald opacity-40">Talent Pool</div>
       </div>
       <div class="text-xs font-bold text-text-secondary uppercase tracking-widest mb-1 opacity-60">Job Seekers</div>
-      <div class="text-5xl font-bold text-text-primary tracking-tighter mb-6">{{ reports.jobSeekers ?? '0' }}</div>
-      <div class="pt-6 border-t border-glass-border">
+      <div class="text-[40px] leading-tight font-bold text-text-primary tracking-tighter mb-4">{{ reports.jobSeekers ?? '0' }}</div>
+      <div class="pt-4 border-t border-glass-border">
         <p class="text-[10px] font-bold text-text-secondary opacity-40 uppercase tracking-widest">Active Candidates</p>
       </div>
     </div>
 
     <!-- Recruiters -->
-    <div class="celestial-card p-10 group hover:shadow-2xl transition-all border-l-4 border-l-energy-indigo/30">
-      <div class="flex items-center justify-between mb-8">
+    <div class="celestial-card p-6 md:p-8 group hover:shadow-2xl transition-all border-l-4 border-l-energy-indigo/30">
+      <div class="flex items-center justify-between mb-6">
         <div
           class="w-14 h-14 rounded-2xl bg-energy-indigo/10 flex items-center justify-center group-hover:bg-energy-indigo/20 transition-all shadow-inner">
           <svg class="w-7 h-7 text-energy-indigo" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -75,15 +75,15 @@
         <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-energy-indigo opacity-40">Partners</div>
       </div>
       <div class="text-xs font-bold text-text-secondary uppercase tracking-widest mb-1 opacity-60">Recruiters</div>
-      <div class="text-5xl font-bold text-text-primary tracking-tighter mb-6">{{ reports.recruiters ?? '0' }}</div>
-      <div class="pt-6 border-t border-glass-border">
+      <div class="text-[40px] leading-tight font-bold text-text-primary tracking-tighter mb-4">{{ reports.recruiters ?? '0' }}</div>
+      <div class="pt-4 border-t border-glass-border">
         <p class="text-[10px] font-bold text-text-secondary opacity-40 uppercase tracking-widest">Company Partners</p>
       </div>
     </div>
 
     <!-- Total Jobs -->
-    <div class="celestial-card p-10 group hover:shadow-2xl transition-all">
-      <div class="flex items-center justify-between mb-8">
+    <div class="celestial-card p-6 md:p-8 group hover:shadow-2xl transition-all">
+      <div class="flex items-center justify-between mb-6">
         <div
           class="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center group-hover:bg-amber-500/20 transition-all shadow-inner">
           <svg class="w-7 h-7 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -93,8 +93,8 @@
         <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-500 opacity-40">Opportunities</div>
       </div>
       <div class="text-xs font-bold text-text-secondary uppercase tracking-widest mb-1 opacity-60">Total Jobs</div>
-      <div class="text-5xl font-bold text-text-primary tracking-tighter mb-6">{{ reports.totalJobs ?? '0' }}</div>
-      <div class="pt-6 border-t border-glass-border">
+      <div class="text-[40px] leading-tight font-bold text-text-primary tracking-tighter mb-4">{{ reports.totalJobs ?? '0' }}</div>
+      <div class="pt-4 border-t border-glass-border">
         <a routerLink="/admin/jobs"
           class="text-[10px] font-black text-amber-600 uppercase tracking-[0.15em] flex items-center gap-2 hover:gap-3 transition-all group/link">
           Manage Jobs
@@ -108,19 +108,19 @@
   </div>
 
   <!-- Total Applications & Detailed Table Section -->
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-12">
-    <div class="celestial-card p-10 flex flex-col justify-between bg-bg-accent text-white border-none inner-glow">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-10">
+    <div class="celestial-card p-6 md:p-8 flex flex-col justify-between bg-bg-accent text-white border-none inner-glow">
       <div>
         <div class="text-[10px] font-bold uppercase tracking-[0.2em] mb-4 opacity-50 text-white">Global Engagement</div>
         <h3 class="text-3xl font-bold tracking-tighter mb-2 text-white">Total Applications</h3>
         <p class="text-sm opacity-60 text-white">Cumulative system-wide job applications</p>
-        <div class="text-6xl font-black text-white mt-12 group-hover:scale-110 transition-transform brightness-125">{{
+        <div class="text-6xl font-black text-white mt-8 group-hover:scale-110 transition-transform brightness-125">{{
         reports.totalApplications ?? '0' }}</div>
       </div>
     </div>
 
     <div class="lg:col-span-2 celestial-card p-8 min-h-[300px]">
-      <div class="flex items-center justify-between mb-8">
+      <div class="flex items-center justify-between mb-6">
         <h3 class="text-xl font-bold text-text-primary">Detailed Metrics</h3>
         <span class="px-3 py-1 bg-royal-blue/10 text-royal-blue text-[10px] font-bold rounded-full uppercase">Real-time
           Data</span>
@@ -137,10 +137,10 @@
           <tbody class="divide-y divide-glass-border/50">
             @for (entry of reports | keyvalue; track entry.key) {
             <tr class="hover:bg-royal-blue/[0.02] transition-colors group">
-              <td class="py-4 text-sm font-semibold text-text-secondary group-hover:text-text-primary capitalize">
+              <td class="py-3 text-sm font-semibold text-text-secondary group-hover:text-text-primary capitalize">
                 {{ entry.key.replace(/([A-Z])/g, ' $1') }}
               </td>
-              <td class="py-4 text-base font-black text-text-primary text-right">{{ entry.value }}</td>
+              <td class="py-3 text-base font-black text-text-primary text-right">{{ entry.value }}</td>
             </tr>
             }
           </tbody>

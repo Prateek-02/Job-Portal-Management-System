@@ -25,8 +25,8 @@
   --font-display: 'Outfit', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  --radius-celestial: 40px;
-  --radius-inner: 24px;
+  --radius-celestial: 24px;
+  --radius-inner: 12px;
 
   --tracking-tight: -0.025em;
   --tracking-tighter: -0.05em;
@@ -107,12 +107,12 @@
   }
 
   h1 { 
-    font-size: clamp(3rem, 7vw, 4.5rem);
+    font-size: clamp(2.5rem, 6vw, 3.5rem);
     font-weight: 700;
     line-height: 1.1;
   }
   h2 { 
-    font-size: clamp(2.25rem, 5vw, 3rem);
+    font-size: clamp(1.85rem, 4vw, 2.5rem);
     font-weight: 700;
   }
 }
@@ -173,8 +173,8 @@
   }
 
   .celestial-card:hover {
-    transform: translateY(-8px) scale(1.01);
-    box-shadow: 0 30px 60px -12px var(--color-glass-shadow);
+    transform: translateY(-4px) scale(1.005);
+    box-shadow: 0 20px 40px -12px var(--color-glass-shadow);
     border-color: rgba(37, 99, 235, 0.3);
   }
 
@@ -195,8 +195,8 @@
   .btn-celestial {
     position: relative;
     overflow: hidden;
-    padding: 1rem 2rem;
-    border-radius: 20px;
+    padding: 0.75rem 1.75rem;
+    border-radius: 14px;
     font-weight: 700;
     color: #fff;
     display: inline-flex;
@@ -207,19 +207,19 @@
     cursor: pointer;
     border: none;
     background: var(--color-royal-blue);
-    box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.3);
+    box-shadow: 0 8px 16px -4px rgba(37, 99, 235, 0.3);
     text-decoration: none;
   }
 
   .btn-celestial:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 20px 30px -10px rgba(37, 99, 235, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 15px 25px -8px rgba(37, 99, 235, 0.5);
     background: #1D4ED8;
   }
 
   .btn-celestial-outline {
-    padding: 1rem 2rem;
-    border-radius: 20px;
+    padding: 0.75rem 1.75rem;
+    border-radius: 14px;
     font-weight: 700;
     border: 2px solid var(--color-royal-blue);
     color: var(--color-royal-blue);
@@ -238,12 +238,12 @@
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--input-border);
     color: var(--color-text-primary-val);
-    border-radius: 1rem;
-    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    padding: 0.75rem 1.25rem;
     outline: none;
     transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     font-family: 'Outfit', sans-serif;
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 
   .celestial-input:focus, .glass-input:focus {
