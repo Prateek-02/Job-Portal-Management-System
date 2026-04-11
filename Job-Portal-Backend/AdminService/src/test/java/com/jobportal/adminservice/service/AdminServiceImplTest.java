@@ -28,136 +28,136 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class AdminServiceImplTest {
 
-    @Mock
-    private AuthServiceClient authServiceClient;
+        @Mock
+        private AuthServiceClient authServiceClient;
 
-    @Mock
-    private JobServiceClient jobServiceClient;
+        @Mock
+        private JobServiceClient jobServiceClient;
 
-    @Mock
-    private ApplicationServiceClient applicationServiceClient;
+        @Mock
+        private ApplicationServiceClient applicationServiceClient;
 
-    @Mock
-    private UserDeleteProducer userDeleteProducer;
+        @Mock
+        private UserDeleteProducer userDeleteProducer;
 
-    @InjectMocks
-    private AdminServiceImpl adminService;
+        @InjectMocks
+        private AdminServiceImpl adminService;
 
-    private UserResponse jobSeeker;
-    private UserResponse recruiter;
-    private List<UserResponse> users;
-    private JobResponse jobResponse;
-    private PageResponse<JobResponse> jobPageResponse;
-    private PageResponse<UserResponse> userPageResponse;
+        private UserResponse jobSeeker;
+        private UserResponse recruiter;
+        private List<UserResponse> users;
+        private JobResponse jobResponse;
+        private PageResponse<JobResponse> jobPageResponse;
+        private PageResponse<UserResponse> userPageResponse;
 
-    private static final String INTERNAL_SECRET = "test-secret";
+        private static final String INTERNAL_SECRET = "test-secret";
 
-    @BeforeEach
-    void setUp() {
+        @BeforeEach
+        void setUp() {
 
-        ReflectionTestUtils.setField(
-                adminService,
-                "internalSecret",
-                INTERNAL_SECRET);
+                ReflectionTestUtils.setField(
+                                adminService,
+                                "internalSecret",
+                                INTERNAL_SECRET);
 
-        jobSeeker = new UserResponse();
-        jobSeeker.setId(1L);
-        jobSeeker.setRole("JOB_SEEKER");
+                jobSeeker = new UserResponse();
+                jobSeeker.setId(1L);
+                jobSeeker.setRole("JOB_SEEKER");
 
-        recruiter = new UserResponse();
-        recruiter.setId(2L);
-        recruiter.setRole("RECRUITER");
+                recruiter = new UserResponse();
+                recruiter.setId(2L);
+                recruiter.setRole("RECRUITER");
 
-        users = Arrays.asList(jobSeeker, recruiter);
+                users = Arrays.asList(jobSeeker, recruiter);
 
-        jobResponse = new JobResponse();
-        jobResponse.setId(1L);
+                jobResponse = new JobResponse();
+                jobResponse.setId(1L);
 
-        userPageResponse = new PageResponse<>();
-        userPageResponse.setContent(users);
-        userPageResponse.setTotalElements(users.size());
+                userPageResponse = new PageResponse<>();
+                userPageResponse.setContent(users);
+                userPageResponse.setTotalElements(users.size());
 
-        jobPageResponse = new PageResponse<>();
-        jobPageResponse.setTotalElements(5);
-    }
+                jobPageResponse = new PageResponse<>();
+                jobPageResponse.setTotalElements(5);
+        }
 
-    @Test
-    void getAllUsers_Success() {
-        when(authServiceClient.getAllUsers(anyString(), anyInt(), anyInt(), anyString(), anyString()))
-                .thenReturn(userPageResponse);
+        @Test
+        void getAllUsers_Success() {
+                when(authServiceClient.getAllUsers(anyString(), anyInt(), anyInt(), anyString(), anyString()))
+                                .thenReturn(userPageResponse);
 
-        PageResponse<UserResponse> response = adminService.getAllUsers(0, 10, "id", "desc");
+                PageResponse<UserResponse> response = adminService.getAllUsers(0, 10, "id", "desc");
 
-        assertThat(response.getContent()).hasSize(2);
+                assertThat(response.getContent()).hasSize(2);
 
-        verify(authServiceClient).getAllUsers(INTERNAL_SECRET, 0, 10, "id", "desc");
-    }
+                verify(authServiceClient).getAllUsers(INTERNAL_SECRET, 0, 10, "id", "desc");
+        }
 
-    @Test
-    void getUserById_Success() {
-        when(authServiceClient.getUserById(anyLong(), anyString()))
-                .thenReturn(jobSeeker);
+        @Test
+        void getUserById_Success() {
+                when(authServiceClient.getUserById(anyLong(), anyString()))
+                                .thenReturn(jobSeeker);
 
-        UserResponse response = adminService.getUserById(1L);
+                UserResponse response = adminService.getUserById(1L);
 
-        assertThat(response.getId()).isEqualTo(1L);
+                assertThat(response.getId()).isEqualTo(1L);
 
-        verify(authServiceClient).getUserById(1L, INTERNAL_SECRET);
-    }
+                verify(authServiceClient).getUserById(1L, INTERNAL_SECRET);
+        }
 
-    @Test
-    void deleteUser_SagaTriggered() {
-        when(authServiceClient.getUserById(anyLong(), anyString()))
-                .thenReturn(recruiter);
+        @Test
+        void deleteUser_SagaTriggered() {
+                when(authServiceClient.getUserById(anyLong(), anyString()))
+                                .thenReturn(recruiter);
 
-        adminService.deleteUser(2L);
+                adminService.deleteUser(2L);
 
-        verify(userDeleteProducer).startSaga(any(UserDeleteEvent.class));
-    }
+                verify(userDeleteProducer).startSaga(any(UserDeleteEvent.class));
+        }
 
-    @Test
-    void getAllJobs_Success() {
-        when(jobServiceClient.getAllJobs(anyInt(), anyInt(), anyString(), anyString()))
-                .thenReturn(jobPageResponse);
+        @Test
+        void getAllJobs_Success() {
+                when(jobServiceClient.getAllJobs(anyInt(), anyInt(), anyString(), anyString()))
+                                .thenReturn(jobPageResponse);
 
-        PageResponse<JobResponse> response = adminService.getAllJobs(0, 10, "createdAt", "desc");
+                PageResponse<JobResponse> response = adminService.getAllJobs(0, 10, "createdAt", "desc");
 
-        assertThat(response.getTotalElements()).isEqualTo(5);
+                assertThat(response.getTotalElements()).isEqualTo(5);
 
-        verify(jobServiceClient).getAllJobs(0, 10, "createdAt", "desc");
-    }
+                verify(jobServiceClient).getAllJobs(0, 10, "createdAt", "desc");
+        }
 
-    @Test
-    void getJobById_Success() {
-        when(jobServiceClient.getJobById(anyLong()))
-                .thenReturn(jobResponse);
+        @Test
+        void getJobById_Success() {
+                when(jobServiceClient.getJobById(anyLong()))
+                                .thenReturn(jobResponse);
 
-        JobResponse response = adminService.getJobById(1L);
+                JobResponse response = adminService.getJobById(1L);
 
-        assertThat(response.getId()).isEqualTo(1L);
+                assertThat(response.getId()).isEqualTo(1L);
 
-        verify(jobServiceClient).getJobById(1L);
-    }
+                verify(jobServiceClient).getJobById(1L);
+        }
 
-    @Test
-    void getReports_Success() {
-        when(authServiceClient.getAllUsers(anyString(), anyInt(), anyInt(), anyString(), anyString()))
-                .thenReturn(userPageResponse);
+        @Test
+        void getReports_Success() {
+                when(authServiceClient.getAllUsers(anyString(), anyInt(), anyInt(), anyString(), anyString()))
+                                .thenReturn(userPageResponse);
 
-        when(jobServiceClient.getAllJobs(anyInt(), anyInt(), anyString(), anyString()))
-                .thenReturn(jobPageResponse);
+                when(jobServiceClient.getAllJobs(anyInt(), anyInt(), anyString(), anyString()))
+                                .thenReturn(jobPageResponse);
 
-        when(applicationServiceClient.getTotalApplications())
-                .thenReturn(10L);
+                when(applicationServiceClient.getTotalApplications())
+                                .thenReturn(10L);
 
-        Map<String, Object> reports = adminService.getReports();
+                Map<String, Object> reports = adminService.getReports();
 
-        assertThat(reports.get("totalUsers")).isEqualTo(2L);
-        assertThat(reports.get("totalJobs")).isEqualTo(5L);
-        assertThat(reports.get("totalApplications")).isEqualTo(10L);
+                assertThat(reports.get("totalUsers")).isEqualTo(2L);
+                assertThat(reports.get("totalJobs")).isEqualTo(5L);
+                assertThat(reports.get("totalApplications")).isEqualTo(10L);
 
-        verify(authServiceClient).getAllUsers(eq(INTERNAL_SECRET), eq(0), eq(1000), eq("id"), eq("desc"));
-        verify(jobServiceClient).getAllJobs(eq(0), eq(1000), eq("createdAt"), eq("desc"));
-        verify(applicationServiceClient).getTotalApplications();
-    }
+                verify(authServiceClient).getAllUsers(eq(INTERNAL_SECRET), eq(0), eq(1000), eq("id"), eq("desc"));
+                verify(jobServiceClient).getAllJobs(eq(0), eq(1000), eq("createdAt"), eq("desc"));
+                verify(applicationServiceClient).getTotalApplications();
+        }
 }

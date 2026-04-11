@@ -64,19 +64,14 @@ public class JwtUtil {
     // Validate token
     public boolean validateToken(String token, String email) {
         try {
-            String extractedEmail = extractEmail(token);
-            return extractedEmail.equals(email)
-                    && !isTokenExpired(token);
+            Claims claims = getClaims(token);
+            String subject = claims.getSubject();
+            if (email == null) return false;
+            if (!email.equals(subject)) return false;
+            return claims.getExpiration().after(new Date());
         } catch (Exception e) {
             return false;
         }
-    }
-
-    // Check if token is expired
-    private boolean isTokenExpired(String token) {
-        return getClaims(token)
-                .getExpiration()
-                .before(new Date());
     }
 
     // Get all claims from token

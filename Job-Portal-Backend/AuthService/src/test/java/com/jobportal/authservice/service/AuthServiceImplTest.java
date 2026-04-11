@@ -1,15 +1,12 @@
 package com.jobportal.authservice.service;
 
-import com.jobportal.authservice.dto.request.LoginRequest;
-import com.jobportal.authservice.dto.request.RegisterRequest;
+import com.jobportal.authservice.dto.request.*;
 import com.jobportal.authservice.dto.response.LoginResponse;
 import com.jobportal.authservice.dto.response.RegisterResponse;
+import com.jobportal.authservice.dto.response.UserResponse;
 import com.jobportal.authservice.entity.User;
 import com.jobportal.authservice.enums.UserRole;
-import com.jobportal.authservice.exception.DuplicateEmailException;
-import com.jobportal.authservice.exception.InvalidCredentialsException;
-import com.jobportal.authservice.exception.UnauthorizedException;
-import com.jobportal.authservice.exception.UserNotFoundException;
+import com.jobportal.authservice.exception.*;
 import com.jobportal.authservice.repository.UserRepository;
 import com.jobportal.authservice.security.JwtUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +17,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -30,329 +34,341 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class AuthServiceImplTest {
 
-        // Mocks — fake versions of dependencies
-        @Mock
-        private UserRepository userRepository;
+    @Mock
+    private UserRepository userRepository;
 
-        @Mock
-        private PasswordEncoder passwordEncoder;
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
-        @Mock
-        private JwtUtil jwtUtil;
+    @Mock
+    private JwtUtil jwtUtil;
 
-        @Mock
-        private ModelMapper modelMapper;
+    @Mock
+    private ModelMapper modelMapper;
 
-        // InjectMocks — class we are testing
-        @InjectMocks
-        private AuthServiceImpl authService;
+    @Mock
+    private EmailService emailService;
 
-        // Test Data — setup before each test
-        private RegisterRequest registerRequest;
-        private LoginRequest loginRequest;
-        private User user;
+    @Mock
+    private CloudinaryService cloudinaryService;
 
-        @BeforeEach
-        void setUp() {
+    @InjectMocks
+    private AuthServiceImpl authService;
 
-                // Register request
-                registerRequest = new RegisterRequest();
-                registerRequest.setName("Priya Singh");
-                registerRequest.setEmail("priya@gmail.com");
-                registerRequest.setPassword("priya123");
-                registerRequest.setPhone("9876543210");
-                registerRequest.setRole(UserRole.JOB_SEEKER);
+    private User user;
 
-                // Login request
-                loginRequest = new LoginRequest();
-                loginRequest.setEmail("priya@gmail.com");
-                loginRequest.setPassword("priya123");
+    @BeforeEach
+    void setUp() {
+        user = new User();
+        user.setId(1L);
+        user.setName("Priya");
+        user.setEmail("priya@gmail.com");
+        user.setPassword("hashed");
+        user.setRole(UserRole.JOB_SEEKER);
+        user.setPhone("1234567890");
+        user.setBio("Bio");
+        user.setLocation("Loc");
+        user.setSkills("Skills");
+    }
 
-                // User object
-                user = new User();
-                user.setId(1L);
-                user.setName("Priya Singh");
-                user.setEmail("priya@gmail.com");
-                user.setPassword("hashedPassword");
-                user.setRole(UserRole.JOB_SEEKER);
-                user.setPhone("9876543210");
-        }
+    @Test
+    void register_Success() {
+        RegisterRequest request = new RegisterRequest();
+        request.setName("Priya");
+        request.setEmail("priya@gmail.com");
+        request.setPassword("pass");
+        request.setRole(UserRole.JOB_SEEKER);
 
-        // REGISTER TESTS
+        when(userRepository.existsByEmail(anyString())).thenReturn(false);
+        when(passwordEncoder.encode(anyString())).thenReturn("hashed");
+        when(userRepository.save(any(User.class))).thenReturn(user);
 
-        @Test
-        void register_Success() {
-                // Arrange
-                when(userRepository.existsByEmail(anyString()))
-                                .thenReturn(false);
-                when(passwordEncoder.encode(anyString()))
-                                .thenReturn("hashedPassword");
-                when(userRepository.save(any(User.class)))
-                                .thenReturn(user);
+        RegisterResponse response = authService.register(request);
+        assertThat(response.getUserId()).isEqualTo(1L);
+    }
 
-                // Act
-                RegisterResponse response = authService.register(registerRequest);
+    @Test
+    void register_DuplicateEmail_ThrowsException() {
+        RegisterRequest request = new RegisterRequest();
+        request.setEmail("priya@gmail.com");
+        when(userRepository.existsByEmail(anyString())).thenReturn(true);
+        assertThatThrownBy(() -> authService.register(request)).isInstanceOf(DuplicateEmailException.class);
+    }
 
-                // Assert
-                assertThat(response).isNotNull();
-                assertThat(response.getUserId())
-                                .isEqualTo(1L);
-                assertThat(response.getEmail())
-                                .isEqualTo("priya@gmail.com");
-                assertThat(response.getRole())
-                                .isEqualTo(UserRole.JOB_SEEKER);
-                assertThat(response.getMessage())
-                                .isEqualTo("Registration successful!");
+    @Test
+    void register_Admin_ThrowsException() {
+        RegisterRequest request = new RegisterRequest();
+        request.setRole(UserRole.ADMIN);
+        assertThatThrownBy(() -> authService.register(request)).isInstanceOf(UnauthorizedException.class);
+    }
 
-                // Verify save was called once
-                verify(userRepository, times(1))
-                                .save(any(User.class));
-                verify(jwtUtil, never())
-                                .generateToken(anyString(),
-                                                anyLong(), anyString());
-        }
+    @Test
+    void login_Success() {
+        LoginRequest request = new LoginRequest();
+        request.setEmail("priya@gmail.com");
+        request.setPassword("pass");
 
-        @Test
-        void register_DuplicateEmail_ThrowsException() {
-                // Arrange
-                when(userRepository.existsByEmail(anyString()))
-                                .thenReturn(true);
+        when(userRepository.findByEmail("priya@gmail.com")).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("pass", "hashed")).thenReturn(true);
+        when(jwtUtil.generateToken(anyString(), anyLong(), anyString())).thenReturn("at");
+        when(jwtUtil.generateRefreshToken(anyString())).thenReturn("rt");
 
-                // Act & Assert
-                assertThatThrownBy(() -> authService.register(registerRequest))
-                                .isInstanceOf(DuplicateEmailException.class)
-                                .hasMessageContaining(
-                                                "Email already registered");
+        LoginResponse response = authService.login(request);
+        assertThat(response.getAccessToken()).isEqualTo("at");
+    }
 
-                // Verify save was never called
-                verify(userRepository, never())
-                                .save(any(User.class));
-        }
+    @Test
+    void login_UserNotFound_ThrowsException() {
+        LoginRequest request = new LoginRequest();
+        request.setEmail("priya@gmail.com");
+        when(userRepository.findByEmail("priya@gmail.com")).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> authService.login(request)).isInstanceOf(UserNotFoundException.class);
+    }
 
-        @Test
-        void register_AsAdmin_ThrowsException() {
-                // Arrange
-                registerRequest.setRole(UserRole.ADMIN);
+    @Test
+    void login_WrongPassword_ThrowsException() {
+        LoginRequest request = new LoginRequest();
+        request.setEmail("priya@gmail.com");
+        request.setPassword("wrong");
 
-                // Act & Assert
-                assertThatThrownBy(() -> authService.register(registerRequest))
-                                .isInstanceOf(UnauthorizedException.class)
-                                .hasMessageContaining(
-                                                "Admin registration is not allowed!");
+        when(userRepository.findByEmail("priya@gmail.com")).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("wrong", "hashed")).thenReturn(false);
+        assertThatThrownBy(() -> authService.login(request)).isInstanceOf(InvalidCredentialsException.class);
+    }
 
-                // Verify save was never called
-                verify(userRepository, never())
-                                .save(any(User.class));
-        }
+    @Test
+    void refreshToken_Success() {
+        RefreshTokenRequest request = new RefreshTokenRequest();
+        request.setRefreshToken("rt");
 
-        // LOGIN TESTS
+        when(jwtUtil.extractEmail("rt")).thenReturn("priya@gmail.com");
+        when(jwtUtil.validateToken("rt", "priya@gmail.com")).thenReturn(true);
+        when(userRepository.findByEmail("priya@gmail.com")).thenReturn(Optional.of(user));
+        when(jwtUtil.generateToken(anyString(), anyLong(), anyString())).thenReturn("nat");
+        when(jwtUtil.generateRefreshToken(anyString())).thenReturn("nrt");
 
-        @Test
-        void login_Success() {
-                // Arrange
-                when(userRepository.findByEmail(anyString()))
-                                .thenReturn(Optional.of(user));
-                when(passwordEncoder.matches(anyString(), anyString()))
-                                .thenReturn(true);
-                when(jwtUtil.generateToken(anyString(),
-                                anyLong(), anyString()))
-                                .thenReturn("mockToken");
+        LoginResponse response = authService.refreshToken(request);
+        assertThat(response.getAccessToken()).isEqualTo("nat");
+    }
 
-                // Act
-                LoginResponse response = authService.login(loginRequest);
+    @Test
+    void refreshToken_Invalid_ThrowsException() {
+        RefreshTokenRequest request = new RefreshTokenRequest();
+        request.setRefreshToken("bad");
+        when(jwtUtil.extractEmail("bad")).thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> authService.refreshToken(request)).isInstanceOf(UnauthorizedException.class);
+    }
 
-                // Assert
-                assertThat(response).isNotNull();
-                assertThat(response.getUserId())
-                                .isEqualTo(1L);
-                assertThat(response.getEmail())
-                                .isEqualTo("priya@gmail.com");
-                assertThat(response.getMessage())
-                                .isEqualTo("Login successful!");
+    @Test
+    void refreshToken_ValidationFails_ThrowsException() {
+        RefreshTokenRequest request = new RefreshTokenRequest();
+        request.setRefreshToken("rt");
+        when(jwtUtil.extractEmail("rt")).thenReturn("e");
+        when(jwtUtil.validateToken("rt", "e")).thenReturn(false);
+        assertThatThrownBy(() -> authService.refreshToken(request)).isInstanceOf(UnauthorizedException.class);
+    }
 
-                // Verify token was generated
-                verify(jwtUtil, times(1))
-                                .generateToken(anyString(),
-                                                anyLong(), anyString());
-        }
+    @Test
+    void refreshToken_UserNotFound_ThrowsException() {
+        RefreshTokenRequest request = new RefreshTokenRequest();
+        request.setRefreshToken("rt");
+        when(jwtUtil.extractEmail("rt")).thenReturn("e");
+        when(jwtUtil.validateToken("rt", "e")).thenReturn(true);
+        when(userRepository.findByEmail("e")).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> authService.refreshToken(request)).isInstanceOf(UnauthorizedException.class);
+    }
 
-        @Test
-        void login_UserNotFound_ThrowsException() {
-                // Arrange
-                when(userRepository.findByEmail(anyString()))
-                                .thenReturn(Optional.empty());
+    @Test
+    void uploadProfileImage_Success() throws IOException {
+        MultipartFile file = mock(MultipartFile.class);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(cloudinaryService.uploadProfileImage(file)).thenReturn("url");
+        when(userRepository.save(any(User.class))).thenReturn(user);
+        when(modelMapper.map(any(), any())).thenReturn(new UserResponse());
 
-                // Act & Assert
-                assertThatThrownBy(() -> authService.login(loginRequest))
-                                .isInstanceOf(UserNotFoundException.class)
-                                .hasMessageContaining(
-                                                "User not found with email");
+        authService.uploadProfileImage(1L, file);
+        verify(userRepository).save(any());
+    }
 
-                // Verify token was never generated
-                verify(jwtUtil, never())
-                                .generateToken(anyString(),
-                                                anyLong(), anyString());
-        }
+    @Test
+    void uploadProfileImage_UserNotFound_ThrowsException() throws IOException {
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.getOriginalFilename()).thenReturn("test.jpg");
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> authService.uploadProfileImage(1L, file)).isInstanceOf(UserNotFoundException.class);
+    }
 
-        @Test
-        void login_WrongPassword_ThrowsException() {
-                // Arrange
-                when(userRepository.findByEmail(anyString()))
-                                .thenReturn(Optional.of(user));
-                when(passwordEncoder.matches(anyString(), anyString()))
-                                .thenReturn(false);
+    @Test
+    void updateProfile_AllFields_Success() {
+        UpdateProfileRequest request = new UpdateProfileRequest();
+        request.setName("N");
+        request.setPhone("P");
+        request.setBio("B");
+        request.setLocation("L");
+        request.setSkills("S");
 
-                // Act & Assert
-                assertThatThrownBy(() -> authService.login(loginRequest))
-                                .isInstanceOf(InvalidCredentialsException.class)
-                                .hasMessageContaining(
-                                                "Invalid email or password");
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenReturn(user);
+        when(modelMapper.map(any(), any())).thenReturn(new UserResponse());
 
-                // Verify token was never generated
-                verify(jwtUtil, never())
-                                .generateToken(anyString(),
-                                                anyLong(), anyString());
-        }
+        authService.updateProfile(1L, request);
+        verify(userRepository).save(argThat(u -> 
+            u.getName().equals("N") && u.getPhone().equals("P") && u.getBio().equals("B") && 
+            u.getLocation().equals("L") && u.getSkills().equals("S")
+        ));
+    }
 
-        // DELETE USER TESTS
+    @Test
+    void updateProfile_Partial_Success() {
+        UpdateProfileRequest request = new UpdateProfileRequest();
+        request.setPhone("999");
 
-        @Test
-        void deleteUser_Success() {
-                // Arrange
-                when(userRepository.findById(anyLong()))
-                                .thenReturn(Optional.of(user));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenReturn(user);
+        when(modelMapper.map(any(), any())).thenReturn(new UserResponse());
 
-                // Act
-                authService.deleteUser(1L);
+        authService.updateProfile(1L, request);
+        verify(userRepository).save(argThat(u -> u.getName().equals("Priya") && u.getPhone().equals("999")));
+    }
 
-                // Verify delete was called
-                verify(userRepository, times(1))
-                                .delete(any(User.class));
-        }
+    @Test
+    void updateProfile_UserNotFound_ThrowsException() {
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> authService.updateProfile(1L, new UpdateProfileRequest())).isInstanceOf(UserNotFoundException.class);
+    }
 
-        @Test
-        void deleteUser_NotFound_ThrowsException() {
-                // Arrange
-                when(userRepository.findById(anyLong()))
-                                .thenReturn(Optional.empty());
+    @Test
+    void getAllUsers_Desc_Success() {
+        Page<User> page = new PageImpl<>(List.of(user));
+        when(userRepository.findAll(any(Pageable.class))).thenReturn(page);
+        when(modelMapper.map(any(), any())).thenReturn(new UserResponse());
 
-                // Act & Assert
-                assertThatThrownBy(() -> authService.deleteUser(1L))
-                                .isInstanceOf(UserNotFoundException.class)
-                                .hasMessageContaining(
-                                                "User not found with id");
+        authService.getAllUsers(0, 10, "id", "desc");
+        verify(userRepository).findAll(any(Pageable.class));
+    }
 
-                // Verify delete was never called
-                verify(userRepository, never())
-                                .delete(any(User.class));
-        }
+    @Test
+    void getAllUsers_Asc_Success() {
+        Page<User> page = new PageImpl<>(List.of(user));
+        when(userRepository.findAll(any(Pageable.class))).thenReturn(page);
+        when(modelMapper.map(any(), any())).thenReturn(new UserResponse());
 
-        // GET USER BY ID TESTS
+        authService.getAllUsers(0, 10, "id", "asc");
+        verify(userRepository).findAll(any(Pageable.class));
+    }
 
-        @Test
-        void getUserById_Success() {
-                // Arrange
-                com.jobportal.authservice.dto.response.UserResponse userResponse = new com.jobportal.authservice.dto.response.UserResponse();
-                userResponse.setId(1L);
-                userResponse.setEmail("priya@gmail.com");
+    @Test
+    void getUserById_Success() {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(modelMapper.map(any(), any())).thenReturn(new UserResponse());
+        authService.getUserById(1L);
+    }
 
-                when(userRepository.findById(anyLong()))
-                                .thenReturn(Optional.of(user));
-                when(modelMapper.map(any(User.class),
-                                eq(com.jobportal.authservice.dto.response.UserResponse.class)))
-                                .thenReturn(userResponse);
+    @Test
+    void getUserById_NotFound_ThrowsException() {
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> authService.getUserById(1L)).isInstanceOf(UserNotFoundException.class);
+    }
 
-                // Act
-                com.jobportal.authservice.dto.response.UserResponse response = authService.getUserById(1L);
+    @Test
+    void deleteUser_Success() {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        authService.deleteUser(1L);
+        verify(userRepository).delete(any());
+    }
 
-                // Assert
-                assertThat(response).isNotNull();
-                assertThat(response.getId()).isEqualTo(1L);
-                assertThat(response.getEmail()).isEqualTo("priya@gmail.com");
-        }
+    @Test
+    void deleteUser_NotFound_ThrowsException() {
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> authService.deleteUser(1L)).isInstanceOf(UserNotFoundException.class);
+    }
 
-        @Test
-        void getUserById_NotFound_ThrowsException() {
-                // Arrange
-                when(userRepository.findById(anyLong()))
-                                .thenReturn(Optional.empty());
+    @Test
+    void forgotPassword_Success() {
+        ForgotPasswordRequest request = new ForgotPasswordRequest();
+        request.setEmail("priya@gmail.com");
+        when(userRepository.findByEmail("priya@gmail.com")).thenReturn(Optional.of(user));
+        authService.forgotPassword(request);
+        verify(userRepository).save(any());
+    }
 
-                // Act & Assert
-                assertThatThrownBy(() -> authService.getUserById(999L))
-                                .isInstanceOf(UserNotFoundException.class);
-        }
+    @Test
+    void forgotPassword_NotFound_ThrowsException() {
+        ForgotPasswordRequest request = new ForgotPasswordRequest();
+        request.setEmail("priya@gmail.com");
+        when(userRepository.findByEmail("priya@gmail.com")).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> authService.forgotPassword(request)).isInstanceOf(UserNotFoundException.class);
+    }
 
-        // UPDATE PROFILE TESTS
+    @Test
+    void resetPassword_UserNotFound_ThrowsException() {
+        ResetPasswordRequest request = new ResetPasswordRequest();
+        request.setEmail("priya@gmail.com");
+        when(userRepository.findByEmail("priya@gmail.com")).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> authService.resetPassword(request)).isInstanceOf(UserNotFoundException.class);
+    }
 
-        @Test
-        void updateProfile_Success() {
-                // Arrange
-                com.jobportal.authservice.dto.request.UpdateProfileRequest updateRequest = new com.jobportal.authservice.dto.request.UpdateProfileRequest();
-                updateRequest.setName("Updated Name");
-                updateRequest.setPhone("9999999999");
-                updateRequest.setBio("Updated bio");
-                updateRequest.setLocation("Mumbai");
+    @Test
+    void resetPassword_Success() {
+        user.setResetToken("123456");
+        user.setResetTokenExpiry(LocalDateTime.now().plusMinutes(5));
+        ResetPasswordRequest request = new ResetPasswordRequest();
+        request.setEmail("priya@gmail.com");
+        request.setOtp("123456");
+        request.setNewPassword("np");
 
-                com.jobportal.authservice.dto.response.UserResponse userResponse = new com.jobportal.authservice.dto.response.UserResponse();
-                userResponse.setId(1L);
-                userResponse.setName("Updated Name");
+        when(userRepository.findByEmail("priya@gmail.com")).thenReturn(Optional.of(user));
+        when(passwordEncoder.encode(anyString())).thenReturn("enp");
 
-                when(userRepository.findById(anyLong()))
-                                .thenReturn(Optional.of(user));
-                when(userRepository.save(any(User.class)))
-                                .thenReturn(user);
-                when(modelMapper.map(any(User.class),
-                                eq(com.jobportal.authservice.dto.response.UserResponse.class)))
-                                .thenReturn(userResponse);
+        authService.resetPassword(request);
+        verify(userRepository).save(any());
+    }
 
-                // Act
-                com.jobportal.authservice.dto.response.UserResponse response = authService.updateProfile(1L,
-                                updateRequest);
+    @Test
+    void resetPassword_InvalidOtp_ThrowsException() {
+        user.setResetToken("1");
+        ResetPasswordRequest request = new ResetPasswordRequest();
+        request.setEmail("priya@gmail.com");
+        request.setOtp("2");
+        when(userRepository.findByEmail("priya@gmail.com")).thenReturn(Optional.of(user));
+        assertThatThrownBy(() -> authService.resetPassword(request)).isInstanceOf(UnauthorizedException.class);
+    }
 
-                // Assert
-                assertThat(response).isNotNull();
-                verify(userRepository, times(1)).save(any(User.class));
-        }
+    @Test
+    void resetPassword_Expired_ThrowsException() {
+        user.setResetToken("123456");
+        user.setResetTokenExpiry(LocalDateTime.now().minusMinutes(1));
+        ResetPasswordRequest request = new ResetPasswordRequest();
+        request.setEmail("priya@gmail.com");
+        request.setOtp("123456");
+        when(userRepository.findByEmail("priya@gmail.com")).thenReturn(Optional.of(user));
+        assertThatThrownBy(() -> authService.resetPassword(request)).isInstanceOf(UnauthorizedException.class);
+    }
 
-        @Test
-        void updateProfile_UserNotFound_ThrowsException() {
-                // Arrange
-                com.jobportal.authservice.dto.request.UpdateProfileRequest updateRequest = new com.jobportal.authservice.dto.request.UpdateProfileRequest();
+    @Test
+    void resetPassword_NullToken_ThrowsException() {
+        user.setResetToken(null);
+        ResetPasswordRequest request = new ResetPasswordRequest();
+        request.setEmail("priya@gmail.com");
+        request.setOtp("123456");
+        when(userRepository.findByEmail("priya@gmail.com")).thenReturn(Optional.of(user));
+        assertThatThrownBy(() -> authService.resetPassword(request)).isInstanceOf(UnauthorizedException.class);
+    }
 
-                when(userRepository.findById(anyLong()))
-                                .thenReturn(Optional.empty());
+    @Test
+    void updateProfile_MinimalFields_Success() {
+        UpdateProfileRequest request = new UpdateProfileRequest();
+        // All fields null
 
-                // Act & Assert
-                assertThatThrownBy(() -> authService.updateProfile(1L, updateRequest))
-                                .isInstanceOf(UserNotFoundException.class);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenReturn(user);
+        when(modelMapper.map(any(), any())).thenReturn(new UserResponse());
 
-                // Verify save was never called
-                verify(userRepository, never()).save(any(User.class));
-        }
-
-        // GET ALL USERS TESTS
-
-        @Test
-        void getAllUsers_Success() {
-                // Arrange
-                java.util.List<User> users = java.util.List.of(user);
-                com.jobportal.authservice.dto.response.UserResponse userResponse = new com.jobportal.authservice.dto.response.UserResponse();
-
-                org.springframework.data.domain.Page<User> pageData = new org.springframework.data.domain.PageImpl<>(users);
-
-                when(userRepository.findAll(any(org.springframework.data.domain.Pageable.class)))
-                                .thenReturn(pageData);
-                when(modelMapper.map(any(User.class),
-                                eq(com.jobportal.authservice.dto.response.UserResponse.class)))
-                                .thenReturn(userResponse);
-
-                // Act
-                com.jobportal.authservice.dto.response.PageResponse<com.jobportal.authservice.dto.response.UserResponse> response = authService
-                                .getAllUsers(0, 10, "id", "desc");
-
-                // Assert
-                assertThat(response).isNotNull();
-                assertThat(response.getContent().size()).isEqualTo(1);
-                verify(userRepository, times(1)).findAll(any(org.springframework.data.domain.Pageable.class));
-        }
+        authService.updateProfile(1L, request);
+        verify(userRepository).save(argThat(u -> 
+            u.getName().equals("Priya") && u.getPhone().equals("1234567890") && 
+            u.getBio().equals("Bio") && u.getLocation().equals("Loc") && 
+            u.getSkills().equals("Skills")
+        ));
+    }
 }

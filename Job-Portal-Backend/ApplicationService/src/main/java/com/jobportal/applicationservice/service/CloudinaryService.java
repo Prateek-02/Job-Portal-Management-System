@@ -46,7 +46,14 @@ public class CloudinaryService {
         	);
 
             
-            return uploadResult.get("secure_url").toString();
+            Object url = uploadResult.get("secure_url");
+            if (url == null) {
+                url = uploadResult.get("url");
+            }
+            if (url == null) {
+                throw new RuntimeException("No URL returned from Cloudinary");
+            }
+            return url.toString();
 
         } 
         catch (Exception e) {

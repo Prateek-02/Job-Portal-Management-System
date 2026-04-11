@@ -203,7 +203,7 @@ class ApplicationControllerTest {
                         .param("jobId", "1")
                         .header("X-User-Id", 1L)
                         .header("X-User-Role", "JOB_SEEKER"))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isConflict());
     }
 
     @Test
@@ -231,5 +231,30 @@ class ApplicationControllerTest {
                         .header("X-User-Id", 2L)
                         .header("X-User-Role", "RECRUITER"))
                 .andExpect(status().isForbidden());
+    }
+
+    // GET ALL RECRUITER APPLICATIONS
+    @Test
+    void testGetAllApplicationsForRecruiter() throws Exception {
+        JobApplicationResponse jobAppResp = new JobApplicationResponse();
+        jobAppResp.setId(1L);
+
+        com.jobportal.applicationservice.dto.response.PageResponse<JobApplicationResponse> pageResponse
+                = new com.jobportal.applicationservice.dto.response.PageResponse<>();
+        pageResponse.setContent(List.of(jobAppResp));
+
+        when(service.getAllApplicationsForRecruiter(
+                eq(1L), eq("RECRUITER"),
+                org.mockito.ArgumentMatchers.anyInt(),
+                org.mockito.ArgumentMatchers.anyInt(),
+                org.mockito.ArgumentMatchers.anyString(),
+                org.mockito.ArgumentMatchers.anyString()))
+                .thenReturn(pageResponse);
+
+        mockMvc.perform(get("/api/applications/recruiter")
+                        .header("X-User-Id", 1L)
+                        .header("X-User-Role", "RECRUITER"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value(1));
     }
 }

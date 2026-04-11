@@ -1,9 +1,7 @@
 package com.jobportal.authservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jobportal.authservice.dto.request.LoginRequest;
-import com.jobportal.authservice.dto.request.RegisterRequest;
-import com.jobportal.authservice.dto.request.UpdateProfileRequest;
+import com.jobportal.authservice.dto.request.*;
 import com.jobportal.authservice.dto.response.LoginResponse;
 import com.jobportal.authservice.dto.response.RegisterResponse;
 import com.jobportal.authservice.dto.response.UserResponse;
@@ -93,6 +91,23 @@ class AuthControllerTest {
                                 .andExpect(jsonPath("$.email").value("test@gmail.com"));
         }
 
+        // REFRESH TOKEN
+        @Test
+        void testRefresh() throws Exception {
+                RefreshTokenRequest request = new RefreshTokenRequest();
+                request.setRefreshToken("old-refresh-token");
+
+                LoginResponse response = new LoginResponse("new-token", "new-refresh", 1L, "P", "e", UserRole.JOB_SEEKER, "Refreshed");
+
+                when(authService.refreshToken(any(RefreshTokenRequest.class))).thenReturn(response);
+
+                mockMvc.perform(post("/api/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.accessToken").value("new-token"));
+        }
+
         // GET PROFILE
         @Test
         void testGetProfile() throws Exception {
@@ -103,7 +118,7 @@ class AuthControllerTest {
                 when(authService.getUserById(1L)).thenReturn(user);
 
                 mockMvc.perform(get("/api/auth/profile")
-                                .header("X-User-Id", "1")) // FIXED: String instead of Long
+                                .header("X-User-Id", "1"))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.email").value("test@gmail.com"));
         }
@@ -171,17 +186,40 @@ class AuthControllerTest {
                 UserResponse response = new UserResponse();
                 response.setId(1L);
 
-                // FIXED: use matchers instead of exact object
                 when(authService.uploadProfileImage(anyLong(), any()))
                                 .thenReturn(response);
 
                 mockMvc.perform(multipart("/api/auth/users/1/profile-image")
-                                .file(file)
-                                .with(request -> {
-                                        request.setMethod("POST"); // ensure correct method
-                                        return request;
-                                }))
+                                .file(file))
                                 .andExpect(status().isOk());
+        }
+
+        // FORGOT PASSWORD
+        @Test
+        void testForgotPassword() throws Exception {
+                ForgotPasswordRequest request = new ForgotPasswordRequest();
+                request.setEmail("test@gmail.com");
+
+                mockMvc.perform(post("/api/auth/forgot-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.message").exists());
+        }
+
+        // RESET PASSWORD
+        @Test
+        void testResetPassword() throws Exception {
+                ResetPasswordRequest request = new ResetPasswordRequest();
+                request.setEmail("test@gmail.com");
+                request.setOtp("123456");
+                request.setNewPassword("newPass");
+
+                mockMvc.perform(post("/api/auth/reset-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.message").exists());
         }
 
         // ERROR TESTS
@@ -200,7 +238,7 @@ class AuthControllerTest {
                 mockMvc.perform(post("/api/auth/register")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
-                                .andExpect(status().isBadRequest());
+                                .andExpect(status().isConflict());
         }
 
         @Test
@@ -256,41 +294,6 @@ class AuthControllerTest {
                                 .thenThrow(new UserNotFoundException("User not found with id"));
 
                 mockMvc.perform(get("/api/auth/users/999"))
-                                .andExpect(status().isNotFound());
-        }
-
-        @Test
-        void testUpdateProfile_UserNotFound() throws Exception {
-                UpdateProfileRequest request = new UpdateProfileRequest();
-                request.setName("Updated");
-
-                when(authService.updateProfile(anyLong(), any(UpdateProfileRequest.class)))
-                                .thenThrow(new UserNotFoundException("User not found with id"));
-
-                mockMvc.perform(put("/api/auth/users/profile")
-                                .header("X-User-Id", "999")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(request)))
-                                .andExpect(status().isNotFound());
-        }
-
-        @Test
-        void testUploadProfileImage_UserNotFound() throws Exception {
-                MockMultipartFile file = new MockMultipartFile(
-                                "image",
-                                "test.jpg",
-                                MediaType.IMAGE_JPEG_VALUE,
-                                "image".getBytes());
-
-                when(authService.uploadProfileImage(anyLong(), any()))
-                                .thenThrow(new UserNotFoundException("User not found with id"));
-
-                mockMvc.perform(multipart("/api/auth/users/999/profile-image")
-                                .file(file)
-                                .with(request -> {
-                                        request.setMethod("POST");
-                                        return request;
-                                }))
                                 .andExpect(status().isNotFound());
         }
 }

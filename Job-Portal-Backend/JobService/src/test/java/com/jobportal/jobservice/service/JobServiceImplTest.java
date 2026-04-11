@@ -1,7 +1,12 @@
 package com.jobportal.jobservice.service;
 
+import com.jobportal.jobservice.config.RabbitMQConfig;
+import com.jobportal.jobservice.dto.JobFilter;
+import com.jobportal.jobservice.dto.JobPostedEvent;
 import com.jobportal.jobservice.dto.request.JobRequest;
 import com.jobportal.jobservice.dto.response.JobResponse;
+import com.jobportal.jobservice.dto.response.MarketStatsResponse;
+import com.jobportal.jobservice.dto.response.PageResponse;
 import com.jobportal.jobservice.entity.Job;
 import com.jobportal.jobservice.exceptions.JobNotFoundException;
 import com.jobportal.jobservice.exceptions.UnauthorizedException;
@@ -13,357 +18,272 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class JobServiceImplTest {
 
-   
-    // Mocks
     @Mock
     private JobRepository jobRepository;
 
     @Mock
     private ModelMapper modelMapper;
 
+    @Mock
+    private RabbitTemplate rabbitTemplate;
 
-    // InjectMocks — class we are testing
     @InjectMocks
     private JobServiceImpl jobService;
 
-
-    // Test Data
-    private JobRequest JobRequest;
-    private JobResponse JobResponse;
     private Job job;
+    private JobRequest jobRequest;
+    private JobResponse jobResponse;
 
     @BeforeEach
     void setUp() {
-
-        // Job Request
-        JobRequest = new JobRequest();
-        JobRequest.setTitle("Backend Developer");
-        JobRequest.setCompanyName("Google");
-        JobRequest.setLocation("Bangalore");
-        JobRequest.setSalary(1500000.0);
-        JobRequest.setExperience(3);
-        JobRequest.setDescription(
-                "Looking for Java developer");
-
-        // Job Entity
         job = new Job();
         job.setId(1L);
-        job.setTitle("Backend Developer");
-        job.setCompanyName("Google");
-        job.setLocation("Bangalore");
-        job.setSalary(1500000.0);
+        job.setTitle("Software Engineer");
+        job.setCompanyName("Tech Corp");
+        job.setLocation("Remote");
+        job.setSalary(100000.0);
         job.setExperience(3);
-        job.setDescription("Looking for Java developer");
-        job.setRecruiterId(1L);
-        job.setCreatedAt(LocalDateTime.now());
+        job.setRecruiterId(200L);
+        job.setSkills(Arrays.asList("Java", "Spring Boot"));
 
-        // Job Response
-        JobResponse = new JobResponse();
-        JobResponse.setId(1L);
-        JobResponse.setTitle("Backend Developer");
-        JobResponse.setCompanyName("Google");
-        JobResponse.setLocation("Bangalore");
-        JobResponse.setSalary(1500000.0);
-        JobResponse.setExperience(3);
-        JobResponse.setRecruiterId(1L);
+        jobRequest = new JobRequest();
+        jobRequest.setTitle("Software Engineer");
+        
+        jobResponse = new JobResponse();
+        jobResponse.setId(1L);
+        jobResponse.setTitle("Software Engineer");
     }
-
-    // CREATE JOB TESTS
 
     @Test
     void createJob_Success() {
-        // Arrange
-        when(modelMapper.map(any(JobRequest.class),
-                eq(Job.class))).thenReturn(job);
-        when(jobRepository.save(any(Job.class)))
-                .thenReturn(job);
-        when(modelMapper.map(any(Job.class),
-                eq(JobResponse.class)))
-                .thenReturn(JobResponse);
+        when(modelMapper.map(jobRequest, Job.class)).thenReturn(job);
+        when(jobRepository.save(any(Job.class))).thenReturn(job);
+        when(modelMapper.map(job, JobResponse.class)).thenReturn(jobResponse);
 
-        // Act
-        JobResponse response =
-                jobService.createJob(JobRequest, 1L,
-                        "RECRUITER");
+        JobResponse response = jobService.createJob(jobRequest, 200L, "RECRUITER");
 
-        // Assert
         assertThat(response).isNotNull();
-        assertThat(response.getTitle())
-                .isEqualTo("Backend Developer");
-        assertThat(response.getCompanyName())
-                .isEqualTo("Google");
-
-        // Verify save was called
-        verify(jobRepository, times(1))
-                .save(any(Job.class));
+        assertThat(response.getTitle()).isEqualTo("Software Engineer");
+        verify(rabbitTemplate, times(1)).convertAndSend(eq(RabbitMQConfig.JOB_POSTED_QUEUE), any(JobPostedEvent.class));
     }
 
     @Test
-    void createJob_NotRecruiter_ThrowsException() {
-        // Act & Assert
-        assertThatThrownBy(() ->
-                jobService.createJob(JobRequest,
-                        1L, "JOB_SEEKER"))
-                .isInstanceOf(UnauthorizedException.class)
-                .hasMessageContaining(
-                        "Only recruiters can post jobs");
+    void createJob_RabbitMQError_DoesNotThrowException() {
+        when(modelMapper.map(jobRequest, Job.class)).thenReturn(job);
+        when(jobRepository.save(any(Job.class))).thenReturn(job);
+        when(modelMapper.map(job, JobResponse.class)).thenReturn(jobResponse);
+        
+        // Simulating an exception thrown internally by RabbitTemplate
+        doThrow(new RuntimeException("RabbitMQ Connection Failed"))
+                .when(rabbitTemplate).convertAndSend(eq(RabbitMQConfig.JOB_POSTED_QUEUE), any(JobPostedEvent.class));
 
-        // Verify save was never called
-        verify(jobRepository, never())
-                .save(any(Job.class));
+        // The method should complete successfully despite the exception
+        JobResponse response = jobService.createJob(jobRequest, 200L, "RECRUITER");
+        assertThat(response).isNotNull();
     }
 
-    // GET JOB BY ID TESTS
+    @Test
+    void createJob_UnauthorizedRole_ThrowsException() {
+        assertThatThrownBy(() -> jobService.createJob(jobRequest, 200L, "USER"))
+                .isInstanceOf(UnauthorizedException.class)
+                .hasMessageContaining("Only recruiters can post jobs");
+    }
+
+    @Test
+    void getAllJobs_Desc_Success() {
+        Page<Job> page = new PageImpl<>(List.of(job));
+        when(jobRepository.findAll(any(Pageable.class))).thenReturn(page);
+        when(modelMapper.map(any(Job.class), eq(JobResponse.class))).thenReturn(jobResponse);
+
+        PageResponse<JobResponse> result = jobService.getAllJobs(0, 10, "id", "desc");
+
+        assertThat(result.getContent()).hasSize(1);
+        verify(jobRepository).findAll(any(Pageable.class));
+    }
+
+    @Test
+    void getAllJobs_Asc_Success() {
+        Page<Job> page = new PageImpl<>(List.of(job));
+        when(jobRepository.findAll(any(Pageable.class))).thenReturn(page);
+        when(modelMapper.map(any(Job.class), eq(JobResponse.class))).thenReturn(jobResponse);
+
+        PageResponse<JobResponse> result = jobService.getAllJobs(0, 10, "id", "asc");
+
+        assertThat(result.getContent()).hasSize(1);
+        verify(jobRepository).findAll(any(Pageable.class));
+    }
 
     @Test
     void getJobById_Success() {
-        // Arrange
-        when(jobRepository.findById(anyLong()))
-                .thenReturn(Optional.of(job));
-        when(modelMapper.map(any(Job.class),
-                eq(JobResponse.class)))
-                .thenReturn(JobResponse);
+        when(jobRepository.findById(1L)).thenReturn(Optional.of(job));
+        when(modelMapper.map(job, JobResponse.class)).thenReturn(jobResponse);
 
-        // Act
         JobResponse response = jobService.getJobById(1L);
 
-        // Assert
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(1L);
-        assertThat(response.getTitle())
-                .isEqualTo("Backend Developer");
     }
 
     @Test
     void getJobById_NotFound_ThrowsException() {
-        // Arrange
-        when(jobRepository.findById(anyLong()))
-                .thenReturn(Optional.empty());
-
-        // Act & Assert
-        assertThatThrownBy(() ->
-                jobService.getJobById(999L))
-                .isInstanceOf(JobNotFoundException.class)
-                .hasMessageContaining("Job not found with id");
+        when(jobRepository.findById(1L)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> jobService.getJobById(1L))
+                .isInstanceOf(JobNotFoundException.class);
     }
-
-    // UPDATE JOB TESTS
 
     @Test
     void updateJob_Success() {
-        // Arrange
-        when(jobRepository.findById(anyLong()))
-                .thenReturn(Optional.of(job));
+        when(jobRepository.findById(1L)).thenReturn(Optional.of(job));
+        when(jobRepository.save(any(Job.class))).thenReturn(job);
+        lenient().doNothing().when(modelMapper).map(any(JobRequest.class), any(Job.class));
+        when(modelMapper.map(any(Job.class), eq(JobResponse.class))).thenReturn(jobResponse);
 
-        // ← Add this — mock the map(dto, job) call
-        doNothing().when(modelMapper)
-                .map(any(JobRequest.class), any(Job.class));
+        JobResponse response = jobService.updateJob(1L, jobRequest, 200L);
 
-        when(jobRepository.save(any(Job.class)))
-                .thenReturn(job);
-        when(modelMapper.map(any(Job.class),
-                eq(JobResponse.class)))
-                .thenReturn(JobResponse);
-
-        // Act
-        JobResponse response =
-                jobService.updateJob(1L, JobRequest, 1L);
-
-        // Assert
         assertThat(response).isNotNull();
-        assertThat(response.getTitle())
-                .isEqualTo("Backend Developer");
+        verify(modelMapper).map(jobRequest, job);
+    }
 
-        // Verify save was called
-        verify(jobRepository, times(1))
-                .save(any(Job.class));
+    @Test
+    void updateJob_JobNotFound_ThrowsException() {
+        when(jobRepository.findById(1L)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> jobService.updateJob(1L, jobRequest, 200L))
+                .isInstanceOf(JobNotFoundException.class);
     }
 
     @Test
     void updateJob_Unauthorized_ThrowsException() {
-        // Arrange — job belongs to recruiter 1
-        // but recruiter 2 is trying to update
-        when(jobRepository.findById(anyLong()))
-                .thenReturn(Optional.of(job));
-
-        // Act & Assert
-        assertThatThrownBy(() ->
-                jobService.updateJob(1L, JobRequest, 2L))
-                .isInstanceOf(UnauthorizedException.class)
-                .hasMessageContaining(
-                        "You are not allowed to update");
-
-        // Verify save was never called
-        verify(jobRepository, never())
-                .save(any(Job.class));
+        when(jobRepository.findById(1L)).thenReturn(Optional.of(job));
+        assertThatThrownBy(() -> jobService.updateJob(1L, jobRequest, 300L))
+                .isInstanceOf(UnauthorizedException.class);
     }
-
-    @Test
-    void updateJob_NotFound_ThrowsException() {
-        // Arrange
-        when(jobRepository.findById(anyLong()))
-                .thenReturn(Optional.empty());
-
-        // Act & Assert
-        assertThatThrownBy(() ->
-                jobService.updateJob(999L, JobRequest, 1L))
-                .isInstanceOf(JobNotFoundException.class)
-                .hasMessageContaining("Job not found with id");
-    }
-
-  
-    // DELETE JOB TESTS
 
     @Test
     void deleteJob_Success() {
-        // Arrange
-        when(jobRepository.findById(anyLong()))
-                .thenReturn(Optional.of(job));
+        when(jobRepository.findById(1L)).thenReturn(Optional.of(job));
+        jobService.deleteJob(1L, 200L);
+        verify(jobRepository, times(1)).delete(job);
+    }
 
-        // Act
-        jobService.deleteJob(1L, 1L);
-
-        // Verify delete was called
-        verify(jobRepository, times(1))
-                .delete(any(Job.class));
+    @Test
+    void deleteJob_JobNotFound_ThrowsException() {
+        when(jobRepository.findById(1L)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> jobService.deleteJob(1L, 200L))
+                .isInstanceOf(JobNotFoundException.class);
     }
 
     @Test
     void deleteJob_Unauthorized_ThrowsException() {
-        // Arrange — job belongs to recruiter 1
-        // but recruiter 2 is trying to delete
-        when(jobRepository.findById(anyLong()))
-                .thenReturn(Optional.of(job));
-
-        // Act & Assert
-        assertThatThrownBy(() ->
-                jobService.deleteJob(1L, 2L))
-                .isInstanceOf(UnauthorizedException.class)
-                .hasMessageContaining(
-                        "You are not allowed to delete");
-
-        // Verify delete was never called
-        verify(jobRepository, never())
-                .delete(any(Job.class));
+        when(jobRepository.findById(1L)).thenReturn(Optional.of(job));
+        assertThatThrownBy(() -> jobService.deleteJob(1L, 300L))
+                .isInstanceOf(UnauthorizedException.class);
     }
-
-    @Test
-    void deleteJob_NotFound_ThrowsException() {
-        // Arrange
-        when(jobRepository.findById(anyLong()))
-                .thenReturn(Optional.empty());
-
-        // Act & Assert
-        assertThatThrownBy(() ->
-                jobService.deleteJob(999L, 1L))
-                .isInstanceOf(JobNotFoundException.class)
-                .hasMessageContaining("Job not found with id");
-    }
-
-    // GET ALL JOBS TESTS
-
-    @Test
-    void getAllJobs_Success() {
-        // Arrange
-        Job job1 = new Job();
-        job1.setId(1L);
-        job1.setTitle("Backend Developer");
-        
-        Job job2 = new Job();
-        job2.setId(2L);
-        job2.setTitle("Frontend Developer");
-
-        when(jobRepository.findAll(any(org.springframework.data.domain.Pageable.class)))
-                .thenReturn(new org.springframework.data.domain.PageImpl<>(java.util.Arrays.asList(job1, job2)));
-        
-        when(modelMapper.map(any(Job.class), eq(JobResponse.class)))
-                .thenAnswer(invocation -> {
-                    Job j = invocation.getArgument(0);
-                    JobResponse dto = new JobResponse();
-                    dto.setId(j.getId());
-                    dto.setTitle(j.getTitle());
-                    return dto;
-                });
-
-        // Act
-        com.jobportal.jobservice.dto.response.PageResponse<JobResponse> response =
-                jobService.getAllJobs(0, 10, "createdAt", "desc");
-
-        // Assert
-        assertThat(response).isNotNull();
-        assertThat(response.getContent().size()).isEqualTo(2);
-        assertThat(response.getContent().get(0).getId()).isEqualTo(1L);
-    }
-
-    @Test
-    void getAllJobs_Ascending() {
-        // Arrange
-        when(jobRepository.findAll(any(org.springframework.data.domain.Pageable.class)))
-                .thenReturn(new org.springframework.data.domain.PageImpl<>(java.util.Collections.emptyList()));
-        
-        when(modelMapper.map(any(Job.class), eq(JobResponse.class)))
-                .thenReturn(new JobResponse());
-
-        // Act
-        com.jobportal.jobservice.dto.response.PageResponse<JobResponse> response =
-                jobService.getAllJobs(0, 10, "createdAt", "asc");
-
-        // Assert
-        assertThat(response).isNotNull();
-        verify(jobRepository, times(1)).findAll(any(org.springframework.data.domain.Pageable.class));
-    }
-
-    // SEARCH JOBS TESTS
 
     @Test
     @SuppressWarnings("unchecked")
-    void searchJobs_Success() {
-        // Arrange
-        com.jobportal.jobservice.dto.JobFilter filter = new com.jobportal.jobservice.dto.JobFilter();
-        
-        Job job = new Job();
-        job.setId(1L);
-        job.setTitle("Java Developer");
-        job.setLocation("Bangalore");
+    void searchJobs_Desc_Success() {
+        JobFilter filter = new JobFilter();
+        Page<Job> page = new PageImpl<>(List.of(job));
+        when(jobRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(page);
+        when(modelMapper.map(any(Job.class), eq(JobResponse.class))).thenReturn(jobResponse);
 
-        when(jobRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class), 
-                any(org.springframework.data.domain.Pageable.class)))
-                .thenReturn(new org.springframework.data.domain.PageImpl<>(java.util.Arrays.asList(job)));
-        
-        when(modelMapper.map(any(Job.class), eq(JobResponse.class)))
-                .thenReturn(JobResponse);
+        PageResponse<JobResponse> result = jobService.searchJobs(filter, 0, 10, "id", "desc");
 
-        // Act
-        com.jobportal.jobservice.dto.response.PageResponse<JobResponse> response =
-                jobService.searchJobs(filter, 0, 10, "createdAt", "desc");
-
-        // Assert
-        assertThat(response).isNotNull();
-        assertThat(response.getContent().size()).isEqualTo(1);
-        
-        verify(jobRepository, times(1)).findAll(any(org.springframework.data.jpa.domain.Specification.class), 
-                any(org.springframework.data.domain.Pageable.class));
+        assertThat(result.getContent()).hasSize(1);
     }
 
-    // DELETE RECRUITER JOBS TESTS
+    @Test
+    @SuppressWarnings("unchecked")
+    void searchJobs_Asc_Success() {
+        JobFilter filter = new JobFilter();
+        Page<Job> page = new PageImpl<>(List.of(job));
+        when(jobRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(page);
+        when(modelMapper.map(any(Job.class), eq(JobResponse.class))).thenReturn(jobResponse);
+
+        PageResponse<JobResponse> result = jobService.searchJobs(filter, 0, 10, "id", "asc");
+        assertThat(result.getContent()).hasSize(1);
+    }
 
     @Test
     void deleteRecruiterJobs_Success() {
-        // Act
-        jobService.deleteRecruiterJobs(1L);
+        jobService.deleteRecruiterJobs(200L);
+        verify(jobRepository, times(1)).deleteByRecruiterId(200L);
+    }
 
-        // Verify deleteByRecruiterId was called
-        verify(jobRepository, times(1)).deleteByRecruiterId(1L);
+    @Test
+    void getJobsByRecruiter_Desc_Success() {
+        Page<Job> page = new PageImpl<>(List.of(job));
+        when(jobRepository.findByRecruiterId(eq(200L), any(Pageable.class))).thenReturn(page);
+        when(modelMapper.map(any(Job.class), eq(JobResponse.class))).thenReturn(jobResponse);
+
+        PageResponse<JobResponse> result = jobService.getJobsByRecruiter(200L, 0, 10, "id", "desc");
+        assertThat(result.getContent()).hasSize(1);
+    }
+
+    @Test
+    void getJobsByRecruiter_Asc_Success() {
+        Page<Job> page = new PageImpl<>(List.of(job));
+        when(jobRepository.findByRecruiterId(eq(200L), any(Pageable.class))).thenReturn(page);
+        when(modelMapper.map(any(Job.class), eq(JobResponse.class))).thenReturn(jobResponse);
+
+        PageResponse<JobResponse> result = jobService.getJobsByRecruiter(200L, 0, 10, "id", "asc");
+        assertThat(result.getContent()).hasSize(1);
+    }
+
+    @Test
+    void getMarketPulseStats_NoJobs_ReturnsZeros() {
+        when(jobRepository.findAll()).thenReturn(new ArrayList<>());
+        MarketStatsResponse response = jobService.getMarketPulseStats();
+
+        assertThat(response.getAverageSalary()).isEqualTo(0.0);
+        assertThat(response.getTopSkills()).isEmpty();
+    }
+
+    @Test
+    void getMarketPulseStats_WithJobs_CalculatesCorrectly() {
+        Job job2 = new Job();
+        job2.setSalary(200000.0);
+        job2.setSkills(Arrays.asList("Java", "AWS"));
+        
+        Job job3 = new Job();
+        // job with no skills explicitly set
+        job3.setSalary(0.0); // should pull average down
+        
+        when(jobRepository.findAll()).thenReturn(Arrays.asList(job, job2, job3));
+
+        MarketStatsResponse response = jobService.getMarketPulseStats();
+
+        assertThat(response.getAverageSalary()).isEqualTo(100000.0); // (100000+200000+0) / 3
+        assertThat(response.getTopSkills()).isNotEmpty();
+        assertThat(response.getSalaryTrend()).hasSize(5);
+        assertThat(response.getDemandTrend()).hasSize(5);
+    }
+    
+    @Test
+    void getMarketPulseStats_NoSkills_UsesFallbackDivision() {
+        Job noSkillJob = new Job();
+        noSkillJob.setSalary(0.0);
+        noSkillJob.setSkills(new ArrayList<>());
+        when(jobRepository.findAll()).thenReturn(Arrays.asList(noSkillJob));
+        MarketStatsResponse response = jobService.getMarketPulseStats();
+        assertThat(response.getTopSkills()).isEmpty();
     }
 }

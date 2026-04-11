@@ -17,14 +17,7 @@ import reactor.core.publisher.Mono;
 import java.nio.charset.StandardCharsets;
 
 /**
- * RATE LIMITING FILTER
- * --------------------
- * This filter applies rate limiting to requests based on:
- * - User ID (if authenticated)
- * - IP Address
- * - API Key (if provided)
- *
- * Uses Redis to store request counters with configurable limits per time window
+ * RATE LIMITING FILTER (Reactive)
  */
 @Slf4j
 @Component
@@ -64,131 +57,70 @@ public class RateLimitingFilter extends AbstractGatewayFilterFactory<RateLimitin
             }
 
             ServerHttpRequest request = exchange.getRequest();
-            ServerHttpResponse response = exchange.getResponse();
-
-            try {
-                // Check rate limits in order: User ID > API Key > IP Address
-                
-                // 1. Check User ID Rate Limit (if user is authenticated)
-                if (enableUserIdLimit) {
-                    String userId = request.getHeaders().getFirst("X-User-Id");
-                    if (userId != null && !userId.isEmpty()) {
-                        RateLimitStatus status = rateLimitingService.checkUserRateLimit(
-                                Long.parseLong(userId), maxRequests, timeWindowSeconds);
-                        
-                        if (!status.isAllowed()) {
-                            log.warn("User rate limit exceeded | userId: {} | count: {}/{}",
-                                    userId, status.getCurrentCount(), status.getMaxAllowed());
-                            return sendErrorResponse(response, HttpStatus.TOO_MANY_REQUESTS,
-                                    "User rate limit exceeded. Max " + maxRequests + " requests per " + 
-                                    timeWindowSeconds + " seconds");
-                        }
-                        
-                        // Add rate limit headers
-                        addRateLimitHeaders(exchange, status);
-                        return chain.filter(exchange);
-                    }
-                }
-                
-                // 2. Check API Key Rate Limit (if API key is provided)
-                if (enableApiKeyLimit) {
-                    String apiKey = request.getHeaders().getFirst("X-API-Key");
-                    if (apiKey != null && !apiKey.isEmpty()) {
-                        RateLimitStatus status = rateLimitingService.checkApiKeyRateLimit(
-                                apiKey, maxRequests, timeWindowSeconds);
-                        
-                        if (!status.isAllowed()) {
-                            log.warn("API key rate limit exceeded | apiKey: {} | count: {}/{}",
-                                    apiKey, status.getCurrentCount(), status.getMaxAllowed());
-                            return sendErrorResponse(response, HttpStatus.TOO_MANY_REQUESTS,
-                                    "API key rate limit exceeded. Max " + maxRequests + " requests per " + 
-                                    timeWindowSeconds + " seconds");
-                        }
-                        
-                        // Add rate limit headers
-                        addRateLimitHeaders(exchange, status);
-                        return chain.filter(exchange);
-                    }
-                }
-                
-                // 3. Check IP Address Rate Limit (fallback - always applies)
-                if (enableIpLimit) {
-                    String clientIp = getClientIpAddress(request);
-                    RateLimitStatus status = rateLimitingService.checkIpRateLimit(
-                            clientIp, maxRequests, timeWindowSeconds);
-                    
-                    if (!status.isAllowed()) {
-                        log.warn("IP rate limit exceeded | ip: {} | count: {}/{}",
-                                clientIp, status.getCurrentCount(), status.getMaxAllowed());
-                        return sendErrorResponse(response, HttpStatus.TOO_MANY_REQUESTS,
-                                "IP rate limit exceeded. Max " + maxRequests + " requests per " + 
-                                timeWindowSeconds + " seconds");
-                    }
-                    
-                    // Add rate limit headers
-                    addRateLimitHeaders(exchange, status);
-                }
-                
-                return chain.filter(exchange);
-
-            } catch (NumberFormatException e) {
-                log.error("Invalid user ID format in rate limit check", e);
-                return chain.filter(exchange);
-            } catch (Exception e) {
-                log.error("Error in rate limiting filter", e);
-                // On error, allow request - fail open
-                return chain.filter(exchange);
+            
+            // 1. Check User ID Rate Limit
+            String userId = request.getHeaders().getFirst("X-User-Id");
+            if (enableUserIdLimit && userId != null && !userId.isEmpty()) {
+                return rateLimitingService.checkUserRateLimit(Long.parseLong(userId), maxRequests, timeWindowSeconds)
+                        .flatMap(status -> handleRateLimitStatus(exchange, chain, status, "User", userId));
             }
+            
+            // 2. Check API Key Rate Limit
+            String apiKey = request.getHeaders().getFirst("X-API-Key");
+            if (enableApiKeyLimit && apiKey != null && !apiKey.isEmpty()) {
+                return rateLimitingService.checkApiKeyRateLimit(apiKey, maxRequests, timeWindowSeconds)
+                        .flatMap(status -> handleRateLimitStatus(exchange, chain, status, "API key", apiKey));
+            }
+            
+            // 3. Check IP Address Rate Limit
+            if (enableIpLimit) {
+                String clientIp = getClientIpAddress(request);
+                return rateLimitingService.checkIpRateLimit(clientIp, maxRequests, timeWindowSeconds)
+                        .flatMap(status -> handleRateLimitStatus(exchange, chain, status, "IP", clientIp))
+                        .onErrorResume(e -> {
+                            log.error("Error in IP rate limiting check", e);
+                            return chain.filter(exchange);
+                        });
+            }
+            
+            return chain.filter(exchange);
         };
     }
 
-    /**
-     * Extract client IP address from request
-     * Handles X-Forwarded-For header for proxied requests
-     */
+    private Mono<Void> handleRateLimitStatus(ServerWebExchange exchange, org.springframework.cloud.gateway.filter.GatewayFilterChain chain, 
+                                           RateLimitStatus status, String type, String identity) {
+        if (status == null || !status.isAllowed()) {
+            log.warn("{} rate limit exceeded | ID: {} | count: {}/{}", 
+                type, identity, status != null ? status.getCurrentCount() : 0, status != null ? status.getMaxAllowed() : 0);
+            return sendErrorResponse(exchange.getResponse(), HttpStatus.TOO_MANY_REQUESTS,
+                type + " rate limit exceeded. Max " + (status != null ? status.getMaxAllowed() : 0) + " requests per " + timeWindowSeconds + " seconds");
+        }
+        
+        addRateLimitHeaders(exchange, status);
+        return chain.filter(exchange);
+    }
+
     private String getClientIpAddress(ServerHttpRequest request) {
         String xForwardedFor = request.getHeaders().getFirst("X-Forwarded-For");
         if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
-            // X-Forwarded-For can contain multiple IPs, take the first one
             return xForwardedFor.split(",")[0].trim();
         }
-        
-        String remoteAddress = request.getRemoteAddress() != null 
-                ? request.getRemoteAddress().getAddress().getHostAddress() 
-                : "unknown";
-        
-        return remoteAddress;
+        return request.getRemoteAddress() != null ? request.getRemoteAddress().getAddress().getHostAddress() : "unknown";
     }
 
-    /**
-     * Add rate limit headers to response
-     */
     private void addRateLimitHeaders(ServerWebExchange exchange, RateLimitStatus status) {
         exchange.getResponse().getHeaders().add("X-RateLimit-Limit", String.valueOf(status.getMaxAllowed()));
         exchange.getResponse().getHeaders().add("X-RateLimit-Remaining", String.valueOf(status.getRemainingRequests()));
         exchange.getResponse().getHeaders().add("X-RateLimit-Reset", String.valueOf(status.getResetTime()));
     }
 
-    /**
-     * Send error response when rate limit is exceeded
-     */
     private Mono<Void> sendErrorResponse(ServerHttpResponse response, HttpStatus status, String message) {
         response.setStatusCode(status);
         response.getHeaders().add("Content-Type", "application/json");
-        
-        String errorJson = String.format(
-                "{\"status\":%d,\"message\":\"%s\",\"errorCode\":\"RATE_LIMIT_EXCEEDED\"}",
-                status.value(), message
-        );
-        
+        String errorJson = String.format("{\"status\":%d,\"message\":\"%s\",\"errorCode\":\"RATE_LIMIT_EXCEEDED\"}", status.value(), message);
         DataBuffer dataBuffer = response.bufferFactory().wrap(errorJson.getBytes(StandardCharsets.UTF_8));
         return response.writeWith(Mono.just(dataBuffer));
     }
 
-    /**
-     * Configuration class
-     */
-    public static class Config {
-        // Configuration options for the filter can be added here
-    }
+    public static class Config {}
 }
