@@ -1,174 +1,196 @@
-A scalable and distributed **Job Portal Application** built using **Spring Boot Microservices Architecture**. This system enables users to register, apply for jobs, and receive notifications, while recruiters can post jobs and manage applications.
+# Job Portal Management System
+
+Full-stack job portal built with **Spring Boot microservices** and an **Angular frontend**.  
+The platform supports authentication, job posting, job applications, admin management, notifications, and observability.
 
 ---
 
-## 🚀 Tech Stack
+## Tech Stack
 
-- **Backend:** Spring Boot, Spring Cloud
-- **Microservices:** REST APIs
-- **Service Discovery:** Eureka Server
-- **API Gateway:** Spring Cloud Gateway
-- **Authentication:** JWT (JSON Web Token)
-- **Messaging Queue:** RabbitMQ
-- **Caching:** Redis
-- **Database:** MySQL (Database per service)
-- **Containerization:** Docker
+### Backend
+- Java 17, Spring Boot 3.x, Spring Cloud
+- Spring Cloud Gateway (API Gateway)
+- Eureka (service discovery)
+- OpenFeign + Resilience4j (service communication/resilience)
+- RabbitMQ (event-driven messaging)
+- Redis (rate limiting/cache)
+- MySQL 8 (persistence)
+- Zipkin + Micrometer/Actuator (tracing/metrics)
+- Prometheus + Grafana (monitoring dashboards)
 
+### Frontend
+- Angular 21 (standalone components + lazy routes)
+- RxJS, Angular Router, Reactive Forms
+- TailwindCSS
+- Vitest + Angular unit-test builder for testing/coverage
 
----
-
-## 🔁 Project Flow
-
-1. **Client Request**
-   - All requests go through the API Gateway.
-
-2. **API Gateway**
-   - Routes requests to appropriate services.
-   - Validates JWT for secured endpoints.
-
-3. **Service Discovery**
-   - Eureka Server dynamically resolves service instances.
-
-4. **Authentication (Auth Service)**
-   - Handles login and registration.
-   - Generates JWT tokens.
-
-5. **Job Service**
-   - Recruiters can post and manage jobs.
-   - Uses Redis caching for performance.
-
-6. **Application Service**
-   - Candidates apply for jobs.
-   - Publishes events to RabbitMQ.
-
-7. **RabbitMQ**
-   - Enables asynchronous communication between services.
-
-8. **Notification Service**
-   - Consumes messages from RabbitMQ.
-   - Sends notifications (e.g., email alerts).
-
-9. **Admin Service**
-   - Manages users and system-level operations.
+### DevOps
+- Docker Compose for local multi-service orchestration
 
 ---
 
-## 🧩 Microservices
+## Repository Structure
 
-### 🔐 Auth Service
-- User registration & login
-- JWT token generation & validation
-
-### 💼 Job Service
-- Create, update, delete jobs
-- Fetch job listings
-- Redis caching for optimization
-
-### 📄 Application Service
-- Apply for jobs
-- Track application status
-- Publish events to RabbitMQ
-
-### 🔔 Notification Service
-- Listens to RabbitMQ events
-- Sends notifications
-
-### 🛠️ Admin Service
-- User management
-- System monitoring
-
----
-
-## ⚙️ Key Features
-
-- ✅ Microservices Architecture
-- ✅ API Gateway Routing
-- ✅ Service Discovery with Eureka
-- ✅ JWT-based Authentication
-- ✅ Asynchronous Communication using RabbitMQ
-- ✅ Redis Caching for Performance Optimization
-- ✅ Database per Service Pattern
-- ✅ Dockerized Deployment
+```text
+Job-Portal-Management-System/
+├─ Job-Portal-Backend/
+│  ├─ EurekaServer/
+│  ├─ ApiGateway/
+│  ├─ AuthService/
+│  ├─ JobService/
+│  ├─ ApplicationService/
+│  ├─ AdminService/
+│  ├─ NotificationService/
+│  ├─ docker-compose.yml
+│  └─ prometheus.yml
+└─ job-portal-frontend/
+   ├─ src/app/
+   │  ├─ core/        (guards, interceptors, singleton services)
+   │  ├─ shared/      (reusable UI, directives, pipes)
+   │  ├─ layout/      (auth/main/admin shells)
+   │  ├─ features/    (auth, dashboard, jobs, applications, profile, admin, notifications)
+   │  └─ models/
+   ├─ vitest.config.ts
+   └─ package.json
+```
 
 ---
 
-## 🗄️ Database Design (ER Overview)
+## Project Architecture
 
-### Entities:
+### High-level flow
 
-- **User**
-  - id, name, email, role
+```text
+[Angular Frontend]
+       |
+       v
+[API Gateway :8085] --JWT validation + rate limiting--> [Redis]
+       |
+       +--> [AuthService :8081] <--> [MySQL]
+       +--> [JobService :8082]  <--> [MySQL]
+       +--> [ApplicationService :8083] <--> [MySQL] <--> [Cloudinary]
+       +--> [AdminService :8084] <--> [MySQL]
+       +--> [NotificationService :8086] --SMTP/Email
 
-- **Job**
-  - id, title, description, company, posted_by
+All services <--> [Eureka :8761] for discovery
+Async events <--> [RabbitMQ :5672 / :15672]
+Tracing ---------> [Zipkin :9411]
+Metrics ---------> [Prometheus :9090] -> [Grafana :3000]
+```
 
-- **Application**
-  - id, user_id, job_id, status
+### Backend service responsibilities
+- **AuthService**: registration/login, JWT/refresh, profile, forgot/reset password.
+- **JobService**: jobs CRUD/search, recruiter job views, market stats.
+- **ApplicationService**: apply to jobs, recruiter application views/status updates.
+- **AdminService**: admin-level user/job/report endpoints.
+- **NotificationService**: consumes async events and sends notifications/emails.
+- **ApiGateway**: routing, auth filter, rate limiting, unified entrypoint.
+- **EurekaServer**: registry for all services.
 
-- **Notification**
-  - id, message, user_id
-
-### Relationships:
-
-- One User → Many Jobs
-- One User → Many Applications
-- One Job → Many Applications
-- One User → Many Notifications
+### Frontend architecture
+- **Core layer**: auth/api/storage/cache/notification services + guards + interceptors.
+- **Shared layer**: reusable components (navbar/sidebar/footer/modal/pagination etc.).
+- **Layout layer**: route shells (`auth`, `main`, `admin`).
+- **Feature layer**: domain modules (`jobs`, `applications`, `dashboard`, `profile`, `admin`, etc.).
+- **Routing**: lazy-loaded feature routes with `authGuard` and `roleGuard` where needed.
 
 ---
 
-## 📡 API Gateway Routing Example
+## Ports
 
-```yaml
-spring:
-  cloud:
-    gateway:
-      routes:
-        - id: auth-service
-          uri: lb://AUTH-SERVICE
-          predicates:
-            - Path=/auth/**
+### Backend + Infra
+- Eureka: `8761`
+- API Gateway: `8085`
+- Auth Service: `8081`
+- Job Service: `8082`
+- Application Service: `8083`
+- Admin Service: `8084`
+- Notification Service: `8086`
+- MySQL: `3307` (container `3306`)
+- RabbitMQ: `5672` (AMQP), `15672` (management UI)
+- Redis: `6379`
+- Zipkin: `9411`
+- Prometheus: `9090`
+- Grafana: `3000`
 
-        - id: job-service
-          uri: lb://JOB-SERVICE
-          predicates:
-            - Path=/jobs/**
+### Frontend
+- Angular dev server: `4200`
 
-        - id: application-service
-          uri: lb://APPLICATION-SERVICE
-          predicates:
-            - Path=/applications/**
-📨 RabbitMQ Flow
-Application Service publishes event:
-rabbitTemplate.convertAndSend(exchange, routingKey, message);
-Notification Service consumes:
-@RabbitListener(queues = "notificationQueue")
-⚡ Redis Caching Example
-@Cacheable(value = "jobs")
-public List<Job> getAllJobs() {
-    return jobRepository.findAll();
-}
-@CacheEvict(value = "jobs", key = "#id")
-🐳 Docker Setup
-Each service runs in a container
-Includes:
-MySQL
-RabbitMQ
-Redis
-Eureka Server
-API Gateway
-📌 Advantages of This Architecture
-🔹 Scalable and modular system
-🔹 Loose coupling using RabbitMQ
-🔹 High availability via Eureka
-🔹 Improved performance with Redis
-🔹 Easy deployment using Docker
-🎯 Future Enhancements
-Add frontend (React / Angular)
-Implement role-based access control (RBAC)
-Add search & filtering for jobs
-Implement analytics dashboard
-Use Kubernetes for orchestration
-👨‍💻 Author
+---
 
-Prateek Raj
+## Prerequisites
+
+- Docker + Docker Compose
+- Node.js + npm (for frontend local dev)
+- Java 17 + Maven (only if running backend services without Docker)
+
+---
+
+## Environment Variables
+
+Create `Job-Portal-Backend/.env` (used by `docker-compose.yml`) with required values such as:
+
+- `MYSQL_ROOT_PASSWORD`, `MYSQL_DATABASE`, `MYSQL_PASSWORD`
+- `JWT_SECRET`, `INTERNAL_SECRET`
+- `RABBITMQ_USERNAME`, `RABBITMQ_PASSWORD`
+- `REDIS_PASSWORD`
+- `MAIL_USERNAME`, `MAIL_PASSWORD`
+- `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
+- `GRAFANA_ADMIN_PASSWORD`
+- optional admin seed values (`ADMIN_EMAIL`, `ADMIN_PASSWORD`, etc.)
+
+---
+
+## Run the Project
+
+### 1) Start backend (Docker Compose)
+
+```bash
+cd Job-Portal-Backend
+docker compose up --build
+```
+
+Recommended startup dependency order is already configured in compose using `depends_on` + health checks.
+
+### 2) Start frontend
+
+```bash
+cd job-portal-frontend
+npm install
+npm start
+```
+
+App URL: `http://localhost:4200`
+
+---
+
+## Testing & Coverage (Frontend)
+
+From `job-portal-frontend/`:
+
+```bash
+npm test
+npm run test:ui
+npm run test:coverage
+```
+
+Coverage output is generated under:
+
+- `job-portal-frontend/coverage/job-portal-frontend/`
+- shortcut entry: `job-portal-frontend/coverage/index.html`
+
+---
+
+## API Entry Point
+
+Use the API Gateway as the single backend entrypoint:
+
+- Base URL: `http://localhost:8085`
+
+---
+
+## Notes
+
+- Gateway handles cross-service routing and security checks.
+- Services are discovered dynamically via Eureka (no hardcoded service hostnames in client-facing flows).
+- RabbitMQ is used for async event propagation (application/job/user lifecycle notifications).
