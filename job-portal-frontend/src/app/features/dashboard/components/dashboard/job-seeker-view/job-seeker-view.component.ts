@@ -19,4 +19,14 @@ import { MarketPulseComponent } from './components/market-pulse/market-pulse.com
 })
 export class JobSeekerViewComponent {
   @Input() user: any;
+
+  getFirstName(): string {
+    const name = this.user?.name?.trim();
+    if (!name) return 'there';
+    return name.split(' ')[0];
+  }
+
+  getSubtitle(): string {
+    return 'Manage your applications and track market trends.';
+  }
 }

@@ -12,7 +12,7 @@ import { getFriendlyError } from '../../../../core/utils/error-handler.util';
   templateUrl: './login.component.html'
 })
 export class LoginComponent implements OnInit {
-  loginForm!: FormGroup;
+  loginForm: FormGroup;
   isLoading = false;
   errorMessage = '';
   showPassword = false;
@@ -23,7 +23,12 @@ export class LoginComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute
-  ) {}
+  ) {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
+    });
+  }
 
   ngOnInit(): void {
     // Redirect if already logged in
@@ -34,10 +39,7 @@ export class LoginComponent implements OnInit {
 
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
 
-    this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
-    });
+    this.loginForm.reset();
   }
 
   onSubmit(): void {

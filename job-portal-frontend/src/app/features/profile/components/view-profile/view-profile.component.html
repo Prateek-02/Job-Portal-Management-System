@@ -2,8 +2,8 @@
   <!-- Bio Section -->
   <div class="celestial-card p-12">
       <h3 class="text-[11px] font-bold text-text-muted uppercase tracking-[0.4em] mb-10 pb-4 border-b border-glass-border inline-block">Professional Bio</h3>
-      @if (user?.bio) {
-        <p class="text-2xl font-medium text-text-secondary leading-relaxed pl-10 border-l-[4px] border-royal-blue/30 italic">
+      @if (hasBio()) {
+        <p class="text-2xl font-medium text-text-secondary leading-relaxed pl-10 border-l-4 border-royal-blue/30 italic">
           {{ user?.bio }}
         </p>
       } @else {
@@ -34,13 +34,13 @@
   
   <!-- Information Grid -->
   <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <div class="celestial-card p-8 bg-white/[0.01]">
+      <div class="celestial-card p-8 bg-white/1">
           <p class="text-[9px] font-black text-text-muted uppercase tracking-widest mb-2 opacity-50">Identity Verified</p>
-          <p class="text-lg font-bold text-text-primary">{{ user?.name }}</p>
+          <p class="text-lg font-bold text-text-primary">{{ getDisplayName() }}</p>
       </div>
-      <div class="celestial-card p-8 bg-white/[0.01]">
+      <div class="celestial-card p-8 bg-white/1">
           <p class="text-[9px] font-black text-text-muted uppercase tracking-widest mb-2 opacity-50">Contact Reliability</p>
-          <p class="text-lg font-bold text-text-primary">{{ user?.phone || 'N/A' }}</p>
+          <p class="text-lg font-bold text-text-primary">{{ getDisplayPhone() }}</p>
       </div>
   </div>
 </div>

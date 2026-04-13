@@ -91,13 +91,7 @@ export class CacheService {
    */
   clearAll(): void {
     this.cacheMap.clear();
-    const keysToRemove: string[] = [];
-    for (let i = 0; i < sessionStorage.length; i++) {
-        const key = sessionStorage.key(i);
-        if (key && key.startsWith(this.STORAGE_PREFIX)) {
-            keysToRemove.push(key);
-        }
-    }
+    const keysToRemove = Object.keys(sessionStorage).filter(key => key.startsWith(this.STORAGE_PREFIX));
     keysToRemove.forEach(key => sessionStorage.removeItem(key));
   }
 
@@ -105,27 +99,23 @@ export class CacheService {
    * Restores cache state from sessionStorage
    */
   private hydrateFromStorage(): void {
-    for (let i = 0; i < sessionStorage.length; i++) {
-      const key = sessionStorage.key(i);
-      if (key && key.startsWith(this.STORAGE_PREFIX)) {
-        try {
-          const item = sessionStorage.getItem(key);
-          if (item) {
-             const entry: CacheEntry = JSON.parse(item);
-             // Verify it's not already expired at boot time
-             if (Date.now() - entry.entryTime > this.MAX_AGE) {
-               sessionStorage.removeItem(key);
-             } else {
-               // Strip the prefix to get the original URL key
-               const urlKey = key.substring(this.STORAGE_PREFIX.length);
-               this.cacheMap.set(urlKey, entry);
-             }
+    const keys = Object.keys(sessionStorage).filter(key => key.startsWith(this.STORAGE_PREFIX));
+
+    keys.forEach(key => {
+      try {
+        const item = sessionStorage.getItem(key);
+        if (item) {
+          const entry: CacheEntry = JSON.parse(item);
+          if (Date.now() - entry.entryTime > this.MAX_AGE) {
+            sessionStorage.removeItem(key);
+          } else {
+            const urlKey = key.substring(this.STORAGE_PREFIX.length);
+            this.cacheMap.set(urlKey, entry);
           }
-        } catch(e) {
-          // If corrupted, remove it
-          sessionStorage.removeItem(key);
         }
+      } catch (e) {
+        sessionStorage.removeItem(key);
       }
-    }
+    });
   }
 }

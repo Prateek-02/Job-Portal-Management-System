@@ -6,7 +6,7 @@
       <!-- Vertical Progress Line -->
       <div class="absolute left-[11px] top-4 bottom-4 w-0.5 border-l border-dashed border-glass-border"></div>
 
-      @for (entry of recentActivity.slice(0, 3); track entry.id; let first = $first) {
+      @for (entry of visibleActivity(3); track trackByActivityId($index, entry); let first = $first) {
       <div class="relative animate-fade-in-right" [style.animation-delay]="($index * 100) + 'ms'">
         <!-- Progress Dot -->
         <div
@@ -21,7 +21,7 @@
         <p class="text-xs text-text-secondary opacity-60 line-clamp-2 leading-relaxed">{{ entry.message }}</p>
       </div>
       }
-      @if (recentActivity.length === 0) {
+      @if (!hasRecentActivity()) {
       <div class="pt-6 text-center opacity-40">
         <p class="text-sm font-bold text-text-secondary">No recent events tracked.</p>
       </div>

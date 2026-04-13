@@ -3,9 +3,11 @@ import { AuthService } from './auth.service';
 import { ApiService } from './api.service';
 import { StorageService } from './storage.service';
 import { NotificationService } from './notification.service';
-import { Router } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -42,6 +44,9 @@ describe('AuthService', () => {
     TestBed.configureTestingModule({
       providers: [
         AuthService,
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideRouter([]),
         { provide: ApiService, useValue: apiServiceMock },
         { provide: StorageService, useValue: storageServiceMock },
         { provide: NotificationService, useValue: notificationServiceMock },
@@ -145,6 +150,56 @@ describe('AuthService', () => {
           expect(apiServiceMock.refreshToken).not.toHaveBeenCalled();
         }
       });
+    });
+  });
+
+  describe('register(), profile and role helpers', () => {
+    it('should set loading false on successful register', () => {
+      service = TestBed.inject(AuthService);
+      apiServiceMock.register.mockReturnValue(of({ message: 'ok' } as any));
+      service.register({} as any).subscribe(() => {
+        expect(apiServiceMock.register).toHaveBeenCalled();
+      });
+    });
+
+    it('should set loading false and propagate register errors', () => {
+      service = TestBed.inject(AuthService);
+      apiServiceMock.register.mockReturnValue(throwError(() => new Error('register failed')));
+      service.register({} as any).subscribe({
+        next: () => { throw new Error('should fail'); },
+        error: (err) => expect(err.message).toBe('register failed')
+      });
+    });
+
+    it('should refresh profile and update storage/current user', () => {
+      service = TestBed.inject(AuthService);
+      const user = { id: 12, name: 'Jane', email: 'jane@x.com', role: 'JOB_SEEKER' } as any;
+      apiServiceMock.getProfile.mockReturnValue(of(user));
+
+      service.refreshProfile().subscribe(res => {
+        expect(res).toEqual(user);
+        expect(storageServiceMock.setUser).toHaveBeenCalledWith(user);
+        expect(service.getCurrentUser()).toEqual(user);
+      });
+    });
+
+    it('should expose role helpers correctly', () => {
+      service = TestBed.inject(AuthService);
+      storageServiceMock.getUserRole.mockReturnValue('ADMIN');
+      expect(service.isAdmin()).toBe(true);
+      storageServiceMock.getUserRole.mockReturnValue('RECRUITER');
+      expect(service.isRecruiter()).toBe(true);
+      storageServiceMock.getUserRole.mockReturnValue('JOB_SEEKER');
+      expect(service.isJobSeeker()).toBe(true);
+    });
+
+    it('should clear auth and navigate on logout', () => {
+      service = TestBed.inject(AuthService);
+      service.logout();
+      expect(storageServiceMock.clear).toHaveBeenCalled();
+      expect(notificationServiceMock.setUserId).toHaveBeenCalledWith(null);
+      expect(routerMock.navigate).toHaveBeenCalledWith(['/auth/login']);
+      expect(service.isAuthenticated()).toBe(false);
     });
   });
 

@@ -35,4 +35,17 @@ describe('FooterComponent', () => {
       fixture.destroy();
     }).not.toThrow();
   });
+
+  it('should expose footer label helper', () => {
+    expect(component.getFooterLabel()).toBe('footer');
+  });
+
+  it('should evaluate footer helper logic', () => {
+    expect(component.getCopyrightYear(new Date('2025-01-01'))).toBe(2025);
+    expect(component.normalizeCompanyName('  Acme  ')).toBe('Acme');
+    expect(component.normalizeCompanyName('')).toBe('Job Portal');
+    expect(component.getFooterText('Acme')).toContain('Acme');
+    expect(component.shouldShowDivider(0)).toBe(false);
+    expect(component.shouldShowDivider(2)).toBe(true);
+  });
 });

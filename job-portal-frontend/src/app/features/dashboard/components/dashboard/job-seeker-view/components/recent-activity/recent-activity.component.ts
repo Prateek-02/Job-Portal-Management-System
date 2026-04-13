@@ -13,5 +13,17 @@ export class RecentActivityComponent {
     return this.notificationService.all.slice(0, 4);
   }
 
+  hasRecentActivity(): boolean {
+    return this.recentActivity.length > 0;
+  }
+
+  visibleActivity(limit = 3) {
+    return this.recentActivity.slice(0, limit);
+  }
+
+  trackByActivityId(_: number, entry: any): string | number {
+    return entry?.id ?? _;
+  }
+
   constructor(private notificationService: NotificationService) { }
 }

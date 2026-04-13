@@ -1,11 +1,14 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CreateJobComponent } from './create-job.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ApiService } from '../../../../core/services/api.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 import { vi } from 'vitest';
 import * as ErrorHandlerUtil from '../../../../core/utils/error-handler.util';
+import { provideRouter } from '@angular/router';
+import { NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 describe('CreateJobComponent', () => {
   let component: CreateJobComponent;
@@ -28,20 +31,17 @@ describe('CreateJobComponent', () => {
     };
 
     vi.spyOn(window, 'confirm').mockReturnValue(true);
-    vi.spyOn(ErrorHandlerUtil, 'getFriendlyError').mockReturnValue('Form submission generated error');
 
     await TestBed.configureTestingModule({
       imports: [CreateJobComponent, ReactiveFormsModule],
       providers: [
+        provideRouter([]),
         { provide: ApiService, useValue: apiServiceMock },
-        { provide: Router, useValue: routerMock },
-        { provide: ActivatedRoute, useValue: routeMock }
-      ]
-    })
-    .overrideComponent(CreateJobComponent, {
-      set: { imports: [ReactiveFormsModule], schemas: ['NO_ERRORS_SCHEMA' as any] } // Mock ngx-editor and routerlink
-    })
-    .compileComponents();
+        { provide: ActivatedRoute, useValue: routeMock },
+        { provide: Router, useValue: routerMock }
+      ],
+      schemas: [NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA]
+    }).compileComponents();
   });
 
   function setupComponent() {
@@ -76,7 +76,7 @@ describe('CreateJobComponent', () => {
 
     it('should catch edit API fetching failures dynamically', () => {
       routeMock.snapshot.paramMap.get.mockReturnValue('101');
-      apiServiceMock.getJobById.mockReturnValue(throwError(() => new Error('API down')));
+      apiServiceMock.getJobById.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
       
       setupComponent();
       fixture.detectChanges();
@@ -127,7 +127,8 @@ describe('CreateJobComponent', () => {
       };
     });
 
-    it('should submit CREATE successfully mapping raw comma skills efficiently', fakeAsync(() => {
+    it('should submit CREATE successfully mapping raw comma skills efficiently', async () => {
+      vi.useFakeTimers();
       apiServiceMock.createJob.mockReturnValue(of({ id: 99 }));
       setupComponent();
       fixture.detectChanges();
@@ -141,11 +142,14 @@ describe('CreateJobComponent', () => {
       }));
       expect(component.successMessage).toContain('Job posted');
       
-      tick(1500); // Navigation boundary 
+      // Navigation boundary - wait for 1500ms setTimeout in component
+      await vi.advanceTimersByTimeAsync(1500);
       expect(routerMock.navigate).toHaveBeenCalledWith(['/jobs', 99]);
-    }));
+      vi.useRealTimers();
+    });
 
-    it('should submit UPDATE successfully mapping empty skills gracefully to array', fakeAsync(() => {
+    it('should submit UPDATE successfully mapping empty skills gracefully to array', async () => {
+      vi.useFakeTimers();
       routeMock.snapshot.paramMap.get.mockReturnValue('101');
       apiServiceMock.getJobById.mockReturnValue(of({ id: 101 }));
       apiServiceMock.updateJob.mockReturnValue(of({ id: 101 }));
@@ -161,19 +165,19 @@ describe('CreateJobComponent', () => {
       }));
       expect(component.successMessage).toContain('Job updated');
       
-      tick(1500);
-    }));
+      await vi.advanceTimersByTimeAsync(1500);
+      vi.useRealTimers();
+    });
 
     it('should log submit errors elegantly directly off stream limits', () => {
-      apiServiceMock.createJob.mockReturnValue(throwError(() => new Error('Post failed')));
+      apiServiceMock.createJob.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
       setupComponent();
       fixture.detectChanges();
       
       component.jobForm.setValue(validFormState);
       component.onSubmit();
       
-      expect(ErrorHandlerUtil.getFriendlyError).toHaveBeenCalled();
-      expect(component.errorMessage).toBe('Form submission generated error');
+      expect(component.errorMessage).toBe('Something went wrong on our end. Please try again shortly.');
     });
   });
 });

@@ -2,11 +2,14 @@ import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testin
 import { ManageApplicationsComponent } from './manage-applications.component';
 import { ApiService } from '../../../../core/services/api.service';
 import { ActivatedRoute } from '@angular/router';
-import { DatePipe } from '@angular/common';
-import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
 import { BehaviorSubject, of, throwError } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
+import { CommonModule, DatePipe } from '@angular/common';
 import { vi } from 'vitest';
 import * as ErrorHandlerUtil from '../../../../core/utils/error-handler.util';
+import { provideRouter } from '@angular/router';
+import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('ManageApplicationsComponent', () => {
   let component: ManageApplicationsComponent;
@@ -24,17 +27,16 @@ describe('ManageApplicationsComponent', () => {
     paramMapSubject = new BehaviorSubject({ get: () => '101' });
 
     vi.spyOn(window, 'alert').mockImplementation(() => {});
-    vi.spyOn(ErrorHandlerUtil, 'getFriendlyError').mockReturnValue('Friendly mapped error');
+    // ErrorHandlerUtil is mocked at top level
 
     await TestBed.configureTestingModule({
       imports: [ManageApplicationsComponent, DatePipe, PaginationComponent],
       providers: [
+        provideRouter([]),
         { provide: ApiService, useValue: apiServiceMock },
         { provide: ActivatedRoute, useValue: { paramMap: paramMapSubject.asObservable() } }
-      ]
-    })
-    .overrideComponent(ManageApplicationsComponent, {
-      set: { imports: [DatePipe], schemas: ['NO_ERRORS_SCHEMA' as any] }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     })
     .compileComponents();
   });
@@ -46,7 +48,7 @@ describe('ManageApplicationsComponent', () => {
 
   describe('Initialization and Loading (Boundary / Normal)', () => {
     it('should silently ignore job load anomalies implicitly per code bounds', () => {
-      apiServiceMock.getJobById.mockReturnValue(throwError(() => new Error('Job Not found silent drop')));
+      apiServiceMock.getJobById.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
       apiServiceMock.getJobApplications.mockReturnValue(of({ content: [] }));
       
       setupComponent();
@@ -59,7 +61,7 @@ describe('ManageApplicationsComponent', () => {
     it('should execute primary flows smoothly natively subscribing to router sequences', () => {
       apiServiceMock.getJobById.mockReturnValue(of({ id: 101, title: 'Engineer' }));
       apiServiceMock.getJobApplications.mockReturnValue(of({
-        content: [{ id: 1, status: 'APPLIED' }],
+        content: [{ id: 1, status: 'APPLIED', applicantName: 'Alice', applicantEmail: 'alice@example.com', appliedAt: '2026-04-01', resumeUrl: 'http://x' }],
         totalElements: 1,
         totalPages: 1
       }));
@@ -93,14 +95,14 @@ describe('ManageApplicationsComponent', () => {
     it('should intercept update API breakdowns delegating structurally to explicit alerts', () => {
       apiServiceMock.getJobById.mockReturnValue(of({ id: 101 }));
       apiServiceMock.getJobApplications.mockReturnValue(of({ content: [] }));
-      apiServiceMock.updateApplicationStatus.mockReturnValue(throwError(() => new Error('Bad network')));
+      apiServiceMock.updateApplicationStatus.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
       setupComponent();
       fixture.detectChanges();
       
       const app = { id: 7, status: 'APPLIED' } as any;
       component.updateStatus(app, 'REJECTED');
       
-      expect(window.alert).toHaveBeenCalledWith('Friendly mapped error');
+      expect(window.alert).toHaveBeenCalledWith('Something went wrong on our end. Please try again shortly.');
       expect(component.updatingId).toBeNull(); // ID explicitly unlocked mapped limit
     });
 

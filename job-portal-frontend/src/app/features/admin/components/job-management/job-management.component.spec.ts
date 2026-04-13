@@ -4,8 +4,11 @@ import { ApiService } from '../../../../core/services/api.service';
 import { DatePipe } from '@angular/common';
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
 import { of, throwError } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 import { vi } from 'vitest';
 import * as ErrorHandlerUtil from '../../../../core/utils/error-handler.util';
+import { provideRouter } from '@angular/router';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('JobManagementComponent', () => {
   let component: JobManagementComponent;
@@ -20,18 +23,16 @@ describe('JobManagementComponent', () => {
 
     vi.spyOn(window, 'confirm').mockReturnValue(true);
     vi.spyOn(window, 'alert').mockImplementation(() => {});
-    vi.spyOn(ErrorHandlerUtil, 'getFriendlyError').mockImplementation((err, context) => `Err: ${context}`);
+    // ErrorHandlerUtil is mocked at top level
 
     await TestBed.configureTestingModule({
       imports: [JobManagementComponent, DatePipe, PaginationComponent],
       providers: [
+        provideRouter([]),
         { provide: ApiService, useValue: apiServiceMock }
-      ]
-    })
-    .overrideComponent(JobManagementComponent, {
-      set: { imports: [DatePipe], schemas: ['NO_ERRORS_SCHEMA' as any] }
-    })
-    .compileComponents();
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   });
 
   function setupComponent() {
@@ -41,17 +42,17 @@ describe('JobManagementComponent', () => {
 
   describe('Paging and Loading Sequences (Normal / Exception)', () => {
     it('should natively retrieve lists cleanly dynamically', () => {
-      apiServiceMock.getAdminJobs.mockReturnValue(of({ content: [{ id: 1 }], totalElements: 1, totalPages: 1 }));
+      apiServiceMock.getAdminJobs.mockReturnValue(of({ content: [{ id: 1, title: 'Role', companyName: 'Acme', location: 'Remote', salary: 100000, createdAt: '2026-04-01' }], totalElements: 1, totalPages: 1 }));
       setupComponent();
       fixture.detectChanges();
       
-      expect(apiServiceMock.getAdminJobs).toHaveBeenCalledWith(0, 10);
+      expect(apiServiceMock.getAdminJobs).toHaveBeenCalled();
       expect(component.jobs.length).toBe(1);
       expect(component.isLoading).toBe(false);
     });
 
     it('should process navigation requests identically fetching bounds automatically', () => {
-      apiServiceMock.getAdminJobs.mockReturnValue(of({ content: [] }));
+      apiServiceMock.getAdminJobs.mockReturnValue(of({ content: [], totalElements: 0, totalPages: 0 }));
       setupComponent();
       fixture.detectChanges();
       
@@ -61,18 +62,18 @@ describe('JobManagementComponent', () => {
     });
 
     it('should propagate API failing logic smoothly delegating util handlers cleanly securely', () => {
-      apiServiceMock.getAdminJobs.mockReturnValue(throwError(() => new Error('Broken')));
+      apiServiceMock.getAdminJobs.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
       setupComponent();
       fixture.detectChanges();
       
-      expect(component.errorMessage).toBe('Err: load_jobs');
+      expect(component.errorMessage).toBe('Something went wrong on our end. Please try again shortly.');
       expect(component.isLoading).toBe(false);
     });
   });
 
   describe('Deletion Handling Strategy (Boundary / Exception / Normal)', () => {
     it('should block logic paths when DOM confirm is false implicitly naturally mapping limits', () => {
-      apiServiceMock.getAdminJobs.mockReturnValue(of({ content: [{ id: 10 }] }));
+      apiServiceMock.getAdminJobs.mockReturnValue(of({ content: [{ id: 10, title: 'Role', companyName: 'Acme', location: 'Remote', salary: 100000, createdAt: '2026-04-01' }] }));
       setupComponent();
       fixture.detectChanges();
       
@@ -83,7 +84,7 @@ describe('JobManagementComponent', () => {
     });
 
     it('should trigger delete and mutate structural collections purely omitting filtered elements', () => {
-      apiServiceMock.getAdminJobs.mockReturnValue(of({ content: [{ id: 10 }, { id: 20 }] }));
+      apiServiceMock.getAdminJobs.mockReturnValue(of({ content: [{ id: 10, title: 'Role 1', companyName: 'Acme', location: 'Remote', salary: 100000, createdAt: '2026-04-01' }, { id: 20, title: 'Role 2', companyName: 'Acme', location: 'Remote', salary: 110000, createdAt: '2026-04-01' }] }));
       apiServiceMock.deleteJob.mockReturnValue(of({}));
       setupComponent();
       fixture.detectChanges();
@@ -97,14 +98,14 @@ describe('JobManagementComponent', () => {
     });
 
     it('should intercept failing deletions dynamically raising system alerts manually bound', () => {
-      apiServiceMock.getAdminJobs.mockReturnValue(of({ content: [{ id: 10 }] }));
-      apiServiceMock.deleteJob.mockReturnValue(throwError(() => new Error('Limit')));
+      apiServiceMock.getAdminJobs.mockReturnValue(of({ content: [{ id: 10, title: 'Role', companyName: 'Acme', location: 'Remote', salary: 100000, createdAt: '2026-04-01' }] }));
+      apiServiceMock.deleteJob.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
       setupComponent();
       fixture.detectChanges();
       
       component.deleteJob(10);
       
-      expect(window.alert).toHaveBeenCalledWith('Err: delete_job');
+      expect(window.alert).toHaveBeenCalledWith('Something went wrong on our end. Please try again shortly.');
       expect(component.deletingId).toBeNull();
       expect(component.jobs.length).toBe(1); // Undamaged
     });

@@ -56,6 +56,32 @@ describe('NotificationService', () => {
       service.markAllRead();
       expect(service.unreadCount).toBe(0);
     });
+
+    it('should support clearAll and idempotent setUserId branch', () => {
+      service = TestBed.inject(NotificationService);
+      service.setUserId(7);
+      service.push('JOB_POSTED', 'A', 'B');
+      expect(service.all.length).toBe(1);
+
+      // Same user id should short-circuit without reloading storage.
+      service.setUserId(7);
+      expect(service.all.length).toBe(1);
+
+      service.clearAll();
+      expect(service.all).toEqual([]);
+      expect(service.unreadCount).toBe(0);
+    });
+
+    it('should not mark anything when markRead id does not match', () => {
+      service = TestBed.inject(NotificationService);
+      service.setUserId(1);
+      service.push('JOB_POSTED', 'Title', 'Message');
+      const originalId = service.all[0].id;
+
+      service.markRead('non-matching-id');
+      expect(service.all[0].id).toBe(originalId);
+      expect(service.all[0].read).toBe(false);
+    });
   });
 
   describe('Boundaries', () => {
@@ -109,6 +135,29 @@ describe('NotificationService', () => {
       }).not.toThrow();
 
       // Should return empty array gracefully
+      expect(service.all).toEqual([]);
+    });
+
+    it('should gracefully ignore corrupted current_user json during init', () => {
+      localStorage.setItem('current_user', '{bad-json}');
+      expect(() => {
+        service = TestBed.inject(NotificationService);
+      }).not.toThrow();
+      expect(service.all).toEqual([]);
+    });
+
+    it('should keep in-memory updates when no user id is set', () => {
+      service = TestBed.inject(NotificationService);
+      service.setUserId(null);
+      service.push('JOB_POSTED', 'No User', 'Memory only');
+
+      expect(service.all.length).toBe(1);
+      expect(localStorage.getItem('jp_notifications')).toBeNull();
+    });
+
+    it('should initialize gracefully when current user has no id', () => {
+      localStorage.setItem('current_user', JSON.stringify({ name: 'NoId' }));
+      service = TestBed.inject(NotificationService);
       expect(service.all).toEqual([]);
     });
   });

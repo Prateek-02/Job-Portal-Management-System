@@ -3,8 +3,10 @@ import { AdminLayoutComponent } from './admin-layout.component';
 import { AuthService } from '../../core/services/auth.service';
 import { CacheService } from '../../core/services/cache.service';
 import { NotificationService } from '../../core/services/notification.service';
-import { Router } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { vi } from 'vitest';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 describe('AdminLayoutComponent', () => {
   let component: AdminLayoutComponent;
@@ -21,24 +23,19 @@ describe('AdminLayoutComponent', () => {
       navigateByUrl: vi.fn().mockResolvedValue(true),
       navigate: vi.fn()
     };
-    authServiceMock = {};
+    authServiceMock = { getCurrentUser: vi.fn().mockReturnValue({ id: 1, role: 'ADMIN' }) };
     notificationServiceMock = {};
 
     await TestBed.configureTestingModule({
       imports: [AdminLayoutComponent],
       providers: [
+        provideRouter([]),
         { provide: CacheService, useValue: cacheServiceMock },
-        { provide: Router, useValue: routerMock },
         { provide: AuthService, useValue: authServiceMock },
-        // Use string provide if path mapping is weird in source, but class injection is used in constructor.
-        // Assuming TS resolves it in TestBed safely via mock:
         { provide: NotificationService, useValue: notificationServiceMock }
-      ]
-    })
-    .overrideComponent(AdminLayoutComponent, {
-      set: { imports: [], schemas: ['NO_ERRORS_SCHEMA' as any] }
-    })
-    .compileComponents();
+      ],
+      schemas: [NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA]
+    }).compileComponents();
     
     fixture = TestBed.createComponent(AdminLayoutComponent);
     component = fixture.componentInstance;
@@ -47,10 +44,15 @@ describe('AdminLayoutComponent', () => {
 
   describe('Normal working', () => {
     it('should refresh data and reload current router URL', async () => {
+      const router = TestBed.inject(Router);
+      vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
+      vi.spyOn(router, 'navigate');
+      Object.defineProperty(router, 'url', { value: '/admin/settings' });
+
       await component.refreshData();
       expect(cacheServiceMock.clearAll).toHaveBeenCalled();
-      expect(routerMock.navigateByUrl).toHaveBeenCalledWith('/', { skipLocationChange: true });
-      expect(routerMock.navigate).toHaveBeenCalledWith(['/admin/settings']);
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/', { skipLocationChange: true });
+      expect(router.navigate).toHaveBeenCalledWith(['/admin/settings']);
     });
 
     it('should toggle notification panel state', () => {

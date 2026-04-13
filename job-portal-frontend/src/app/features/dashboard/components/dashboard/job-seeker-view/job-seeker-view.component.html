@@ -1,7 +1,7 @@
 <!-- ── JOB SEEKER PERSPECTIVE ─────────────────────────── -->
 <div class="mb-8">
-  <h1 class="text-3xl font-bold text-text-primary tracking-tighter mb-3">Hello, {{ user?.name?.split(' ')[0] }}</h1>
-  <p class="text-[15px] font-medium text-text-secondary opacity-70">Manage your applications and track market trends.
+  <h1 class="text-3xl font-bold text-text-primary tracking-tighter mb-3">Hello, {{ getFirstName() }}</h1>
+  <p class="text-[15px] font-medium text-text-secondary opacity-70">{{ getSubtitle() }}
   </p>
 </div>
 

@@ -1,11 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AllApplicationsComponent } from './all-applications.component';
 import { ApiService } from '../../../../core/services/api.service';
-import { DatePipe } from '@angular/common';
+import { DatePipe, CommonModule } from '@angular/common';
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
 import { of, throwError } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 import { vi } from 'vitest';
 import * as ErrorHandlerUtil from '../../../../core/utils/error-handler.util';
+import { provideRouter } from '@angular/router';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('AllApplicationsComponent', () => {
   let component: AllApplicationsComponent;
@@ -18,17 +21,16 @@ describe('AllApplicationsComponent', () => {
       updateApplicationStatus: vi.fn()
     };
 
-    vi.spyOn(ErrorHandlerUtil, 'getFriendlyError').mockReturnValue('Application specific error');
+    // ErrorHandlerUtil is mocked at top level
     vi.spyOn(window, 'alert').mockImplementation(() => {});
 
     await TestBed.configureTestingModule({
       imports: [AllApplicationsComponent, DatePipe, PaginationComponent],
       providers: [
+        provideRouter([]),
         { provide: ApiService, useValue: apiServiceMock }
-      ]
-    })
-    .overrideComponent(AllApplicationsComponent, {
-      set: { imports: [DatePipe], schemas: ['NO_ERRORS_SCHEMA' as any] } // Mock RouterLink
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     })
     .compileComponents();
   });
@@ -41,7 +43,10 @@ describe('AllApplicationsComponent', () => {
   describe('Initialization (Normal / Exception)', () => {
     it('should cleanly init boundary conditions pulling applications normally', () => {
       apiServiceMock.getAllRecruiterApplications.mockReturnValue(of({
-        content: [{ id: 1, status: 'APPLIED' }, { id: 2, status: 'SHORTLISTED' }],
+        content: [
+          { id: 1, status: 'APPLIED', applicantName: 'Alice', applicantEmail: 'alice@example.com', jobTitle: 'Engineer', companyName: 'Acme', appliedAt: '2026-04-01', resumeUrl: 'http://x' },
+          { id: 2, status: 'SHORTLISTED', applicantName: 'Bob', applicantEmail: 'bob@example.com', jobTitle: 'Developer', companyName: 'Acme', appliedAt: '2026-04-01', resumeUrl: 'http://x' }
+        ],
         totalElements: 2,
         totalPages: 1
       }));
@@ -59,12 +64,12 @@ describe('AllApplicationsComponent', () => {
     });
 
     it('should natively propagate internal loading exceptions appropriately', () => {
-      apiServiceMock.getAllRecruiterApplications.mockReturnValue(throwError(() => new Error('Server dead')));
+      apiServiceMock.getAllRecruiterApplications.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
       
       setupComponent();
       fixture.detectChanges();
-      
-      expect(component.errorMessage).toBe('Application specific error');
+      expect(component.isLoading).toBe(false);
+      expect(component.errorMessage).toBe('Something went wrong on our end. Please try again shortly.');
       expect(component.isLoading).toBe(false);
     });
   });
@@ -97,14 +102,14 @@ describe('AllApplicationsComponent', () => {
 
     it('should protect unhandled exceptions safely firing DOM alerts when bounds exceeded', () => {
       apiServiceMock.getAllRecruiterApplications.mockReturnValue(of({ content: [] }));
-      apiServiceMock.updateApplicationStatus.mockReturnValue(throwError(() => new Error('Fail bounds')));
+      apiServiceMock.updateApplicationStatus.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
       setupComponent();
       fixture.detectChanges();
       
       const app = { id: 5, status: 'APPLIED' } as any;
       component.updateStatus(app, 'SHORTLISTED');
       
-      expect(window.alert).toHaveBeenCalledWith('Application specific error');
+      expect(window.alert).toHaveBeenCalledWith('Something went wrong on our end. Please try again shortly.');
       expect(component.updatingId).toBeNull(); // Clean up successfully
     });
 

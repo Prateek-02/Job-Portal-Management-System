@@ -1,11 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UserManagementComponent } from './user-management.component';
 import { ApiService } from '../../../../core/services/api.service';
-import { DatePipe } from '@angular/common';
-import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
 import { of, throwError } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
+import { DatePipe } from '@angular/common';
 import { vi } from 'vitest';
 import * as ErrorHandlerUtil from '../../../../core/utils/error-handler.util';
+import { provideRouter } from '@angular/router';
+import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('UserManagementComponent', () => {
   let component: UserManagementComponent;
@@ -20,18 +23,16 @@ describe('UserManagementComponent', () => {
 
     vi.spyOn(window, 'confirm').mockReturnValue(true);
     vi.spyOn(window, 'alert').mockImplementation(() => {});
-    vi.spyOn(ErrorHandlerUtil, 'getFriendlyError').mockImplementation((err, context) => `Err: ${context}`);
+    // ErrorHandlerUtil is mocked at top level
 
     await TestBed.configureTestingModule({
       imports: [UserManagementComponent, DatePipe, PaginationComponent],
       providers: [
+        provideRouter([]),
         { provide: ApiService, useValue: apiServiceMock }
-      ]
-    })
-    .overrideComponent(UserManagementComponent, {
-      set: { imports: [DatePipe], schemas: ['NO_ERRORS_SCHEMA' as any] }
-    })
-    .compileComponents();
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   });
 
   function setupComponent() {
@@ -41,7 +42,7 @@ describe('UserManagementComponent', () => {
 
   describe('Paging and Loading Sequences (Normal / Exception)', () => {
     it('should natively retrieve user lists cleanly mapping observables dynamically', () => {
-      apiServiceMock.getAdminUsers.mockReturnValue(of({ content: [{ id: 1 }], totalElements: 1, totalPages: 1 }));
+      apiServiceMock.getAdminUsers.mockReturnValue(of({ content: [{ id: 1, name: 'John', email: 'john@example.com', role: 'JOB_SEEKER', createdAt: '2026-04-01' }], totalElements: 1, totalPages: 1 }));
       setupComponent();
       fixture.detectChanges();
       
@@ -51,7 +52,7 @@ describe('UserManagementComponent', () => {
     });
 
     it('should process user navigation requests identically fetching bounds automatically', () => {
-      apiServiceMock.getAdminUsers.mockReturnValue(of({ content: [] }));
+      apiServiceMock.getAdminUsers.mockReturnValue(of({ content: [], totalElements: 0, totalPages: 0 }));
       setupComponent();
       fixture.detectChanges();
       
@@ -61,18 +62,18 @@ describe('UserManagementComponent', () => {
     });
 
     it('should propagate API failing user fetches smoothly delegating UI blocks cleanly securely', () => {
-      apiServiceMock.getAdminUsers.mockReturnValue(throwError(() => new Error('Broken')));
+      apiServiceMock.getAdminUsers.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
       setupComponent();
       fixture.detectChanges();
-      
-      expect(component.errorMessage).toBe('Err: load_users');
+      expect(component.isLoading).toBe(false);
+      expect(component.errorMessage).toBe('Something went wrong on our end. Please try again shortly.');
       expect(component.isLoading).toBe(false);
     });
   });
 
   describe('Deletion Strategy & CSS Bindings (Boundary / Exception / Normal)', () => {
     it('should boundary protect bypass deletions natively when prompt maps confirm inherently false manually', () => {
-      apiServiceMock.getAdminUsers.mockReturnValue(of({ content: [{ id: 10 }] }));
+      apiServiceMock.getAdminUsers.mockReturnValue(of({ content: [{ id: 10, name: 'A', email: 'a@example.com', role: 'JOB_SEEKER', createdAt: '2026-04-01' }] }));
       setupComponent();
       fixture.detectChanges();
       
@@ -83,7 +84,7 @@ describe('UserManagementComponent', () => {
     });
 
     it('should trigger user delete correctly mutating structural limits seamlessly mapped internally', () => {
-      apiServiceMock.getAdminUsers.mockReturnValue(of({ content: [{ id: 10 }, { id: 20 }] }));
+      apiServiceMock.getAdminUsers.mockReturnValue(of({ content: [{ id: 10, name: 'A', email: 'a@example.com', role: 'JOB_SEEKER', createdAt: '2026-04-01' }, { id: 20, name: 'B', email: 'b@example.com', role: 'RECRUITER', createdAt: '2026-04-01' }] }));
       apiServiceMock.deleteUser.mockReturnValue(of({}));
       setupComponent();
       fixture.detectChanges();
@@ -97,14 +98,14 @@ describe('UserManagementComponent', () => {
     });
 
     it('should throw UI intercept exception alerts propagating errors gracefully unblocking locks logically dynamically', () => {
-      apiServiceMock.getAdminUsers.mockReturnValue(of({ content: [{ id: 10 }] }));
-      apiServiceMock.deleteUser.mockReturnValue(throwError(() => new Error('Limit')));
+      apiServiceMock.getAdminUsers.mockReturnValue(of({ content: [{ id: 10, name: 'A', email: 'a@example.com', role: 'JOB_SEEKER', createdAt: '2026-04-01' }] }));
+      apiServiceMock.deleteUser.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
       setupComponent();
       fixture.detectChanges();
       
       component.deleteUser(10);
       
-      expect(window.alert).toHaveBeenCalledWith('Err: delete_user');
+      expect(window.alert).toHaveBeenCalledWith('Something went wrong on our end. Please try again shortly.');
       expect(component.deletingId).toBeNull();
       expect(component.users.length).toBe(1); // Undamaged structure bounds mapping
     });

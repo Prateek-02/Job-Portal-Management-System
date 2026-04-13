@@ -1,5 +1,5 @@
 <!-- ── SOPHISTICATED SIDEBAR ─────────────────────────────── -->
-<aside class="lg:w-[320px] flex-shrink-0 animate-fade-in-up">
+<aside class="lg:w-[320px] shrink-0 animate-fade-in-up">
   <div class="celestial-card p-8 flex flex-col items-center text-center sticky top-28 inner-glow">
 
     <!-- User Profile Section -->
@@ -8,7 +8,7 @@
         style="background: linear-gradient(135deg, var(--energy-sphere-color), var(--color-energy-indigo))">
         <div
           class="w-full h-full rounded-full bg-bg-primary flex items-center justify-center text-text-primary font-bold text-4xl shadow-inner">
-          {{ user?.name?.charAt(0)?.toUpperCase() || 'U' }}
+          {{ getInitial() }}
         </div>
       </div>
       <!-- Decorative Energy Ring -->
@@ -16,12 +16,12 @@
         style="background: var(--energy-sphere-color)"></div>
     </div>
 
-    <h2 class="text-2xl font-bold text-text-primary mb-1">{{ user?.name || 'User Profile' }}</h2>
+    <h2 class="text-2xl font-bold text-text-primary mb-1">{{ getDisplayName() }}</h2>
     <p class="text-sm font-semibold text-text-secondary opacity-60 mb-6">{{ user?.email }}</p>
 
     <div
       class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] bg-bg-secondary text-text-primary mb-10 shadow-lg border border-glass-border">
-      {{ isJobSeeker ? 'Job Seeker' : (isRecruiter ? 'Recruiter' : 'System Admin') }}
+      {{ getRoleLabel() }}
     </div>
 
     <!-- Dashboard Navigation -->

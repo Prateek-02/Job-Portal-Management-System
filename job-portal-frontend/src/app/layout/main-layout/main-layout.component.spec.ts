@@ -3,6 +3,11 @@ import { MainLayoutComponent } from './main-layout.component';
 import { AuthService } from '../../core/services/auth.service';
 import { BehaviorSubject } from 'rxjs';
 import { vi } from 'vitest';
+import { RouterOutlet, provideRouter } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { FooterComponent } from '../../shared/components/footer/footer.component';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('MainLayoutComponent', () => {
   let component: MainLayoutComponent;
@@ -15,17 +20,22 @@ describe('MainLayoutComponent', () => {
     authServiceMock = {
       currentUser$: currentUserSubject.asObservable(),
       isJobSeeker: vi.fn(),
-      isRecruiter: vi.fn()
+      isRecruiter: vi.fn(),
+      isAdmin: vi.fn()
     };
 
     await TestBed.configureTestingModule({
       imports: [MainLayoutComponent],
       providers: [
+        provideRouter([]),
         { provide: AuthService, useValue: authServiceMock }
       ]
     })
     .overrideComponent(MainLayoutComponent, {
-      set: { imports: [], schemas: ['NO_ERRORS_SCHEMA' as any] }
+      set: { 
+        imports: [CommonModule, RouterOutlet, NavbarComponent, FooterComponent], 
+        schemas: [NO_ERRORS_SCHEMA] 
+      }
     })
     .compileComponents();
     

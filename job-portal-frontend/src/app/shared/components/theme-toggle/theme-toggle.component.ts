@@ -11,4 +11,28 @@ import { ThemeService } from '../../../core/services/theme.service';
 })
 export class ThemeToggleComponent {
   constructor(public themeService: ThemeService) {}
+
+  isDarkMode(): boolean {
+    return this.themeService.isDark();
+  }
+
+  toggleTheme(): void {
+    this.themeService.toggleTheme();
+  }
+
+  getToggleTitle(): string {
+    return this.isDarkMode() ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+  }
+
+  getIconName(): 'sun' | 'moon' {
+    return this.isDarkMode() ? 'sun' : 'moon';
+  }
+
+  showSunIcon(): boolean {
+    return this.isDarkMode();
+  }
+
+  showMoonIcon(): boolean {
+    return !this.isDarkMode();
+  }
 }

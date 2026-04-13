@@ -1,4 +1,4 @@
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { ThemeService, Theme } from './theme.service';
 import { vi } from 'vitest';
 
@@ -55,7 +55,8 @@ describe('ThemeService', () => {
     });
 
     // Exception handling / null boundary
-    it('should safely add and remove transition classes using fakeAsync without throwing exceptions', fakeAsync(() => {
+    it('should safely add and remove transition classes using fake timers without throwing exceptions', async () => {
+      vi.useFakeTimers();
       service = TestBed.inject(ThemeService);
       
       service.setTheme('dark');
@@ -64,10 +65,11 @@ describe('ThemeService', () => {
       expect(document.documentElement.classList.contains('theme-transitioning')).toBe(true);
       
       // Fast-forward 500ms
-      tick(500);
+      vi.advanceTimersByTime(500);
       
       // Class should be removed without exceptions
       expect(document.documentElement.classList.contains('theme-transitioning')).toBe(false);
-    }));
+      vi.useRealTimers();
+    });
   });
 });

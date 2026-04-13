@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MyJobsComponent } from './my-jobs.component';
 import { ApiService } from '../../../../core/services/api.service';
 import { AuthService } from '../../../../core/services/auth.service';
-import { Router } from '@angular/router';
+import { Router, provideRouter, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
 import { of, throwError } from 'rxjs';
@@ -30,13 +30,16 @@ describe('MyJobsComponent', () => {
     await TestBed.configureTestingModule({
       imports: [MyJobsComponent, DatePipe, PaginationComponent],
       providers: [
+        provideRouter([]),
         { provide: ApiService, useValue: apiServiceMock },
-        { provide: AuthService, useValue: authServiceMock },
-        { provide: Router, useValue: {} }
+        { provide: AuthService, useValue: authServiceMock }
       ]
     })
     .overrideComponent(MyJobsComponent, {
-      set: { imports: [DatePipe], schemas: ['NO_ERRORS_SCHEMA' as any] } // Mock RouterLink
+      set: { 
+        imports: [DatePipe, PaginationComponent, RouterLink], 
+        schemas: ['NO_ERRORS_SCHEMA' as any] 
+      }
     })
     .compileComponents();
   });
@@ -59,7 +62,7 @@ describe('MyJobsComponent', () => {
     it('should seamlessly execute API and map page metadata strictly when valid user exists natively', () => {
       authServiceMock.getCurrentUser.mockReturnValue({ id: 10 });
       apiServiceMock.getJobsByRecruiter.mockReturnValue(of({ 
-        content: [{ id: 1, title: 'Job 1' }], totalElements: 1, totalPages: 1 
+        content: [{ id: 1, title: 'Job 1', companyName: 'TestCorp' }], totalElements: 1, totalPages: 1 
       }));
       
       setupComponent();
@@ -74,7 +77,7 @@ describe('MyJobsComponent', () => {
   describe('Deletion Strategy (Normal / Exception / Boundary)', () => {
     it('should conditionally halt payload submission natively when prompt boundary confirms implicitly false', () => {
       authServiceMock.getCurrentUser.mockReturnValue({ id: 10 });
-      apiServiceMock.getJobsByRecruiter.mockReturnValue(of({ content: [{ id: 99 }] }));
+      apiServiceMock.getJobsByRecruiter.mockReturnValue(of({ content: [{ id: 99, companyName: 'TestCorp' }] }));
       setupComponent();
       fixture.detectChanges();
       
@@ -86,7 +89,7 @@ describe('MyJobsComponent', () => {
 
     it('should safely omit structurally deleted entities locally seamlessly', () => {
       authServiceMock.getCurrentUser.mockReturnValue({ id: 10 });
-      apiServiceMock.getJobsByRecruiter.mockReturnValue(of({ content: [{ id: 99 }, { id: 100 }] }));
+      apiServiceMock.getJobsByRecruiter.mockReturnValue(of({ content: [{ id: 99, companyName: 'TestCorp' }, { id: 100, companyName: 'TestCorp' }] }));
       apiServiceMock.deleteJob.mockReturnValue(of({}));
       
       setupComponent();
@@ -103,7 +106,7 @@ describe('MyJobsComponent', () => {
 
     it('should securely handle API exceptions structurally propagating error signals explicitly via core logic alerts directly mapped limit constraints', () => {
       authServiceMock.getCurrentUser.mockReturnValue({ id: 10 });
-      apiServiceMock.getJobsByRecruiter.mockReturnValue(of({ content: [{ id: 99 }] }));
+      apiServiceMock.getJobsByRecruiter.mockReturnValue(of({ content: [{ id: 99, companyName: 'TestCorp' }] }));
       apiServiceMock.deleteJob.mockReturnValue(throwError(() => new Error('Delete constraint limit')));
       
       setupComponent();

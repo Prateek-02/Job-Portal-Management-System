@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AuthLayoutComponent } from './auth-layout.component';
+import { RouterOutlet, provideRouter } from '@angular/router';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('AuthLayoutComponent', () => {
   let component: AuthLayoutComponent;
@@ -7,10 +9,11 @@ describe('AuthLayoutComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AuthLayoutComponent]
+      imports: [AuthLayoutComponent],
+      providers: [provideRouter([])]
     })
     .overrideComponent(AuthLayoutComponent, {
-      set: { imports: [], schemas: ['NO_ERRORS_SCHEMA' as any] }
+      set: { imports: [RouterOutlet], schemas: [NO_ERRORS_SCHEMA] }
     })
     .compileComponents();
     
@@ -29,5 +32,20 @@ describe('AuthLayoutComponent', () => {
     expect(() => {
       fixture.detectChanges();
     }).not.toThrow();
+  });
+
+  it('should expose auth layout helper', () => {
+    expect(component.getLayoutType()).toBe('auth');
+  });
+
+  it('should evaluate auth layout helpers', () => {
+    expect(component.getContainerClass()).toBe('auth-layout');
+    expect(component.normalizeRedirect(' /signup ')).toBe('/signup');
+    expect(component.normalizeRedirect('')).toBe('/login');
+    expect(component.normalizeRedirect(undefined)).toBe('/login');
+    expect(component.shouldUseCompactLayout(500)).toBe(true);
+    expect(component.shouldUseCompactLayout(768)).toBe(false);
+    expect(component.shouldUseCompactLayout(1200)).toBe(false);
+    expect(component.getDefaultRedirect()).toBe('/login');
   });
 });

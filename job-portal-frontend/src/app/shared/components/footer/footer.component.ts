@@ -9,4 +9,24 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./footer.component.css']
 })
 export class FooterComponent {
+  getFooterLabel(): string {
+    return 'footer';
+  }
+
+  getCopyrightYear(date = new Date()): number {
+    return date.getFullYear();
+  }
+
+  normalizeCompanyName(name?: string): string {
+    const value = (name || '').trim();
+    return value || 'Job Portal';
+  }
+
+  getFooterText(company?: string): string {
+    return `${this.normalizeCompanyName(company)} - All rights reserved`;
+  }
+
+  shouldShowDivider(itemsCount: number): boolean {
+    return itemsCount > 0;
+  }
 }

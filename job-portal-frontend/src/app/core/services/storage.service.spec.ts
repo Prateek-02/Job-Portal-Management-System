@@ -33,11 +33,25 @@ describe('StorageService', () => {
     // Boundary value
     it('should handle empty string as valid token', () => {
       service.setToken('');
-      expect(service.getToken()).toBe('');
+      expect(service.getToken()).toBeNull();
       // In JS, an empty string falls to falsy on `!!`, but since it's an empty string and not null,
       // localStorage.getItem returns "". `!!""` is false. Let's see if hasToken returns false.
       // A truly valid token shouldn't be empty, but testing boundary.
       expect(service.hasToken()).toBe(false); 
+    });
+  });
+
+  describe('Refresh Token and Role Management', () => {
+    it('should set/get/remove refresh token', () => {
+      service.setRefreshToken('refresh_1');
+      expect(service.getRefreshToken()).toBe('refresh_1');
+      service.removeRefreshToken();
+      expect(service.getRefreshToken()).toBeNull();
+    });
+
+    it('should set/get user role', () => {
+      service.setUserRole('RECRUITER');
+      expect(service.getUserRole()).toBe('RECRUITER');
     });
   });
 
@@ -62,6 +76,13 @@ describe('StorageService', () => {
       expect(() => {
         service.getUser();
       }).toThrowError(SyntaxError);
+    });
+
+    it('should remove user explicitly', () => {
+      service.setUser({ id: 9, name: 'Jane' });
+      expect(service.getUser()).toEqual({ id: 9, name: 'Jane' });
+      service.removeUser();
+      expect(service.getUser()).toBeNull();
     });
   });
 

@@ -20,4 +20,32 @@ export class SidebarComponent {
     this.authService.logout();
     this.router.navigate(['/auth/login']);
   }
+
+  getAdminDashboardRoute(): string {
+    return '/admin/dashboard';
+  }
+
+  getUsersRoute(): string {
+    return '/admin/users';
+  }
+
+  getJobsRoute(): string {
+    return '/admin/jobs';
+  }
+
+  getBrowseJobsRoute(): string {
+    return '/jobs';
+  }
+
+  canShowAdminNav(): boolean {
+    return this.authService.isAdmin();
+  }
+
+  getConsoleTitle(): string {
+    return 'Admin Console';
+  }
+
+  getConsoleSubtitle(): string {
+    return 'System Root';
+  }
 }

@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
 import { ApiService } from './api.service';
 import { environment } from '../../../environments/environment';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -11,8 +12,7 @@ describe('ApiService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [ApiService]
+      providers: [ApiService, provideHttpClient(), provideHttpClientTesting()]
     });
     service = TestBed.inject(ApiService);
     httpMock = TestBed.inject(HttpTestingController);
@@ -218,6 +218,122 @@ describe('ApiService', () => {
 
       const req = httpMock.expectOne(request => request.url === `${apiUrl}/applications/jobApplication/999/status`);
       req.flush('Not Found', { status: 404, statusText: 'Not Found' });
+    });
+  });
+
+  describe('additional endpoint coverage', () => {
+    it('should hit basic auth/profile endpoints', () => {
+      service.register({ name: 'x' } as any).subscribe();
+      httpMock.expectOne(`${apiUrl}/auth/register`).flush({ message: 'ok' });
+
+      service.refreshToken('r1').subscribe();
+      httpMock.expectOne(`${apiUrl}/auth/refresh`).flush({ accessToken: 'a' });
+
+      service.forgotPassword('a@b.com').subscribe();
+      httpMock.expectOne(`${apiUrl}/auth/forgot-password`).flush({ message: 'sent' });
+
+      service.resetPassword('a@b.com', '111111', 'pass').subscribe();
+      httpMock.expectOne(`${apiUrl}/auth/reset-password`).flush({ message: 'ok' });
+
+      service.getProfile().subscribe();
+      httpMock.expectOne(`${apiUrl}/auth/profile`).flush({});
+
+      service.updateProfile({ name: 'Jane' } as any).subscribe();
+      httpMock.expectOne(`${apiUrl}/auth/users/profile`).flush({});
+
+      const fd = new FormData();
+      service.uploadProfileImage(7, fd).subscribe();
+      httpMock.expectOne(`${apiUrl}/auth/users/7/profile-image`).flush({});
+    });
+
+    it('should hit user/job CRUD endpoints with params', () => {
+      service.getAllUsers(1, 20, 'name', 'asc').subscribe();
+      const usersReq = httpMock.expectOne(r => r.url === `${apiUrl}/auth/users`);
+      expect(usersReq.request.params.get('page')).toBe('1');
+      usersReq.flush({ content: [] });
+
+      service.getUserById(9).subscribe();
+      httpMock.expectOne(`${apiUrl}/auth/users/9`).flush({});
+
+      service.getJobById(11).subscribe();
+      httpMock.expectOne(`${apiUrl}/jobs/11`).flush({});
+
+      service.createJob({ title: 'Dev' } as any).subscribe();
+      httpMock.expectOne(`${apiUrl}/jobs`).flush({});
+
+      service.updateJob(11, { title: 'Dev2' } as any).subscribe();
+      httpMock.expectOne(`${apiUrl}/jobs/11`).flush({});
+
+      service.deleteJob(11).subscribe();
+      httpMock.expectOne(`${apiUrl}/jobs/11`).flush({ message: 'ok' });
+    });
+
+    it('should hit search/recruiter/application/admin endpoints', () => {
+      service.searchJobs({ title: 'java' } as any, 2, 5).subscribe();
+      const searchReq = httpMock.expectOne(r => r.url === `${apiUrl}/jobs/search`);
+      expect(searchReq.request.method).toBe('POST');
+      expect(searchReq.request.params.get('page')).toBe('2');
+      searchReq.flush({ content: [] });
+
+      service.getJobsByRecruiter(5).subscribe();
+      httpMock.expectOne(r => r.url === `${apiUrl}/jobs/recruiter/5`).flush({ content: [] });
+
+      service.getMarketPulseStats().subscribe();
+      httpMock.expectOne(`${apiUrl}/jobs/stats/market-pulse`).flush({});
+
+      service.getMyApplications().subscribe();
+      httpMock.expectOne(r => r.url === `${apiUrl}/applications/user/viewApplications`).flush({ content: [] });
+
+      service.getJobApplications(9).subscribe();
+      httpMock.expectOne(r => r.url === `${apiUrl}/applications/jobApplications/9`).flush({ content: [] });
+
+      service.getAllRecruiterApplications().subscribe();
+      httpMock.expectOne(r => r.url === `${apiUrl}/applications/recruiter`).flush({ content: [] });
+
+      service.getTotalApplicationsCount().subscribe();
+      httpMock.expectOne(`${apiUrl}/applications/count`).flush(5);
+
+      service.deleteJobApplications(9).subscribe();
+      httpMock.expectOne(`${apiUrl}/applications/job/9`).flush({ message: 'ok' });
+
+      service.getAdminUsers().subscribe();
+      httpMock.expectOne(r => r.url === `${apiUrl}/admin/users`).flush({ content: [] });
+
+      service.getAdminUserById(4).subscribe();
+      httpMock.expectOne(`${apiUrl}/admin/users/4`).flush({});
+
+      service.deleteUser(4).subscribe();
+      httpMock.expectOne(`${apiUrl}/admin/users/4`).flush({ message: 'ok' });
+
+      service.getAdminJobs().subscribe();
+      httpMock.expectOne(r => r.url === `${apiUrl}/admin/jobs`).flush({ content: [] });
+
+      service.getAdminJobById(8).subscribe();
+      httpMock.expectOne(`${apiUrl}/admin/jobs/8`).flush({});
+
+      service.getAdminReports().subscribe();
+      httpMock.expectOne(`${apiUrl}/admin/reports`).flush({});
+
+      service.getPublicStats().subscribe();
+      httpMock.expectOne(`${apiUrl}/admin/public/stats`).flush({});
+    });
+
+    it('should apply default query params for getAllUsers and searchJobs', () => {
+      service.getAllUsers().subscribe();
+      const usersReq = httpMock.expectOne(r => r.url === `${apiUrl}/auth/users`);
+      expect(usersReq.request.params.get('page')).toBe('0');
+      expect(usersReq.request.params.get('size')).toBe('10');
+      expect(usersReq.request.params.get('sortBy')).toBe('id');
+      expect(usersReq.request.params.get('direction')).toBe('desc');
+      usersReq.flush({ content: [] });
+
+      service.searchJobs({} as any).subscribe();
+      const searchReq = httpMock.expectOne(r => r.url === `${apiUrl}/jobs/search`);
+      expect(searchReq.request.params.get('page')).toBe('0');
+      expect(searchReq.request.params.get('size')).toBe('10');
+      expect(searchReq.request.params.get('sortBy')).toBe('createdAt');
+      expect(searchReq.request.params.get('direction')).toBe('desc');
+      searchReq.flush({ content: [] });
     });
   });
 });

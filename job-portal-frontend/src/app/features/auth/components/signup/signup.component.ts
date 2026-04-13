@@ -13,7 +13,7 @@ import { getFriendlyError } from '../../../../core/utils/error-handler.util';
   templateUrl: './signup.component.html'
 })
 export class SignupComponent implements OnInit {
-  signupForm!: FormGroup;
+  signupForm: FormGroup;
   isLoading = false;
   errorMessage = '';
   showPassword = false;
@@ -23,7 +23,14 @@ export class SignupComponent implements OnInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router
-  ) {}
+  ) {
+    this.signupForm = this.fb.group({
+      name: ['', [Validators.required, Validators.minLength(2)]],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      phone: ['', [Validators.required, Validators.pattern('^[0-9]{10,15}$')]]
+    });
+  }
 
   ngOnInit(): void {
     if (this.authService.isAuthenticated()) {
@@ -31,12 +38,7 @@ export class SignupComponent implements OnInit {
       return;
     }
 
-    this.signupForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(2)]],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      phone: ['', [Validators.required, Validators.pattern('^[0-9]{10,15}$')]]
-    });
+    this.signupForm.reset();
   }
 
   selectRole(role: UserRole): void {

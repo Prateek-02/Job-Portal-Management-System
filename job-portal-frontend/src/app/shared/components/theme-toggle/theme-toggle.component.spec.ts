@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ThemeToggleComponent } from './theme-toggle.component';
 import { ThemeService, Theme } from '../../../core/services/theme.service';
 import { signal } from '@angular/core';
+import { vi } from 'vitest';
 
 describe('ThemeToggleComponent', () => {
   let component: ThemeToggleComponent;
@@ -37,19 +38,19 @@ describe('ThemeToggleComponent', () => {
   describe('Normal working', () => {
     it('should create and verify injected service interacts correctly', () => {
       expect(component).toBeTruthy();
-      expect(component.themeService.isDark()).toBe(false);
+      expect(component.isDarkMode()).toBe(false);
       
-      component.themeService.toggleTheme();
-      expect(component.themeService.isDark()).toBe(true);
+      component.toggleTheme();
+      expect(component.isDarkMode()).toBe(true);
     });
   });
 
   describe('Boundary value', () => {
     it('should render structurally true when toggled rapidly', () => {
       for (let i = 0; i < 5; i++) {
-        component.themeService.toggleTheme();
+        component.toggleTheme();
       }
-      expect(component.themeService.isDark()).toBe(true); // toggled 5 times from light -> dark -> light -> dark -> light -> dark
+      expect(component.isDarkMode()).toBe(true); // toggled 5 times from light -> dark -> light -> dark -> light -> dark
     });
   });
 
@@ -59,8 +60,25 @@ describe('ThemeToggleComponent', () => {
       mockThemeService.toggleTheme = () => { throw new Error('Theme error'); };
       
       expect(() => {
-        component.themeService.toggleTheme();
+        component.toggleTheme();
       }).toThrowError('Theme error');
     });
+  });
+
+  it('should support direct class instantiation', () => {
+    const direct = new ThemeToggleComponent(mockThemeService);
+    expect(direct).toBeTruthy();
+  });
+
+  it('should return title for dark and light mode', () => {
+    expect(component.getToggleTitle()).toBe('Switch to Dark Mode');
+    expect(component.getIconName()).toBe('moon');
+    expect(component.showMoonIcon()).toBe(true);
+    expect(component.showSunIcon()).toBe(false);
+    component.toggleTheme();
+    expect(component.getToggleTitle()).toBe('Switch to Light Mode');
+    expect(component.getIconName()).toBe('sun');
+    expect(component.showMoonIcon()).toBe(false);
+    expect(component.showSunIcon()).toBe(true);
   });
 });

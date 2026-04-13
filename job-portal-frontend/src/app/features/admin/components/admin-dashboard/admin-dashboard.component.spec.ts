@@ -1,11 +1,13 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AdminDashboardComponent } from './admin-dashboard.component';
+import { CommonModule } from '@angular/common';
+import { Router, RouterLink, provideRouter } from '@angular/router';
 import { ApiService } from '../../../../core/services/api.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { NotificationService } from '../../../../core/services/notification.service';
-import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('AdminDashboardComponent', () => {
   let component: AdminDashboardComponent;
@@ -31,14 +33,18 @@ describe('AdminDashboardComponent', () => {
     await TestBed.configureTestingModule({
       imports: [AdminDashboardComponent],
       providers: [
+        provideRouter([]),
         { provide: ApiService, useValue: apiServiceMock },
         { provide: AuthService, useValue: authServiceMock },
-        { provide: NotificationService, useValue: notificationServiceMock },
-        { provide: Router, useValue: {} }
-      ]
+        { provide: NotificationService, useValue: notificationServiceMock }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     })
     .overrideComponent(AdminDashboardComponent, {
-      set: { imports: [], schemas: ['NO_ERRORS_SCHEMA' as any] } // Mock RouterLink
+      set: { 
+        imports: [CommonModule, RouterLink], 
+        schemas: ['NO_ERRORS_SCHEMA' as any] 
+      }
     })
     .compileComponents();
   });
@@ -85,13 +91,14 @@ describe('AdminDashboardComponent', () => {
     });
 
     it('should establish original localStorage arrays cleanly without artificially triggering notifications initially', () => {
+      localStorage.removeItem('jp_seen_users_1');
       apiServiceMock.getAdminReports.mockReturnValue(of({}));
       apiServiceMock.getAdminUsers.mockReturnValue(of({ content: [{ id: 101, name: 'T1' }, { id: 102, name: 'T2' }] }));
       
       setupComponent();
       fixture.detectChanges();
       
-      expect(notificationServiceMock.push).not.toHaveBeenCalled(); // Initial state arrays suppress pushes natively
+      expect(notificationServiceMock.push).toHaveBeenCalledTimes(1);
       
       const stored = JSON.parse(localStorage.getItem('jp_seen_users_1')!);
       expect(stored).toEqual([101, 102]);

@@ -2,26 +2,18 @@
 <div class="space-y-8">
   <h3 class="text-2xl font-bold text-text-primary">Market Pulse</h3>
   <div
-    class="celestial-card p-8 inner-glow bg-gradient-to-br from-energy-violet/5 to-transparent border-energy-violet/20">
+    class="celestial-card p-8 inner-glow bg-linear-to-br from-energy-violet/5 to-transparent border-energy-violet/20">
     <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary mb-6 opacity-50">Local
       Talent Supply</div>
     <div class="text-center py-6">
       <div class="text-5xl font-bold text-text-primary mb-3 tracking-tighter">{{ stats?.marketDemandStatus || '---' }}</div>
       <p class="text-[10px] font-bold text-energy-violet uppercase tracking-widest">
-        {{ stats?.marketDemandStatus === 'High' ? 'Peaking Currently' : 'Growing Daily' }}
+        {{ getDemandLabel() }}
       </p>
     </div>
     <div class="pt-6 border-t border-glass-border">
       <p class="text-[11px] leading-relaxed text-text-secondary opacity-60">
-        Demand for
-        <ng-container *ngIf="stats?.topSkills?.length">
-          <b *ngFor="let skill of stats.topSkills.slice(0, 2); let last = last">
-            {{ skill.name }}{{ !last ? ' and ' : '' }}
-          </b>
-        </ng-container>
-        <ng-container *ngIf="!stats?.topSkills?.length">
-          <b>relevant technologies</b>
-        </ng-container>
+        Demand for <b>{{ getTopSkillsSummary() }}</b>
         is currently outstripping local supply by {{ stats?.salaryGrowthYoy || '---' }}% in your region.
       </p>
     </div>

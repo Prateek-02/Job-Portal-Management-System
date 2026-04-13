@@ -16,4 +16,16 @@ export class ViewProfileComponent {
       ? this.user.skills.split(',').map((s: string) => s.trim()).filter(Boolean) 
       : [];
   }
+
+  hasBio(): boolean {
+    return !!this.user?.bio;
+  }
+
+  getDisplayName(): string {
+    return this.user?.name || 'N/A';
+  }
+
+  getDisplayPhone(): string {
+    return this.user?.phone || 'N/A';
+  }
 }

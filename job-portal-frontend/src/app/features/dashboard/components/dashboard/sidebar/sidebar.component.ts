@@ -12,4 +12,18 @@ export class SidebarComponent {
   @Input() user: any;
   @Input() isJobSeeker = false;
   @Input() isRecruiter = false;
+
+  getInitial(): string {
+    return this.user?.name?.charAt(0)?.toUpperCase() || 'U';
+  }
+
+  getDisplayName(): string {
+    return this.user?.name || 'User Profile';
+  }
+
+  getRoleLabel(): string {
+    if (this.isJobSeeker) return 'Job Seeker';
+    if (this.isRecruiter) return 'Recruiter';
+    return 'System Admin';
+  }
 }

@@ -1,11 +1,14 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ForgotPasswordComponent } from './forgot-password.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ApiService } from '../../../../core/services/api.service';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 import { vi } from 'vitest';
 import * as ErrorHandlerUtil from '../../../../core/utils/error-handler.util';
+import { provideRouter } from '@angular/router';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('ForgotPasswordComponent', () => {
   let component: ForgotPasswordComponent;
@@ -23,14 +26,16 @@ describe('ForgotPasswordComponent', () => {
       navigate: vi.fn()
     };
 
-    vi.spyOn(ErrorHandlerUtil, 'getFriendlyError').mockReturnValue('Forgot password error');
+    // ErrorHandlerUtil is mocked at top level
 
     await TestBed.configureTestingModule({
       imports: [ForgotPasswordComponent, ReactiveFormsModule],
       providers: [
+        provideRouter([]),
         { provide: ApiService, useValue: apiServiceMock },
         { provide: Router, useValue: routerMock }
-      ]
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     })
     .overrideComponent(ForgotPasswordComponent, {
       set: { imports: [ReactiveFormsModule], schemas: ['NO_ERRORS_SCHEMA' as any] }
@@ -55,14 +60,19 @@ describe('ForgotPasswordComponent', () => {
     });
 
     it('should catch unhandled exceptions when API throws 500 on request', () => {
-      apiServiceMock.forgotPassword.mockReturnValue(throwError(() => new Error('Server limit')));
+      apiServiceMock.forgotPassword.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
       
       component.forgotForm.setValue({ email: 'test@example.com' });
       component.onSendOtp();
       
-      expect(ErrorHandlerUtil.getFriendlyError).toHaveBeenCalled();
-      expect(component.errorMessage).toBe('Forgot password error');
+      expect(component.errorMessage).toBe('Something went wrong on our end. Please try again shortly.');
       expect(component.showOtpStep).toBe(false);
+    });
+
+    it('should not call forgotPassword when email form is invalid', () => {
+      component.forgotForm.setValue({ email: '' });
+      component.onSendOtp();
+      expect(apiServiceMock.forgotPassword).not.toHaveBeenCalled();
     });
   });
 
@@ -83,7 +93,8 @@ describe('ForgotPasswordComponent', () => {
       expect(apiServiceMock.resetPassword).not.toHaveBeenCalled();
     });
 
-    it('should successfully submit final reset block and route asynchronously', fakeAsync(() => {
+    it('should successfully submit final reset block and route asynchronously', async () => {
+      vi.useFakeTimers();
       apiServiceMock.resetPassword.mockReturnValue(of({ message: 'Success' }));
       
       // Initial mock states
@@ -101,8 +112,26 @@ describe('ForgotPasswordComponent', () => {
       
       // Test the timeout boundary logic routing wrapper
       expect(routerMock.navigate).not.toHaveBeenCalled();
-      tick(2000);
+      await vi.advanceTimersByTimeAsync(2000);
       expect(routerMock.navigate).toHaveBeenCalledWith(['/auth/login']);
-    }));
+      vi.useRealTimers();
+    });
+
+    it('should fallback reset success message and handle API errors', () => {
+      apiServiceMock.resetPassword.mockReturnValue(of({}));
+      component.forgotForm.setValue({ email: 'test@example.com' });
+      component.resetForm.setValue({
+        otp: '123456',
+        newPassword: 'password123',
+        confirmPassword: 'password123'
+      });
+      component.onResetPassword();
+      expect(component.successMessage).toBe('Password reset successfully!');
+
+      apiServiceMock.resetPassword.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 400 })));
+      component.onResetPassword();
+      expect(component.isLoading).toBe(false);
+      expect(component.errorMessage.length).toBeGreaterThan(0);
+    });
   });
 });

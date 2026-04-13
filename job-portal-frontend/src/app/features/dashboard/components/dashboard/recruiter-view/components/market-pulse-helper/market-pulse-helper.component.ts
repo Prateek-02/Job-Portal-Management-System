@@ -27,4 +27,14 @@ export class MarketPulseHelperComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
+
+  getDemandLabel(): string {
+    return this.stats?.marketDemandStatus === 'High' ? 'Peaking Currently' : 'Growing Daily';
+  }
+
+  getTopSkillsSummary(): string {
+    const skills = this.stats?.topSkills || [];
+    if (!skills.length) return 'relevant technologies';
+    return skills.slice(0, 2).map((s: any) => s.name).join(' and ');
+  }
 }

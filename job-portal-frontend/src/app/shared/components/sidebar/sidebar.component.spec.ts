@@ -1,29 +1,24 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SidebarComponent } from './sidebar.component';
 import { AuthService } from '../../../core/services/auth.service';
-import { Router } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { vi } from 'vitest';
 
 describe('SidebarComponent', () => {
   let component: SidebarComponent;
   let fixture: ComponentFixture<SidebarComponent>;
   let authServiceMock: any;
-  let routerMock: any;
 
   beforeEach(async () => {
     authServiceMock = {
       logout: vi.fn(),
       isAdmin: vi.fn().mockReturnValue(true),
     };
-    routerMock = {
-      navigate: vi.fn()
-    };
-
     await TestBed.configureTestingModule({
       imports: [SidebarComponent],
       providers: [
-        { provide: AuthService, useValue: authServiceMock },
-        { provide: Router, useValue: routerMock }
+        provideRouter([]),
+        { provide: AuthService, useValue: authServiceMock }
       ]
     })
     .compileComponents();
@@ -35,9 +30,11 @@ describe('SidebarComponent', () => {
 
   describe('Normal working', () => {
     it('should successfully trigger logout sequence and route', () => {
+      const router = TestBed.inject(Router);
+      vi.spyOn(router, 'navigate');
       component.logout();
       expect(authServiceMock.logout).toHaveBeenCalled();
-      expect(routerMock.navigate).toHaveBeenCalledWith(['/auth/login']);
+      expect(router.navigate).toHaveBeenCalledWith(['/auth/login']);
     });
   });
 
@@ -49,12 +46,24 @@ describe('SidebarComponent', () => {
       }
       expect(authServiceMock.logout).toHaveBeenCalledTimes(10);
     });
+
+    it('should expose route helpers and admin visibility', () => {
+      expect(component.getAdminDashboardRoute()).toBe('/admin/dashboard');
+      expect(component.getUsersRoute()).toBe('/admin/users');
+      expect(component.getJobsRoute()).toBe('/admin/jobs');
+      expect(component.getBrowseJobsRoute()).toBe('/jobs');
+      expect(component.getConsoleTitle()).toBe('Admin Console');
+      expect(component.getConsoleSubtitle()).toBe('System Root');
+      expect(component.canShowAdminNav()).toBe(true);
+      authServiceMock.isAdmin.mockReturnValue(false);
+      expect(component.canShowAdminNav()).toBe(false);
+    });
   });
 
   describe('Exception handling', () => {
     it('should pass unhandled promise rejections properly without crashing DOM when router fails', async () => {
-      // Mock unhandled exception in router
-      routerMock.navigate.mockRejectedValue(new Error('Router failure'));
+      const router = TestBed.inject(Router);
+      vi.spyOn(router, 'navigate').mockRejectedValue(new Error('Router failure'));
       
       // Attempting logout shouldn't throw synchronously
       expect(() => {

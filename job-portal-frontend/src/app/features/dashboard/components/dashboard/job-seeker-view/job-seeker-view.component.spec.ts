@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { JobSeekerViewComponent } from './job-seeker-view.component';
+import { provideRouter } from '@angular/router';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('JobSeekerViewComponent', () => {
   let component: JobSeekerViewComponent;
@@ -7,10 +9,12 @@ describe('JobSeekerViewComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [JobSeekerViewComponent]
+      imports: [JobSeekerViewComponent],
+      providers: [provideRouter([])],
+      schemas: [NO_ERRORS_SCHEMA]
     })
     .overrideComponent(JobSeekerViewComponent, {
-      set: { imports: [], schemas: ['NO_ERRORS_SCHEMA' as any] }
+      set: { schemas: [NO_ERRORS_SCHEMA] }
     })
     .compileComponents();
   });
@@ -37,8 +41,32 @@ describe('JobSeekerViewComponent', () => {
     expect(component.user).toBeUndefined();
   });
 
+  it('should accept null user value without throwing', () => {
+    component.user = null;
+    expect(() => fixture.detectChanges()).not.toThrow();
+    expect(component.user).toBeNull();
+  });
+
   // Exception handling
   it('should process native lifecycle changes bypassing UI blocking strictly avoiding internal framework crashing exceptions', () => {
     expect(() => fixture.detectChanges()).not.toThrow();
+  });
+
+  it('should support direct class instantiation', () => {
+    const direct = new JobSeekerViewComponent();
+    expect(direct).toBeTruthy();
+  });
+
+  it('should compute first name helper for user and fallback', () => {
+    component.user = { name: 'John Smith' };
+    expect(component.getFirstName()).toBe('John');
+    component.user = { name: '   ' };
+    expect(component.getFirstName()).toBe('there');
+    component.user = null;
+    expect(component.getFirstName()).toBe('there');
+  });
+
+  it('should provide static subtitle helper', () => {
+    expect(component.getSubtitle()).toBe('Manage your applications and track market trends.');
   });
 });

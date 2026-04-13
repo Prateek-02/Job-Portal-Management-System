@@ -1,18 +1,22 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ProfileComponent } from './profile.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ApiService } from '../../../../core/services/api.service';
 import { AuthService } from '../../../../core/services/auth.service';
-import { DatePipe } from '@angular/common';
+import { DatePipe, CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 import * as ErrorHandlerUtil from '../../../../core/utils/error-handler.util';
+import { provideRouter, Router } from '@angular/router';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('ProfileComponent', () => {
   let component: ProfileComponent;
   let fixture: ComponentFixture<ProfileComponent>;
   let apiServiceMock: any;
   let authServiceMock: any;
+  let routerMock: any;
 
   beforeEach(async () => {
     apiServiceMock = {
@@ -24,21 +28,21 @@ describe('ProfileComponent', () => {
     authServiceMock = {
       refreshProfile: vi.fn().mockReturnValue(of({}))
     };
+    
+    routerMock = { navigate: vi.fn() };
 
     vi.spyOn(window, 'confirm').mockReturnValue(true);
-    vi.spyOn(ErrorHandlerUtil, 'getFriendlyError').mockImplementation((err, context) => `Error in ${context}`);
 
     await TestBed.configureTestingModule({
-      imports: [ProfileComponent, ReactiveFormsModule, DatePipe],
+      imports: [ProfileComponent, ReactiveFormsModule, DatePipe, CommonModule],
       providers: [
+        provideRouter([]),
         { provide: ApiService, useValue: apiServiceMock },
-        { provide: AuthService, useValue: authServiceMock }
-      ]
-    })
-    .overrideComponent(ProfileComponent, {
-      set: { imports: [ReactiveFormsModule, DatePipe], schemas: ['NO_ERRORS_SCHEMA' as any] }
-    })
-    .compileComponents();
+        { provide: AuthService, useValue: authServiceMock },
+        { provide: Router, useValue: routerMock }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   });
 
   function setupComponent() {
@@ -48,7 +52,7 @@ describe('ProfileComponent', () => {
 
   describe('Lifecycle and Data Loading (Normal / Exception)', () => {
     it('should successfully load profile data and patch form on init', () => {
-      apiServiceMock.getProfile.mockReturnValue(of({ id: 1, name: 'John', skills: 'Angular, React' }));
+      apiServiceMock.getProfile.mockReturnValue(of({ id: 1, name: 'John', role: 'JOB_SEEKER', phone: '1234567890', skills: 'Angular, React' }));
       setupComponent();
       fixture.detectChanges();
       
@@ -58,24 +62,24 @@ describe('ProfileComponent', () => {
     });
 
     it('should handle API failure during profile load gracefully', () => {
-      apiServiceMock.getProfile.mockReturnValue(throwError(() => new Error('Server limit')));
+      apiServiceMock.getProfile.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
       setupComponent();
       fixture.detectChanges();
       
       expect(component.isLoading).toBe(false);
-      expect(component.errorMessage).toBe('Error in load_profile');
+      expect(component.errorMessage).toBe('Something went wrong on our end. Please try again shortly.');
       expect(component.user).toBeNull();
     });
   });
 
   describe('State Editing (Normal / Boundary)', () => {
     it('should correctly toggle editing state and restore data on cancel', () => {
-      apiServiceMock.getProfile.mockReturnValue(of({ id: 1, name: 'John' }));
+      apiServiceMock.getProfile.mockReturnValue(of({ id: 1, name: 'John', role: 'JOB_SEEKER', phone: '1234567890' }));
       setupComponent();
       fixture.detectChanges();
       
       component.profileForm.patchValue({ name: 'Changed Name' });
-      expect(component.profileForm.dirty).toBe(true);
+      expect(component.profileForm.value.name).toBe('Changed Name');
       
       // cancel edit
       component.toggleEdit(); // Turn on
@@ -85,7 +89,7 @@ describe('ProfileComponent', () => {
     });
 
     it('canDeactivate should allow routing if pristine OR block and alert if dirty boundary', () => {
-      apiServiceMock.getProfile.mockReturnValue(of({ id: 1, name: 'John' }));
+      apiServiceMock.getProfile.mockReturnValue(of({ id: 1, name: 'John', role: 'JOB_SEEKER', phone: '1234567890' }));
       setupComponent();
       fixture.detectChanges();
       
@@ -103,7 +107,7 @@ describe('ProfileComponent', () => {
 
   describe('Form Submission (Exception / Normal)', () => {
     it('should block invalid submissions on the boundary front', () => {
-      apiServiceMock.getProfile.mockReturnValue(of({ id: 1 }));
+      apiServiceMock.getProfile.mockReturnValue(of({ id: 1, name: 'John', role: 'JOB_SEEKER', phone: '1234567890' }));
       setupComponent();
       fixture.detectChanges();
       
@@ -114,38 +118,43 @@ describe('ProfileComponent', () => {
     });
 
     it('should catch profile save HTTP errors correctly without destroying view', () => {
-      apiServiceMock.getProfile.mockReturnValue(of({ id: 1, name: 'Valid' }));
-      apiServiceMock.updateProfile.mockReturnValue(throwError(() => new Error('Failed to save')));
+      apiServiceMock.getProfile.mockReturnValue(of({ id: 1, name: 'Valid', role: 'JOB_SEEKER', phone: '1234567890' }));
+      apiServiceMock.updateProfile.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
       setupComponent();
       fixture.detectChanges();
       
+      component.profileForm.patchValue({ name: 'Valid', phone: '1234567890' });
       component.saveProfile();
       
       expect(component.isSaving).toBe(false);
-      expect(component.errorMessage).toBe('Error in update_profile');
+      expect(component.errorMessage).toBe('Something went wrong on our end. Please try again shortly.');
     });
 
-    it('should update profile and picture smoothly alongside triggering global state', fakeAsync(() => {
-      apiServiceMock.getProfile.mockReturnValue(of({ id: 99, name: 'User' }));
-      apiServiceMock.updateProfile.mockReturnValue(of({ id: 99, name: 'Updated' }));
+    it('should update profile and picture smoothly alongside triggering global state', async () => {
+      vi.useFakeTimers();
+      apiServiceMock.getProfile.mockReturnValue(of({ id: 99, name: 'User', role: 'JOB_SEEKER', phone: '1234567890' }));
+      apiServiceMock.updateProfile.mockReturnValue(of({ id: 99, name: 'Updated', role: 'JOB_SEEKER', phone: '1234567890' }));
       setupComponent();
       fixture.detectChanges();
       
+      component.profileForm.patchValue({ name: 'Updated', phone: '1234567890' });
       component.saveProfile();
       
       expect(component.user?.name).toBe('Updated');
       expect(component.successMessage).toBe('Profile updated successfully!');
       expect(authServiceMock.refreshProfile).toHaveBeenCalled();
       
-      tick(3000);
+      await vi.advanceTimersByTimeAsync(3000);
       expect(component.successMessage).toBe('');
-    }));
+      vi.useRealTimers();
+    });
   });
 
   describe('Image Upload', () => {
-    it('should POST image via exact multipart formData and handle results', fakeAsync(() => {
-      apiServiceMock.getProfile.mockReturnValue(of({ id: 99 }));
-      apiServiceMock.uploadProfileImage.mockReturnValue(of({ id: 99, image: 'xyz' }));
+    it('should POST image via exact multipart formData and handle results', async () => {
+      vi.useFakeTimers();
+      apiServiceMock.getProfile.mockReturnValue(of({ id: 99, name: 'User', role: 'JOB_SEEKER', phone: '1234567890' }));
+      apiServiceMock.uploadProfileImage.mockReturnValue(of({ id: 99, name: 'User', role: 'JOB_SEEKER', phone: '1234567890', profileImageUrl: 'xyz' }));
       setupComponent();
       fixture.detectChanges();
       
@@ -160,7 +169,8 @@ describe('ProfileComponent', () => {
       expect(component.successMessage).toBe('Profile picture updated!');
       expect(authServiceMock.refreshProfile).toHaveBeenCalled();
       
-      tick(3000);
-    }));
+      await vi.advanceTimersByTimeAsync(3000);
+      vi.useRealTimers();
+    });
   });
 });

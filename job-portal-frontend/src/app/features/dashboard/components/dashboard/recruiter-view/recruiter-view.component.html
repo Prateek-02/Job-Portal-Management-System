@@ -1,14 +1,15 @@
 <!-- ── RECRUITMENT PERSPECTIVE ───────────────────────── -->
 <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-8 animate-fade-in-up">
   <div>
-    <h1 class="text-3xl font-bold text-text-primary tracking-tighter mb-3">Recruiter Dashboard</h1>
-    <p class="text-[15px] font-medium text-text-secondary opacity-70">Optimize your hiring pipeline and track
-      candidate flow.</p>
+    <h1 class="text-3xl font-bold text-text-primary tracking-tighter mb-3">{{ getDashboardTitle() }}</h1>
+    <p class="text-[15px] font-medium text-text-secondary opacity-70">{{ getDashboardSubtitle() }}</p>
   </div>
-  <a routerLink="/jobs/create/new"
-    class="btn-celestial !py-3.5 !px-8 !text-sm !shadow-2xl hover:scale-105 transition-all">
-    Post a New Job
+  @if (shouldShowCta()) {
+  <a [routerLink]="getCreateJobRoute()"
+    class="btn-celestial py-3.5! px-8! text-sm! shadow-2xl! hover:scale-105 transition-all">
+    {{ getCtaLabel() }}
   </a>
+  }
 </div>
 
 <!-- Recruitment Insights Stats -->

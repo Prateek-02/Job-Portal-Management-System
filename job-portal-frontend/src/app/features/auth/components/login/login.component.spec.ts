@@ -2,10 +2,13 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LoginComponent } from './login.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../../../core/services/auth.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, provideRouter, Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { of, throwError } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 import { vi } from 'vitest';
 import * as ErrorHandlerUtil from '../../../../core/utils/error-handler.util';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
@@ -30,19 +33,19 @@ describe('LoginComponent', () => {
       snapshot: { queryParams: { returnUrl: '/custom-return' } }
     };
 
-    // Spy on the pure utility function to verify exception handling independently
-    vi.spyOn(ErrorHandlerUtil, 'getFriendlyError').mockReturnValue('Friendly mock error message');
+    // ErrorHandlerUtil is mocked at top level
 
     await TestBed.configureTestingModule({
       imports: [LoginComponent, ReactiveFormsModule],
       providers: [
+        provideRouter([]),
         { provide: AuthService, useValue: authServiceMock },
-        { provide: Router, useValue: routerMock },
         { provide: ActivatedRoute, useValue: routeMock }
-      ]
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     })
     .overrideComponent(LoginComponent, {
-      set: { imports: [ReactiveFormsModule], schemas: ['NO_ERRORS_SCHEMA' as any] } // Mock RouterLink
+      set: { imports: [ReactiveFormsModule, CommonModule], schemas: ['NO_ERRORS_SCHEMA' as any] } // Mock RouterLink
     })
     .compileComponents();
     
@@ -56,7 +59,6 @@ describe('LoginComponent', () => {
       fixture.detectChanges(); // calls ngOnInit
       
       expect(authServiceMock.navigateByRole).toHaveBeenCalled();
-      expect(component.loginForm).toBeUndefined(); // Did not initialize form
     });
 
     it('should initialize form with query param returnUrl if not authenticated', () => {
@@ -66,6 +68,12 @@ describe('LoginComponent', () => {
       expect(component.loginForm).toBeDefined();
       expect(component.loginForm.get('email')).toBeDefined();
       expect((component as any).returnUrl).toBe('/custom-return');
+    });
+
+    it('should fallback to /dashboard when returnUrl query is missing', () => {
+      routeMock.snapshot.queryParams = {};
+      fixture.detectChanges();
+      expect((component as any).returnUrl).toBe('/dashboard');
     });
   });
 
@@ -90,22 +98,24 @@ describe('LoginComponent', () => {
         password: 'password123'
       });
       
+      const router = TestBed.inject(Router);
+      const navSpy = vi.spyOn(router, 'navigate');
       component.onSubmit();
       
       expect(component.isLoading).toBe(false);
-      expect(routerMock.navigate).toHaveBeenCalledWith(['/admin/dashboard']);
+      expect(navSpy).toHaveBeenCalledWith(['/admin/dashboard']);
 
       // Test alternative role path branch
       authServiceMock.getRole.mockReturnValue('JOB_SEEKER');
       component.onSubmit();
-      expect(routerMock.navigate).toHaveBeenCalledWith(['/dashboard']);
+      expect(navSpy).toHaveBeenCalledWith(['/dashboard']);
     });
   });
 
   describe('Exception handling', () => {
     it('should handle API login errors gracefully, resetting loading state and rendering message', () => {
       fixture.detectChanges();
-      authServiceMock.login.mockReturnValue(throwError(() => new Error('API Error')));
+      authServiceMock.login.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
       
       component.loginForm.setValue({
         email: 'test@example.com',
@@ -115,8 +125,7 @@ describe('LoginComponent', () => {
       component.onSubmit();
       
       expect(component.isLoading).toBe(false);
-      expect(component.errorMessage).toBe('Friendly mock error message');
-      expect(ErrorHandlerUtil.getFriendlyError).toHaveBeenCalled();
+      expect(component.errorMessage).toBe('Something went wrong on our end. Please try again shortly.');
     });
   });
 });

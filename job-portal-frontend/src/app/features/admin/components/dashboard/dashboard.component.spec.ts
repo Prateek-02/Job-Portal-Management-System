@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DashboardComponent } from './dashboard.component';
+import { provideRouter } from '@angular/router';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('Admin Dashboard Shell Component', () => {
   let component: DashboardComponent;
@@ -7,10 +9,11 @@ describe('Admin Dashboard Shell Component', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [DashboardComponent]
+      imports: [DashboardComponent],
+      providers: [provideRouter([])]
     })
     .overrideComponent(DashboardComponent, {
-      set: { schemas: ['NO_ERRORS_SCHEMA' as any] }
+      set: { schemas: [NO_ERRORS_SCHEMA] }
     })
     .compileComponents();
   });
@@ -34,5 +37,19 @@ describe('Admin Dashboard Shell Component', () => {
   // Exception handling
   it('should process native life cycle executions inherently', () => {
     expect(() => fixture.detectChanges()).not.toThrow();
+  });
+
+  it('should expose page title helper', () => {
+    expect(component.getPageTitle()).toBe('Admin Dashboard');
+  });
+
+  it('should handle section helpers', () => {
+    expect(component.getSectionCount()).toBe(3);
+    expect(component.normalizeSectionName(' Users ')).toBe('users');
+    expect(component.normalizeSectionName('')).toBe('overview');
+    expect(component.normalizeSectionName(undefined)).toBe('overview');
+    expect(component.isKnownSection('jobs')).toBe(true);
+    expect(component.isKnownSection('other')).toBe(false);
+    expect(component.getDefaultSection()).toBe('overview');
   });
 });
