@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ApplicationResponse } from '../../../../../../../models/application.model';
 import { ApiService } from '../../../../../../../core/services/api.service';
 import { AuthService } from '../../../../../../../core/services/auth.service';
-import { NotificationService } from '../../../../../../notifications/services/notification.service';
+import { NotificationService } from '../../../../../../../core/services/notification.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -25,7 +25,7 @@ export class JobSeekerStatsComponent implements OnInit, OnDestroy {
     private apiService: ApiService,
     private authService: AuthService,
     private notificationService: NotificationService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe(user => {

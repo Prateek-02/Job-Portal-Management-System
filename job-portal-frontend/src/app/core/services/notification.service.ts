@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { AppNotification, NotificationType } from '../../../models/notification.model';
+import { AppNotification, NotificationType } from '../../models/notification.model';
 
 const BASE_STORAGE_KEY = 'jp_notifications';
 
@@ -24,7 +24,7 @@ export class NotificationService {
           this.setUserId(user.id);
         }
       }
-    } catch {}
+    } catch { }
   }
 
   public setUserId(userId: number | null): void {
@@ -81,7 +81,7 @@ export class NotificationService {
       if (this.currentUserId) {
         localStorage.setItem(this.storageKey, JSON.stringify(notifications));
       }
-    } catch {}
+    } catch { }
     this.notificationsSubject.next(notifications);
   }
 

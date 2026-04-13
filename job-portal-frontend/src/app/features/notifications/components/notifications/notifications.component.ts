@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { NotificationService } from '../../services/notification.service';
+import { NotificationService } from '../../../../core/services/notification.service';
 import { AppNotification } from '../../../../models/notification.model';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -22,7 +22,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     public notificationService: NotificationService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.notificationService.notifications$.pipe(takeUntil(this.destroy$)).subscribe(n => {

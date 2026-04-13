@@ -1,7 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { NotificationService } from '../../services/notification.service';
+import { NotificationService } from '../../../../core/services/notification.service';
 import { AppNotification } from '../../../../models/notification.model';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';

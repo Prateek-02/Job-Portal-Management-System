@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { NotificationService } from '../../../../../../notifications/services/notification.service';
+import { NotificationService } from '../../../../../../../core/services/notification.service';
 
 @Component({
   selector: 'app-recent-activity',
@@ -13,5 +13,5 @@ export class RecentActivityComponent {
     return this.notificationService.all.slice(0, 4);
   }
 
-  constructor(private notificationService: NotificationService) {}
+  constructor(private notificationService: NotificationService) { }
 }

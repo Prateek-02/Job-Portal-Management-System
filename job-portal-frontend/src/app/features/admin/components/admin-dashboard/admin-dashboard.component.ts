@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../../../core/services/api.service';
 import { AuthService } from '../../../../core/services/auth.service';
-import { NotificationService } from '../../../notifications/services/notification.service';
+import { NotificationService } from '../../../../core/services/notification.service';
 import { AdminReports, AdminUserResponse } from '../../../../models/api-response.model';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -24,7 +24,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     private apiService: ApiService,
     private authService: AuthService,
     private notificationService: NotificationService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.apiService.getAdminReports().pipe(takeUntil(this.destroy$)).subscribe({

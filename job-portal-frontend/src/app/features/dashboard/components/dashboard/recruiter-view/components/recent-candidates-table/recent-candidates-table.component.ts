@@ -3,7 +3,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { JobApplicationResponse } from '../../../../../../../models/application.model';
 import { AuthService } from '../../../../../../../core/services/auth.service';
-import { NotificationService } from '../../../../../../notifications/services/notification.service';
+import { NotificationService } from '../../../../../../../core/services/notification.service';
 import { DashboardPollingService } from '../../../../../../../core/services/dashboard-polling.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -24,7 +24,7 @@ export class RecentCandidatesTableComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private notificationService: NotificationService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe(user => {

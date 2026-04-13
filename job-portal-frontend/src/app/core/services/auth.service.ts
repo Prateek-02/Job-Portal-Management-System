@@ -4,7 +4,7 @@ import { tap, catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { ApiService } from './api.service';
 import { StorageService } from './storage.service';
-import { NotificationService } from '../../features/notifications/services/notification.service';
+import { NotificationService } from './notification.service';
 import { LoginResponse, LoginRequest, RegisterRequest, User, UserRole, RegisterResponse } from '../../models/user.model';
 
 @Injectable({
@@ -82,11 +82,11 @@ export class AuthService {
   private handleAuthSuccess(response: LoginResponse): void {
     if (response && response.accessToken) {
       this.storageService.setToken(response.accessToken);
-      
+
       if (response.refreshToken) {
         this.storageService.setRefreshToken(response.refreshToken);
       }
-      
+
       const user = {
         id: response.userId,
         name: response.name,

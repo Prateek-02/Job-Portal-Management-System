@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { CacheService } from '../../../core/services/cache.service';
-import { NotificationService } from '../../../features/notifications/services/notification.service';
+import { NotificationService } from '../../../core/services/notification.service';
 import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
 import { NotificationPanelComponent } from '../../../features/notifications/components/notification-panel/notification-panel.component';
 
@@ -21,11 +21,11 @@ export class NavbarComponent implements OnInit {
   isNotificationOpen = false;
 
   constructor(
-    public authService: AuthService, 
-    public notificationService: NotificationService, 
+    public authService: AuthService,
+    public notificationService: NotificationService,
     private router: Router,
     private cacheService: CacheService
-  ) {}
+  ) { }
 
   refreshData(): void {
     this.cacheService.clearAll();
@@ -77,7 +77,7 @@ export class NavbarComponent implements OnInit {
     const target = event.target as HTMLElement;
     const isClickInsideNotificationBell = target.closest('.notification-container');
     const isClickInsideProfileBtn = target.closest('.profile-container');
-    
+
     if (!isClickInsideNotificationBell && !isClickInsideProfileBtn) {
       this.isNotificationOpen = false;
       this.isDropdownOpen = false;

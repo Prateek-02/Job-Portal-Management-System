@@ -110,101 +110,14 @@
       <!-- ── MAIN CONTENT COLUMN ── -->
       <main class="space-y-10">
         @if (!isEditing) {
-          <div class="space-y-10 animate-fade-in">
-            
-            <!-- Bio Section -->
-            <div class="celestial-card p-12">
-               <h3 class="text-[11px] font-bold text-text-muted uppercase tracking-[0.4em] mb-10 pb-4 border-b border-glass-border inline-block">Professional Bio</h3>
-               @if (user.bio) {
-                 <p class="text-2xl font-medium text-text-secondary leading-relaxed pl-10 border-l-[4px] border-royal-blue/30 italic">
-                   {{ user.bio }}
-                 </p>
-               } @else {
-                 <div class="py-12 text-center border-2 border-dashed border-glass-border rounded-3xl opacity-40">
-                   <p class="text-sm font-bold text-text-muted uppercase tracking-widest">No biography provided yet</p>
-                 </div>
-               }
-            </div>
-
-            <!-- Skills Section -->
-            <div class="celestial-card p-12 overflow-hidden relative">
-               <div class="absolute -top-12 -right-12 w-40 h-40 bg-energy-indigo/5 blur-3xl pointer-events-none"></div>
-               <h3 class="text-[11px] font-bold text-text-muted uppercase tracking-[0.4em] mb-10 pb-4 border-b border-glass-border inline-block">Skills & Expertise</h3>
-               <div class="flex flex-wrap gap-4">
-                 @if (getSkillsList().length > 0) {
-                   @for (skill of getSkillsList(); track skill) {
-                     <span class="px-8 py-3.5 rounded-2xl bg-bg-secondary border border-glass-border text-text-primary text-sm font-black shadow-lg hover:border-royal-blue/40 transition-all">
-                       {{ skill }}
-                     </span>
-                   }
-                  } @else {
-                    <div class="w-full py-8 text-center opacity-40">
-                       <p class="text-xs font-bold text-text-muted uppercase tracking-widest">No skills listed</p>
-                    </div>
-                  }
-               </div>
-            </div>
-            
-            <!-- Information Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="celestial-card p-8 bg-white/[0.01]">
-                    <p class="text-[9px] font-black text-text-muted uppercase tracking-widest mb-2 opacity-50">Identity Verified</p>
-                    <p class="text-lg font-bold text-text-primary">{{ user.name }}</p>
-                </div>
-                <div class="celestial-card p-8 bg-white/[0.01]">
-                    <p class="text-[9px] font-black text-text-muted uppercase tracking-widest mb-2 opacity-50">Contact Reliability</p>
-                    <p class="text-lg font-bold text-text-primary">{{ user.phone || 'N/A' }}</p>
-                </div>
-            </div>
-          </div>
+          <app-view-profile [user]="user"></app-view-profile>
         } @else {
-          <!-- Edit Mode UI -->
-          <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="celestial-card p-12 space-y-12 animate-fade-in relative overflow-hidden">
-            <div class="absolute -top-24 -right-24 w-80 h-80 bg-royal-blue/5 blur-[120px] pointer-events-none"></div>
-            
-            <div class="border-b border-glass-border pb-8 flex justify-between items-end">
-              <div>
-                <h3 class="text-3xl font-black text-text-primary tracking-tighter">Identity Management</h3>
-                <p class="text-[10px] font-bold text-text-muted uppercase tracking-widest mt-2">Securely update your digital presence</p>
-              </div>
-              <div class="hidden md:block w-12 h-12 bg-royal-blue/10 rounded-xl flex items-center justify-center">
-                 <svg class="w-6 h-6 text-royal-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.0163z" /></svg>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-              <div class="space-y-3">
-                <label class="text-[10px] font-extrabold text-text-muted uppercase tracking-[0.3em] ml-1">Full Identity</label>
-                <input type="text" formControlName="name" placeholder="Full Name" class="glass-input !bg-bg-secondary !border-glass-border !py-5 !px-6 !text-lg !font-bold">
-              </div>
-              <div class="space-y-3">
-                <label class="text-[10px] font-extrabold text-text-muted uppercase tracking-[0.3em] ml-1">Secure Contact</label>
-                <input type="tel" formControlName="phone" placeholder="9876543210" class="glass-input !bg-bg-secondary !border-glass-border !py-5 !px-6 !text-lg !font-bold">
-              </div>
-              <div class="md:col-span-2 space-y-3">
-                <label class="text-[10px] font-extrabold text-text-muted uppercase tracking-[0.3em] ml-1">Base Location</label>
-                <input type="text" formControlName="location" placeholder="City, Country" class="glass-input !py-5 !px-6 !text-lg !font-bold">
-              </div>
-              <div class="md:col-span-2 space-y-3">
-                <label class="text-[10px] font-extrabold text-text-muted uppercase tracking-[0.3em] ml-1">Skill Matrix (Tag System)</label>
-                <input type="text" formControlName="skills" placeholder="e.g. Java, Spring Boot, Angular" class="glass-input !py-5 !px-6 !text-lg !font-bold">
-              </div>
-              <div class="md:col-span-2 space-y-3">
-                <label class="text-[10px] font-extrabold text-text-muted uppercase tracking-[0.3em] ml-1">Manifesto (Professional Bio)</label>
-                <textarea formControlName="bio" rows="6" placeholder="Tell us about your professional background..." class="glass-input !py-5 !px-6 !text-lg !font-bold leading-relaxed"></textarea>
-              </div>
-            </div>
-
-            <div class="flex flex-col sm:flex-row gap-6 pt-10 border-t border-glass-border">
-              <button type="button" (click)="toggleEdit()" class="px-10 py-5 rounded-2xl border border-glass-border font-bold text-text-muted uppercase tracking-widest hover:border-text-primary hover:text-text-primary transition-all">Discard Changes</button>
-              <button type="submit" [disabled]="isSaving" class="btn-celestial flex-1 !py-5 !rounded-2xl text-xl shadow-2xl flex items-center justify-center gap-4">
-                @if (isSaving) {
-                  <svg class="animate-spin h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
-                }
-                Commit Secure Update
-              </button>
-            </div>
-          </form>
+          <app-edit-profile 
+            [profileForm]="profileForm" 
+            [isSaving]="isSaving" 
+            (cancelEdit)="toggleEdit()" 
+            (submitForm)="saveProfile()">
+          </app-edit-profile>
         }
       </main>
     </div>

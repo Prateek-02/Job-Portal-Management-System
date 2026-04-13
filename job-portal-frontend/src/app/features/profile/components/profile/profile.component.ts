@@ -8,11 +8,13 @@ import { User } from '../../../../models/user.model';
 import { getFriendlyError } from '../../../../core/utils/error-handler.util';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { EditProfileComponent } from '../edit-profile/edit-profile.component';
+import { ViewProfileComponent } from '../view-profile/view-profile.component';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, DatePipe],
+  imports: [CommonModule, ReactiveFormsModule, DatePipe, EditProfileComponent, ViewProfileComponent],
   templateUrl: './profile.component.html'
 })
 export class ProfileComponent implements OnInit, OnDestroy, CanComponentDeactivate {
@@ -119,9 +121,5 @@ export class ProfileComponent implements OnInit, OnDestroy, CanComponentDeactiva
         error: (err: any) => { this.isUploadingImage = false; this.errorMessage = getFriendlyError(err, 'upload_image'); }
       });
     }
-  }
-
-  getSkillsList(): string[] {
-    return this.user?.skills ? this.user.skills.split(',').map((s: string) => s.trim()).filter(Boolean) : [];
   }
 }

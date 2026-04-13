@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { CacheService } from '../../core/services/cache.service';
-import { NotificationService } from '../../features/notifications/services/notification.service';
+import { NotificationService } from '../../core/services/notification.service';
 import { NotificationPanelComponent } from '../../features/notifications/components/notification-panel/notification-panel.component';
 import { ThemeToggleComponent } from '../../shared/components/theme-toggle/theme-toggle.component';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
@@ -22,7 +22,7 @@ export class AdminLayoutComponent {
     public notificationService: NotificationService,
     private router: Router,
     private cacheService: CacheService
-  ) {}
+  ) { }
 
   refreshData(): void {
     this.cacheService.clearAll();
