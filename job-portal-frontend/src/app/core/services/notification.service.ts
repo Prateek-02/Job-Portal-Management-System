@@ -48,7 +48,7 @@ export class NotificationService {
   /** Add a new in-app notification */
   push(type: NotificationType, title: string, message: string, link?: string): void {
     const notification: AppNotification = {
-      id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      id: self.crypto.randomUUID(),
       type,
       title,
       message,

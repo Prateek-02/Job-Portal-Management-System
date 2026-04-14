@@ -292,6 +292,8 @@ public class AuthServiceImpl implements AuthService {
         log.info("User deleted successfully | userId: {}", id);
     }
 
+    private static final java.security.SecureRandom secureRandom = new java.security.SecureRandom();
+
     // FORGOT PASSWORD
     @Override
     public void forgotPassword(com.jobportal.authservice.dto.request.ForgotPasswordRequest request) {
@@ -299,8 +301,8 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UserNotFoundException("User not found with email: " + request.getEmail()));
 
-        // Generate 6-digit OTP
-        String otp = String.format("%06d", new java.util.Random().nextInt(999999));
+        // Generate 6-digit OTP using SecureRandom
+        String otp = String.format("%06d", secureRandom.nextInt(999999));
         
         user.setResetToken(otp);
         user.setResetTokenExpiry(java.time.LocalDateTime.now().plusMinutes(10));

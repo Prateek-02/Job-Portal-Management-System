@@ -30,10 +30,11 @@ public class CloudinaryService {
             throw new RuntimeException("Only PDF files are allowed!");
         }
 
-       
-        File tempFile = File.createTempFile("resume-", ".pdf");
+        // Security Hardening: Use Files.createTempFile for more secure permissions
+        java.nio.file.Path tempPath = java.nio.file.Files.createTempFile("resume-", ".pdf");
+        File tempFile = tempPath.toFile();
         tempFile.deleteOnExit(); 
-        file.transferTo(tempFile);
+        file.transferTo(tempPath);
 
 
         try {
