@@ -108,6 +108,7 @@ export class CreateJobComponent implements OnInit, OnDestroy, CanComponentDeacti
     request.subscribe({
       next: (job) => {
         this.isSubmitting = false;
+        this.jobForm.markAsPristine();
         this.successMessage = this.isEditMode 
           ? 'Job updated successfully! Redirecting...' 
           : 'Job posted successfully! Redirecting...';

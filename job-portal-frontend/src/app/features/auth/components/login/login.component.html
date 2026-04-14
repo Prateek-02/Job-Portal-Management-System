@@ -35,7 +35,7 @@
       <!-- Email -->
       <div class="space-y-1.5">
         <label class="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em] ml-1" for="email">Email Address</label>
-        <input id="email" type="email" formControlName="email" 
+        <input id="email" type="email" formControlName="email" autocomplete="username"
           class="w-full px-4 py-2.5 bg-bg-secondary border border-glass-border rounded-lg text-text-primary font-bold placeholder:text-text-muted/50 focus:bg-bg-primary focus:ring-4 focus:ring-royal-blue/5 transition-all outline-none" 
           placeholder="email@example.com">
         @if (email?.touched && email?.invalid) {
@@ -50,7 +50,7 @@
           <a routerLink="/auth/forgot-password" class="text-[11px] font-bold text-royal-blue hover:underline transition-opacity uppercase tracking-wider">Forgot Password?</a>
         </div>
         <div class="relative">
-          <input id="password" [type]="showPassword ? 'text' : 'password'" formControlName="password" 
+          <input id="password" [type]="showPassword ? 'text' : 'password'" formControlName="password" autocomplete="current-password"
             class="w-full px-4 py-2.5 bg-bg-secondary border border-glass-border rounded-lg text-text-primary font-bold placeholder:text-text-muted/50 focus:bg-bg-primary focus:ring-4 focus:ring-royal-blue/5 transition-all outline-none" 
             placeholder="••••••••">
           <button type="button" (click)="showPassword = !showPassword" class="absolute inset-y-0 right-4 flex items-center text-text-muted hover:text-text-primary transition-colors">
