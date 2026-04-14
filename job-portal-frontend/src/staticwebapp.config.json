@@ -5,7 +5,19 @@
   },
   "routes": [
     {
-      "route": "/*.js|css|png|jpg|svg|ico",
+      "route": "/*.js",
+      "headers": {
+        "cache-control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "route": "/*.css",
+      "headers": {
+        "cache-control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "route": "/*.{png,jpg,svg,ico}",
       "headers": {
         "cache-control": "public, max-age=31536000, immutable"
       }
