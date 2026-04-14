@@ -46,7 +46,7 @@ jobs:
 
       - name: Run Frontend Tests
         working-directory: ./job-portal-frontend
-        run: npm run test:coverage -- --watch=false
+        run: npm run test:coverage
 
       # SonarCloud Scan
       - name: SonarCloud Scan
