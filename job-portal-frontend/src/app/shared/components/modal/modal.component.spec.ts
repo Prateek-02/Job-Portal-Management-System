@@ -19,7 +19,7 @@ describe('ModalComponent', () => {
 
   // Normal working
   it('should emit close event when onClose is called directly or via backdrop click', () => {
-    const emitSpy = vi.spyOn(component.close, 'emit');
+    const emitSpy = vi.spyOn(component.modalClose, 'emit');
     
     component.onClose();
     expect(emitSpy).toHaveBeenCalledTimes(1);
@@ -48,7 +48,7 @@ describe('ModalComponent', () => {
   // Exception handling
   it('should ignore escape key events safely without throwing when modal is already closed', () => {
     component.isOpen = false;
-    const emitSpy = vi.spyOn(component.close, 'emit');
+    const emitSpy = vi.spyOn(component.modalClose, 'emit');
     
     // Should pass through handleEscape but not trigger anything
     expect(() => {

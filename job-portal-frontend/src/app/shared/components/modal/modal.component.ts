@@ -12,7 +12,7 @@ export class ModalComponent {
   @Input() isOpen: boolean = false;
   @Input() title: string = '';
   @Input() size: 'sm' | 'md' | 'lg' | 'xl' = 'md';
-  @Output() close = new EventEmitter<void>();
+  @Output() modalClose = new EventEmitter<void>();
 
   @HostListener('document:keydown.escape', ['$event'])
   handleEscape(event: any) {
@@ -22,7 +22,7 @@ export class ModalComponent {
   }
 
   onClose() {
-    this.close.emit();
+    this.modalClose.emit();
   }
 
   onBackdropClick(event: MouseEvent) {
