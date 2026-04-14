@@ -1,0 +1,56 @@
+name: SonarCloud Analysis
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  sonarcloud:
+    name: SonarCloud Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: job-portal-frontend/package-lock.json
+
+      # Build and Test Backend (Limited Scope)
+      - name: Build and Test Backend
+        run: |
+          services=("AuthService" "JobService" "ApplicationService" "ApiGateway")
+          for service in "${services[@]}"; do
+            echo "Testing $service..."
+            cd "Job-Portal-Backend/$service"
+            mvn test
+            cd ../..
+          done
+
+      # Build and Test Frontend
+      - name: Install Frontend Dependencies
+        working-directory: ./job-portal-frontend
+        run: npm install
+
+      - name: Run Frontend Tests
+        working-directory: ./job-portal-frontend
+        run: npm run test:coverage -- --watch=false
+
+      # SonarCloud Scan
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
