@@ -1,13 +1,14 @@
 {
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/assets/*", "/favicon.ico", "/*.js", "/*.css"]
+    "exclude": ["/assets/**", "/**/*.js", "/**/*.css", "/**/*.png", "/**/*.jpg", "/**/*.svg", "/**/*.ico", "/**/*.json"]
   },
   "routes": [
     {
       "route": "/*",
       "headers": {
-        "cache-control": "must-revalidate, max-age=604800"
+        "cache-control": "no-cache, no-store, must-revalidate",
+        "pragma": "no-cache"
       }
     }
   ],

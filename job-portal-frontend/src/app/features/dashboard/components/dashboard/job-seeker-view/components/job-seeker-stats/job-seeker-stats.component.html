@@ -1,24 +1,24 @@
 <!-- Application Stats -->
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
-  <div class="celestial-card p-8 inner-glow border-none bg-bg-secondary text-text-primary group border border-glass-border">
-    <div class="text-[10px] font-bold uppercase tracking-[0.2em] mb-4 opacity-50 text-text-secondary">Applications Sent
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+  <div class="celestial-card p-6 inner-glow border-none bg-bg-secondary text-text-primary group border border-glass-border">
+    <div class="text-[9px] font-bold uppercase tracking-[0.2em] mb-3 opacity-50 text-text-secondary">Applications Sent
     </div>
-    <div class="text-5xl font-bold mb-2 group-hover:scale-105 transition-all text-text-primary">{{ appliedCount }}</div>
-    <div class="w-8 h-1 rounded-full bg-energy-emerald"></div>
+    <div class="text-3xl font-bold mb-1.5 group-hover:scale-105 transition-all text-text-primary">{{ appliedCount }}</div>
+    <div class="w-6 h-1 rounded-full bg-energy-emerald"></div>
   </div>
 
-  <div class="celestial-card p-8">
-    <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary mb-4 opacity-50">Active
+  <div class="celestial-card p-6">
+    <div class="text-[9px] font-bold uppercase tracking-[0.2em] text-text-secondary mb-3 opacity-50">Active
       Interviews</div>
-    <div class="text-5xl font-bold text-text-primary mb-2">{{ interviewCount }}</div>
-    <div class="w-8 h-1 rounded-full bg-royal-blue"></div>
+    <div class="text-3xl font-bold text-text-primary mb-1.5">{{ interviewCount }}</div>
+    <div class="w-6 h-1 rounded-full bg-royal-blue"></div>
   </div>
 
-  <div class="celestial-card p-8">
-    <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary mb-4 opacity-50">Awaiting
+  <div class="celestial-card p-6">
+    <div class="text-[9px] font-bold uppercase tracking-[0.2em] text-text-secondary mb-3 opacity-50">Awaiting
       Feedback</div>
-    <div class="text-5xl font-bold text-text-primary mb-2">{{ myApplications.length - (interviewCount + rejectedCount)
+    <div class="text-3xl font-bold text-text-primary mb-1.5">{{ myApplications.length - (interviewCount + rejectedCount)
       }}</div>
-    <div class="w-8 h-1 rounded-full bg-royal-blue"></div>
+    <div class="w-6 h-1 rounded-full bg-royal-blue"></div>
   </div>
 </div>
