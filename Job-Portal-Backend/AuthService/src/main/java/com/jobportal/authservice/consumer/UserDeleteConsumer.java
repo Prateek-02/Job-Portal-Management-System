@@ -26,7 +26,7 @@ public class UserDeleteConsumer {
 
         log.info("Received JOBS_DELETED | userId: {}", event.getUserId());
 
-        // ✅ Idempotency
+        //  Idempotency
         if (!userRepository.existsById(event.getUserId())) {
             log.warn("User already deleted | userId: {}", event.getUserId());
         } else {
@@ -34,10 +34,10 @@ public class UserDeleteConsumer {
             log.info("User deleted | userId: {}", event.getUserId());
         }
 
-        // ✅ Update status
+        //  Update status
         event.setStatus("COMPLETED");
 
-        // ✅ Publish final event
+        //  Publish final event
         rabbitTemplate.convertAndSend(
                 RabbitMQConfig.USER_DELETED_QUEUE, event);
 

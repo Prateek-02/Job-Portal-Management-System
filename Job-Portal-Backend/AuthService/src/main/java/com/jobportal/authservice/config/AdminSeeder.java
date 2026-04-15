@@ -8,7 +8,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Configuration
 public class AdminSeeder {
 
@@ -36,9 +38,9 @@ public class AdminSeeder {
                         .role(UserRole.ADMIN)
                         .build();
                 userRepository.save(admin);
-                System.out.println("Admin user seeded successfully with email: " + adminEmail);
+                log.info("Admin user seeded successfully with email: " + adminEmail);
             } else {
-                System.out.println("Admin user already exists. Skipping seeding.");
+                log.info("Admin user already exists. Skipping seeding.");
             }
         };
     }
