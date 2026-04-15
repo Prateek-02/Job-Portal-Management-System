@@ -395,7 +395,6 @@ public class ApplicationServiceImpl implements ApplicationService {
         List<JobApplicationResponse> allApplications = new ArrayList<>();
 
         // 2. For each job, fetch applications
-        // Note: This approach is NOT ideal for large datasets (N+1 query problem).
         // Ideally, we'd have a findByJobIdIn method in the repository.
         for (JobResponse job : recruiterJobs) {
             try {

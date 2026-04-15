@@ -1,6 +1,7 @@
 package com.jobportal.authservice.controller;
 
 import java.io.IOException;
+import java.util.Map;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +12,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.jobportal.authservice.dto.request.LoginRequest;
+import com.jobportal.authservice.dto.request.ForgotPasswordRequest;
 import com.jobportal.authservice.dto.request.RegisterRequest;
 import com.jobportal.authservice.dto.request.RefreshTokenRequest;
+import com.jobportal.authservice.dto.request.ResetPasswordRequest;
 import com.jobportal.authservice.dto.request.UpdateProfileRequest;
 import com.jobportal.authservice.dto.response.LoginResponse;
+import com.jobportal.authservice.dto.response.PageResponse;
 import com.jobportal.authservice.dto.response.RegisterResponse;
 import com.jobportal.authservice.dto.response.UserResponse;
 import com.jobportal.authservice.service.AuthService;
@@ -95,7 +99,7 @@ public class AuthController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<com.jobportal.authservice.dto.response.PageResponse<UserResponse>> getAllUsers(
+    public ResponseEntity<PageResponse<UserResponse>> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -103,7 +107,7 @@ public class AuthController {
 
         log.info("Fetch all users API called | page: {} | size: {}", page, size);
 
-        com.jobportal.authservice.dto.response.PageResponse<UserResponse> response = 
+        PageResponse<UserResponse> response = 
                 authService.getAllUsers(page, size, sortBy, direction);
 
         return ResponseEntity.ok(response);
@@ -134,18 +138,18 @@ public class AuthController {
     }
     
     @PostMapping("/forgot-password")
-    public ResponseEntity<java.util.Map<String, String>> forgotPassword(
-            @Valid @RequestBody com.jobportal.authservice.dto.request.ForgotPasswordRequest request) {
+    public ResponseEntity<Map<String, String>> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequest request) {
         log.info("Forgot password API called | email: {}", request.getEmail());
         authService.forgotPassword(request);
-        return ResponseEntity.ok(java.util.Map.of("message", "If your email is registered, you will receive a reset link."));
+        return ResponseEntity.ok(Map.of("message", "If your email is registered, you will receive a reset link."));
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<java.util.Map<String, String>> resetPassword(
-            @Valid @RequestBody com.jobportal.authservice.dto.request.ResetPasswordRequest request) {
+    public ResponseEntity<Map<String, String>> resetPassword(
+            @Valid @RequestBody ResetPasswordRequest request) {
         log.info("Reset password API called");
         authService.resetPassword(request);
-        return ResponseEntity.ok(java.util.Map.of("message", "Password successfully reset. You can now login."));
+        return ResponseEntity.ok(Map.of("message", "Password successfully reset. You can now login."));
     }
 }
