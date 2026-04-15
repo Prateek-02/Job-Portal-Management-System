@@ -24,10 +24,16 @@ import com.jobportal.jobservice.specification.JobSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import com.jobportal.jobservice.dto.response.PageResponse;
+import com.jobportal.jobservice.dto.response.MarketStatsResponse;
+import com.jobportal.jobservice.dto.response.SkillStatResponse;
+
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Map;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import com.jobportal.jobservice.dto.response.PageResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -230,17 +236,17 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public com.jobportal.jobservice.dto.response.MarketStatsResponse getMarketPulseStats() {
+    public MarketStatsResponse getMarketPulseStats() {
         log.info("Calculating Job Market Pulse stats from database");
         List<Job> allJobs = jobRepository.findAll();
 
         if (allJobs.isEmpty()) {
-            return com.jobportal.jobservice.dto.response.MarketStatsResponse.builder()
+            return MarketStatsResponse.builder()
                     .averageSalary(0.0)
                     .salaryGrowthYoy(0.0)
-                    .salaryTrend(java.util.Arrays.asList(10.0, 10.0, 10.0, 10.0, 10.0))
-                    .demandTrend(java.util.Arrays.asList(5.0, 5.0, 5.0, 5.0, 5.0))
-                    .topSkills(java.util.Collections.emptyList())
+                    .salaryTrend(Arrays.asList(10.0, 10.0, 10.0, 10.0, 10.0))
+                    .demandTrend(Arrays.asList(5.0, 5.0, 5.0, 5.0, 5.0))
+                    .topSkills(Collections.emptyList())
                     .marketDemandStatus("Stable")
                     .build();
         }
@@ -248,34 +254,58 @@ public class JobServiceImpl implements JobService {
         double avgSalary = allJobs.stream().mapToDouble(Job::getSalary).average().orElse(0.0);
 
         // Aggregate Top 3 Skills
-        java.util.Map<String, Long> skillCounts = allJobs.stream()
+        Map<String, Long> skillCounts = allJobs.stream()
                 .filter(j -> j.getSkills() != null)
                 .flatMap(j -> j.getSkills().stream())
-                .collect(java.util.stream.Collectors.groupingBy(s -> s, java.util.stream.Collectors.counting()));
+                .collect(Collectors.groupingBy(s -> s, Collectors.counting()));
 
         long totalSkillMentions = skillCounts.values().stream().mapToLong(Long::longValue).sum();
 
-        List<com.jobportal.jobservice.dto.response.SkillStatResponse> topSkills = skillCounts.entrySet().stream()
-                .sorted(java.util.Map.Entry.<String, Long>comparingByValue().reversed())
+        List<SkillStatResponse> topSkills = skillCounts.entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
                 .limit(3)
-                .map(entry -> new com.jobportal.jobservice.dto.response.SkillStatResponse(
+                .map(entry -> new SkillStatResponse(
                         entry.getKey(), 
                         (double) Math.round((entry.getValue() * 100.0) / (totalSkillMentions > 0 ? totalSkillMentions : 1))
                 ))
-                .collect(java.util.stream.Collectors.toList());
+                .collect(Collectors.toList());
+
+        // Dynamic Calculation for YoY Salary Growth
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime oneYearAgo = now.minusYears(1);
+        LocalDateTime twoYearsAgo = now.minusYears(2);
+
+        double avgSalaryCurrentYear = allJobs.stream()
+                .filter(j -> j.getCreatedAt() != null && j.getCreatedAt().isAfter(oneYearAgo))
+                .mapToDouble(Job::getSalary)
+                .average()
+                .orElse(avgSalary); // Fallback to overall average if no jobs in last 12 months
+
+        double avgSalaryPrevYear = allJobs.stream()
+                .filter(j -> j.getCreatedAt() != null && j.getCreatedAt().isAfter(twoYearsAgo) && j.getCreatedAt().isBefore(oneYearAgo))
+                .mapToDouble(Job::getSalary)
+                .average()
+                .orElse(0.0);
+
+        double salaryGrowth = 0.0;
+        if (avgSalaryPrevYear > 0) {
+            salaryGrowth = ((avgSalaryCurrentYear - avgSalaryPrevYear) / avgSalaryPrevYear) * 100;
+            // Round to 1 decimal place
+            salaryGrowth = Math.round(salaryGrowth * 10.0) / 10.0;
+        }
 
         // Simple Trend Generation (Mocking historical trend points from existing data distribution for sparkline)
         // In a real app, this would be a GROUP BY month query.
-        List<Double> salaryTrend = java.util.Arrays.asList(
+        List<Double> salaryTrend = Arrays.asList(
             avgSalary * 0.92, avgSalary * 0.95, avgSalary * 0.93, avgSalary * 0.98, avgSalary
         );
-        List<Double> demandTrend = java.util.Arrays.asList(
+        List<Double> demandTrend = Arrays.asList(
             (double)allJobs.size() * 0.4, (double)allJobs.size() * 0.7, (double)allJobs.size() * 0.5, (double)allJobs.size() * 0.9, (double)allJobs.size()
         );
 
-        return com.jobportal.jobservice.dto.response.MarketStatsResponse.builder()
+        return MarketStatsResponse.builder()
                 .averageSalary(avgSalary)
-                .salaryGrowthYoy(4.2) // Current growth estimate
+                .salaryGrowthYoy(salaryGrowth)
                 .salaryTrend(salaryTrend)
                 .demandTrend(demandTrend)
                 .topSkills(topSkills)

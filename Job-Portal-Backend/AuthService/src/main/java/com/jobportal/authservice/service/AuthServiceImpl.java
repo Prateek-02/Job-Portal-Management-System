@@ -1,6 +1,8 @@
 package com.jobportal.authservice.service;
 
 import java.io.IOException;
+import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -9,14 +11,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import com.jobportal.authservice.dto.request.LoginRequest;
 import com.jobportal.authservice.dto.request.RegisterRequest;
 import com.jobportal.authservice.dto.request.UpdateProfileRequest;
 import com.jobportal.authservice.dto.request.RefreshTokenRequest;
+import com.jobportal.authservice.dto.request.ForgotPasswordRequest;
+import com.jobportal.authservice.dto.request.ResetPasswordRequest;
 import com.jobportal.authservice.dto.response.LoginResponse;
 import com.jobportal.authservice.dto.response.RegisterResponse;
 import com.jobportal.authservice.dto.response.UserResponse;
+import com.jobportal.authservice.dto.response.PageResponse;
 import com.jobportal.authservice.entity.User;
 import com.jobportal.authservice.enums.UserRole;
 import com.jobportal.authservice.exception.DuplicateEmailException;
@@ -228,17 +237,17 @@ public class AuthServiceImpl implements AuthService {
 
     // GET ALL USERS
     @Override
-    public com.jobportal.authservice.dto.response.PageResponse<UserResponse> getAllUsers(int page, int size, String sortBy, String direction) {
+    public PageResponse<UserResponse> getAllUsers(int page, int size, String sortBy, String direction) {
 
         log.info("Fetching all users | page: {} | size: {}", page, size);
 
-        org.springframework.data.domain.Sort sort = direction.equalsIgnoreCase("desc") ?
-                org.springframework.data.domain.Sort.by(sortBy).descending() :
-                org.springframework.data.domain.Sort.by(sortBy).ascending();
+        Sort sort = direction.equalsIgnoreCase("desc") ?
+                Sort.by(sortBy).descending() :
+                Sort.by(sortBy).ascending();
 
-        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, sort);
+        Pageable pageable = PageRequest.of(page, size, sort);
 
-        org.springframework.data.domain.Page<User> pageData = userRepository.findAll(pageable);
+        Page<User> pageData = userRepository.findAll(pageable);
 
         List<UserResponse> content = pageData.getContent().stream()
                 .map(user -> modelMapper.map(user, UserResponse.class))
@@ -246,7 +255,7 @@ public class AuthServiceImpl implements AuthService {
 
         log.debug("Users fetched | page: {} | total: {}", page, pageData.getTotalElements());
 
-        return com.jobportal.authservice.dto.response.PageResponse.<UserResponse>builder()
+        return PageResponse.<UserResponse>builder()
                 .content(content)
                 .pageNumber(pageData.getNumber())
                 .pageSize(pageData.getSize())
@@ -292,11 +301,11 @@ public class AuthServiceImpl implements AuthService {
         log.info("User deleted successfully | userId: {}", id);
     }
 
-    private static final java.security.SecureRandom secureRandom = new java.security.SecureRandom();
+    private static final SecureRandom secureRandom = new SecureRandom();
 
     // FORGOT PASSWORD
     @Override
-    public void forgotPassword(com.jobportal.authservice.dto.request.ForgotPasswordRequest request) {
+    public void forgotPassword(ForgotPasswordRequest request) {
         log.info("Forgot password requested for email: {}", request.getEmail());
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UserNotFoundException("User not found with email: " + request.getEmail()));
@@ -305,7 +314,7 @@ public class AuthServiceImpl implements AuthService {
         String otp = String.format("%06d", secureRandom.nextInt(999999));
         
         user.setResetToken(otp);
-        user.setResetTokenExpiry(java.time.LocalDateTime.now().plusMinutes(10));
+        user.setResetTokenExpiry(LocalDateTime.now().plusMinutes(10));
         userRepository.save(user);
 
         emailService.sendPasswordResetOTP(user.getEmail(), otp);
@@ -313,7 +322,7 @@ public class AuthServiceImpl implements AuthService {
 
     // RESET PASSWORD
     @Override
-    public void resetPassword(com.jobportal.authservice.dto.request.ResetPasswordRequest request) {
+    public void resetPassword(ResetPasswordRequest request) {
         log.info("Reset password attempt for email: {}", request.getEmail());
         
         User user = userRepository.findByEmail(request.getEmail())
@@ -323,7 +332,7 @@ public class AuthServiceImpl implements AuthService {
             throw new UnauthorizedException("Invalid or incorrect OTP");
         }
 
-        if (user.getResetTokenExpiry().isBefore(java.time.LocalDateTime.now())) {
+        if (user.getResetTokenExpiry().isBefore(LocalDateTime.now())) {
             throw new UnauthorizedException("OTP has expired");
         }
 
