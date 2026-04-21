@@ -222,8 +222,16 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public PageResponse<JobResponse> getJobsByRecruiter(Long recruiterId, int page, int size, String sortBy, String direction) {
-        log.info("Fetching jobs for recruiter | recruiterId: {} | page: {}", recruiterId, page);
+    public PageResponse<JobResponse> getJobsByRecruiter(Long recruiterId, Long requesterId, String role, int page, int size, String sortBy, String direction) {
+        log.info("Fetching jobs for recruiter | recruiterId: {} | requesterId: {} | role: {} | page: {}", 
+                recruiterId, requesterId, role, page);
+
+        // Security Check: Only the recruiter themselves or an ADMIN can view this private list
+        if (!role.equalsIgnoreCase("ADMIN") && !recruiterId.equals(requesterId)) {
+            log.warn("Unauthorized access to recruiter jobs | recruiterId: {} | requesterId: {} | role: {}", 
+                    recruiterId, requesterId, role);
+            throw new UnauthorizedException("Access Denied! You can only view your own jobs.");
+        }
         
         Sort sort = direction.equalsIgnoreCase("desc") ?
                 Sort.by(sortBy).descending() :

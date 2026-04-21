@@ -152,12 +152,15 @@ public class JobController {
     @GetMapping("/recruiter/{recruiterId}")
     public ResponseEntity<PageResponse<JobResponse>> getJobsByRecruiter(
             @PathVariable Long recruiterId,
+            @RequestHeader("X-User-Id") Long requesterId,
+            @RequestHeader("X-User-Role") String role,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "desc") String direction) {
-        log.info("Get jobs by recruiter | recruiterId: {} | page: {}", recruiterId, page);
-        return ResponseEntity.ok(jobService.getJobsByRecruiter(recruiterId, page, size, sortBy, direction));
+        log.info("Get jobs by recruiter API | recruiterId: {} | requesterId: {} | role: {} | page: {}", 
+                recruiterId, requesterId, role, page);
+        return ResponseEntity.ok(jobService.getJobsByRecruiter(recruiterId, requesterId, role, page, size, sortBy, direction));
     }
 
     @GetMapping("/stats/market-pulse")

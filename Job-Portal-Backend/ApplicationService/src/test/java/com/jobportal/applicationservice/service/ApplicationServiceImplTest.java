@@ -322,7 +322,7 @@ class ApplicationServiceImplTest {
     void getAllApplicationsForRecruiter_success() {
         PageResponse<JobResponse> jobPage = new PageResponse<>();
         jobPage.setContent(java.util.List.of(job));
-        when(jobClient.getJobsByRecruiter(1L, 0, 1000, "createdAt", "desc")).thenReturn(jobPage);
+        when(jobClient.getJobsByRecruiter(1L, 1L, "RECRUITER", 0, 1000, "createdAt", "desc")).thenReturn(jobPage);
 
         JobApplication entity2 = new JobApplication();
         entity2.setId(2L);
@@ -344,7 +344,7 @@ class ApplicationServiceImplTest {
     void getAllApplicationsForRecruiter_AscSort() {
         PageResponse<JobResponse> jobPage = new PageResponse<>();
         jobPage.setContent(java.util.List.of(job));
-        when(jobClient.getJobsByRecruiter(1L, 0, 1000, "createdAt", "desc")).thenReturn(jobPage);
+        when(jobClient.getJobsByRecruiter(1L, 1L, "RECRUITER", 0, 1000, "createdAt", "desc")).thenReturn(jobPage);
 
         Page<JobApplication> appPage = new PageImpl<>(java.util.List.of(entity));
         when(repository.findByJobId(eq(1L), any(Pageable.class))).thenReturn(appPage);
@@ -362,7 +362,7 @@ class ApplicationServiceImplTest {
     void getAllApplicationsForRecruiter_SecondPage() {
         PageResponse<JobResponse> jobPage = new PageResponse<>();
         jobPage.setContent(java.util.List.of(job));
-        when(jobClient.getJobsByRecruiter(1L, 0, 1000, "createdAt", "desc")).thenReturn(jobPage);
+        when(jobClient.getJobsByRecruiter(1L, 1L, "RECRUITER", 0, 1000, "createdAt", "desc")).thenReturn(jobPage);
 
         Page<JobApplication> appPage = new PageImpl<>(java.util.List.of(entity, entity));
         when(repository.findByJobId(eq(1L), any(Pageable.class))).thenReturn(appPage);
@@ -381,7 +381,7 @@ class ApplicationServiceImplTest {
     void getAllApplicationsForRecruiter_NotLastPage() {
         PageResponse<JobResponse> jobPage = new PageResponse<>();
         jobPage.setContent(java.util.List.of(job));
-        when(jobClient.getJobsByRecruiter(1L, 0, 1000, "createdAt", "desc")).thenReturn(jobPage);
+        when(jobClient.getJobsByRecruiter(1L, 1L, "RECRUITER", 0, 1000, "createdAt", "desc")).thenReturn(jobPage);
 
         Page<JobApplication> appPage = new PageImpl<>(java.util.List.of(entity, entity));
         when(repository.findByJobId(eq(1L), any(Pageable.class))).thenReturn(appPage);
@@ -406,7 +406,7 @@ class ApplicationServiceImplTest {
     void getAllApplicationsForRecruiter_FetchAppsError_SwallowsErrorAndContinues() {
         PageResponse<JobResponse> jobPage = new PageResponse<>();
         jobPage.setContent(java.util.List.of(job));
-        when(jobClient.getJobsByRecruiter(1L, 0, 1000, "createdAt", "desc")).thenReturn(jobPage);
+        when(jobClient.getJobsByRecruiter(1L, 1L, "RECRUITER", 0, 1000, "createdAt", "desc")).thenReturn(jobPage);
 
         // Simulate an error when fetching applications for one of the jobs
         when(jobClient.getJobById(1L)).thenThrow(new RuntimeException("Fetch failed"));

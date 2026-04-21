@@ -234,7 +234,7 @@ class JobServiceImplTest {
         when(jobRepository.findByRecruiterId(eq(200L), any(Pageable.class))).thenReturn(page);
         when(modelMapper.map(any(Job.class), eq(JobResponse.class))).thenReturn(jobResponse);
 
-        PageResponse<JobResponse> result = jobService.getJobsByRecruiter(200L, 0, 10, "id", "desc");
+        PageResponse<JobResponse> result = jobService.getJobsByRecruiter(200L, 200L, "RECRUITER", 0, 10, "id", "desc");
         assertThat(result.getContent()).hasSize(1);
     }
 
@@ -244,7 +244,24 @@ class JobServiceImplTest {
         when(jobRepository.findByRecruiterId(eq(200L), any(Pageable.class))).thenReturn(page);
         when(modelMapper.map(any(Job.class), eq(JobResponse.class))).thenReturn(jobResponse);
 
-        PageResponse<JobResponse> result = jobService.getJobsByRecruiter(200L, 0, 10, "id", "asc");
+        PageResponse<JobResponse> result = jobService.getJobsByRecruiter(200L, 200L, "RECRUITER", 0, 10, "id", "asc");
+        assertThat(result.getContent()).hasSize(1);
+    }
+
+    @Test
+    void getJobsByRecruiter_Unauthorized_ThrowsException() {
+        assertThatThrownBy(() -> jobService.getJobsByRecruiter(200L, 300L, "RECRUITER", 0, 10, "id", "desc"))
+                .isInstanceOf(UnauthorizedException.class)
+                .hasMessageContaining("Access Denied! You can only view your own jobs.");
+    }
+
+    @Test
+    void getJobsByRecruiter_AdminSuccess() {
+        Page<Job> page = new PageImpl<>(List.of(job));
+        when(jobRepository.findByRecruiterId(eq(200L), any(Pageable.class))).thenReturn(page);
+        when(modelMapper.map(any(Job.class), eq(JobResponse.class))).thenReturn(jobResponse);
+
+        PageResponse<JobResponse> result = jobService.getJobsByRecruiter(200L, 300L, "ADMIN", 0, 10, "id", "desc");
         assertThat(result.getContent()).hasSize(1);
     }
 

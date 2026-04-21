@@ -14,6 +14,8 @@ public interface JobClient {
     @GetMapping("/api/jobs/recruiter/{recruiterId}")
     com.jobportal.applicationservice.dto.response.PageResponse<JobResponse> getJobsByRecruiter(
         @PathVariable Long recruiterId,
+        @org.springframework.web.bind.annotation.RequestHeader("X-User-Id") Long userId,
+        @org.springframework.web.bind.annotation.RequestHeader("X-User-Role") String role,
         @org.springframework.web.bind.annotation.RequestParam(defaultValue = "0") int page,
         @org.springframework.web.bind.annotation.RequestParam(defaultValue = "1000") int size,
         @org.springframework.web.bind.annotation.RequestParam(defaultValue = "createdAt") String sortBy,

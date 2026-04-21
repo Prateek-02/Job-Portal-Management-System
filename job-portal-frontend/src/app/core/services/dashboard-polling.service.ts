@@ -51,21 +51,24 @@ export class DashboardPollingService implements OnDestroy {
 
   private initPolling(): void {
     this.pollingSub = this.authService.currentUser$.pipe(
-      filter(user => !!user && user.role === 'RECRUITER'),
-      switchMap(user => 
-        this.isTabVisible$.pipe(
+      switchMap(user => {
+        if (!user || user.role !== 'RECRUITER') {
+          return of(null); // Stop polling if not a recruiter
+        }
+        
+        return this.isTabVisible$.pipe(
           switchMap(visible => {
             if (!visible) return of(null); // Pause polling when tab is hidden
             
             return timer(0, this.POLL_INTERVAL).pipe(
               switchMap(() => {
-                return this.fetchRecruiterDashboardData(user!.id!);
+                return this.fetchRecruiterDashboardData(user.id!);
               })
             );
           }),
           filter(data => data !== null)
-        )
-      )
+        );
+      })
     ).subscribe({
       next: (data: any) => {
         this.recruiterDataSubject.next({ ...data, loading: false });

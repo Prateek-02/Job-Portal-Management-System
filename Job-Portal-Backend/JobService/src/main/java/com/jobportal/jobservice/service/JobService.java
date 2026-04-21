@@ -21,7 +21,7 @@ public interface JobService {
     // Delete all jobs by recruiterId
     void deleteRecruiterJobs(Long recruiterId);
     
-    PageResponse<JobResponse> getJobsByRecruiter(Long recruiterId, int page, int size, String sortBy, String direction);
+    PageResponse<JobResponse> getJobsByRecruiter(Long recruiterId, Long requesterId, String role, int page, int size, String sortBy, String direction);
 
     com.jobportal.jobservice.dto.response.MarketStatsResponse getMarketPulseStats();
 }

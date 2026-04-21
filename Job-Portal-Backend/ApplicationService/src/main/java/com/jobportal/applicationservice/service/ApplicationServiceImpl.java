@@ -389,7 +389,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         // 1. Fetch all jobs posted by this recruiter from JobService (using a large size to get all, or we could paginate this too)
         // Here we use the provided pagination for the AGGREGATED list, but we need all jobs first.
         // For simplicity, we fetch up to 1000 jobs.
-        PageResponse<JobResponse> recruiterJobsPage = jobClient.getJobsByRecruiter(recruiterId, 0, 1000, "createdAt", "desc");
+        PageResponse<JobResponse> recruiterJobsPage = jobClient.getJobsByRecruiter(recruiterId, recruiterId, role, 0, 1000, "createdAt", "desc");
         List<JobResponse> recruiterJobs = recruiterJobsPage.getContent();
         
         List<JobApplicationResponse> allApplications = new ArrayList<>();

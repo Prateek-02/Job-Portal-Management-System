@@ -152,9 +152,12 @@ class JobControllerTest {
                 .content(Collections.singletonList(jobResponse))
                 .build();
 
-        when(jobService.getJobsByRecruiter(200L, 0, 10, "createdAt", "desc")).thenReturn(pageResponse);
+        when(jobService.getJobsByRecruiter(eq(200L), eq(200L), eq("RECRUITER"), eq(0), eq(10), eq("createdAt"), eq("desc")))
+                .thenReturn(pageResponse);
 
         mockMvc.perform(get("/api/jobs/recruiter/{recruiterId}", 200L)
+                        .header("X-User-Id", 200L)
+                        .header("X-User-Role", "RECRUITER")
                         .param("page", "0")
                         .param("size", "10")
                         .param("sortBy", "createdAt")
