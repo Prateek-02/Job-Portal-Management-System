@@ -14,7 +14,7 @@ export function getFriendlyError(err: any, context?: ErrorContext): string {
       case 0:
         return 'Unable to connect to the server. Please check your internet connection.';
       case 400:
-        return backendMsg || getFallback(context, 'bad_request');
+        return backendMsg || getFallback(context, '400');
       case 401:
         return getFallback(context, '401');
       case 403:

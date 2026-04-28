@@ -11,11 +11,7 @@ describe('AuthLayoutComponent', () => {
     await TestBed.configureTestingModule({
       imports: [AuthLayoutComponent],
       providers: [provideRouter([])]
-    })
-    .overrideComponent(AuthLayoutComponent, {
-      set: { imports: [RouterOutlet], schemas: [NO_ERRORS_SCHEMA] }
-    })
-    .compileComponents();
+    }).compileComponents();
     
     fixture = TestBed.createComponent(AuthLayoutComponent);
     component = fixture.componentInstance;

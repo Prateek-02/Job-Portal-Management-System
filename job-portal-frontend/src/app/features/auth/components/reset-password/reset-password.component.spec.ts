@@ -37,11 +37,7 @@ describe('ResetPasswordComponent', () => {
         { provide: ActivatedRoute, useValue: routeMock }
       ],
       schemas: [NO_ERRORS_SCHEMA]
-    })
-    .overrideComponent(ResetPasswordComponent, {
-      set: { imports: [ReactiveFormsModule], schemas: ['NO_ERRORS_SCHEMA' as any] }
-    })
-    .compileComponents();
+    }).compileComponents();
     
     fixture = TestBed.createComponent(ResetPasswordComponent);
     component = fixture.componentInstance;
@@ -123,6 +119,17 @@ describe('ResetPasswordComponent', () => {
 
       component.onSubmit();
       expect(component.successMessage).toBe('Password successfully reset!');
+    });
+
+    it('should use empty string fallback if token is somehow falsy during submission', () => {
+      fixture.detectChanges();
+      component.token = ''; // force empty
+      component.resetForm.setValue({
+        password: 'password123',
+        confirmPassword: 'password123'
+      });
+      component.onSubmit();
+      expect(apiServiceMock.resetPassword).not.toHaveBeenCalled();
     });
   });
 });

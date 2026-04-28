@@ -43,11 +43,7 @@ describe('LoginComponent', () => {
         { provide: ActivatedRoute, useValue: routeMock }
       ],
       schemas: [NO_ERRORS_SCHEMA]
-    })
-    .overrideComponent(LoginComponent, {
-      set: { imports: [ReactiveFormsModule, CommonModule], schemas: ['NO_ERRORS_SCHEMA' as any] } // Mock RouterLink
-    })
-    .compileComponents();
+    }).compileComponents();
     
     fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;

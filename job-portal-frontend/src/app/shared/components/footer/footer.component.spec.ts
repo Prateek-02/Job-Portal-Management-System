@@ -42,6 +42,7 @@ describe('FooterComponent', () => {
 
   it('should evaluate footer helper logic', () => {
     expect(component.getCopyrightYear(new Date('2025-01-01'))).toBe(2025);
+    expect(component.getCopyrightYear()).toBe(new Date().getFullYear());
     expect(component.normalizeCompanyName('  Acme  ')).toBe('Acme');
     expect(component.normalizeCompanyName('')).toBe('Job Portal');
     expect(component.getFooterText('Acme')).toContain('Acme');

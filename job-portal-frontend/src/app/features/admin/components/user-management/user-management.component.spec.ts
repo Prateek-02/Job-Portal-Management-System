@@ -51,6 +51,13 @@ describe('UserManagementComponent', () => {
       expect(component.isLoading).toBe(false);
     });
 
+    it('should handle null content response gracefully', () => {
+      apiServiceMock.getAdminUsers.mockReturnValue(of(null));
+      setupComponent();
+      fixture.detectChanges();
+      expect(component.users).toEqual([]);
+    });
+
     it('should process user navigation requests identically fetching bounds automatically', () => {
       apiServiceMock.getAdminUsers.mockReturnValue(of({ content: [], totalElements: 0, totalPages: 0 }));
       setupComponent();

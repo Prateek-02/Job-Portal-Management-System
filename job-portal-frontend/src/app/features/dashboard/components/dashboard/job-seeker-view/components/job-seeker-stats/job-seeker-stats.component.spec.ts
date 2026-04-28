@@ -57,8 +57,20 @@ describe('JobSeekerStatsComponent', () => {
     expect(component.appliedCount).toBe(3);
     expect(component.interviewCount).toBe(1);
     expect(component.rejectedCount).toBe(1);
-    expect(notificationServiceMock.push).toHaveBeenCalledTimes(3);
+    expect(notificationServiceMock.push).toHaveBeenCalledWith(
+      'APPLICATION_STATUS',
+      'Application Submitted',
+      expect.stringContaining('shortlisted'),
+      '/applications/my-applications'
+    );
     expect(localStorage.getItem('jp_app_metadata_7')).toContain('"1":"APPLIED"');
+  });
+
+  it('should fallback to default labels for unknown statuses and handle null responses gracefully', () => {
+    apiServiceMock.getMyApplications.mockReturnValue(of(null));
+    component.ngOnInit();
+    currentUser$.next({ id: 1 });
+    expect(component.appliedCount).toBe(0);
   });
 
   it('should only notify when status changes and skip unchanged ones', () => {

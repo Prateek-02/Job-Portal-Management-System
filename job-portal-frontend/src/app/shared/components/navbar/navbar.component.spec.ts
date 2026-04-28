@@ -107,6 +107,15 @@ describe('NavbarComponent', () => {
       component.toggleNotifications();
       expect(component.isNotificationOpen).toBe(true);
       expect(component.isDropdownOpen).toBe(false);
+
+      // Toggle off to hit the false branch
+      component.isDropdownOpen = true;
+      component.toggleDropdown();
+      expect(component.isDropdownOpen).toBe(false);
+      
+      component.isNotificationOpen = true;
+      component.toggleNotifications();
+      expect(component.isNotificationOpen).toBe(false);
     });
   });
 
@@ -128,42 +137,41 @@ describe('NavbarComponent', () => {
       component.isDropdownOpen = true;
       component.isNotificationOpen = true;
 
-      // Mock an element that is totally unattached/null parent tree
-      const mockEvent = {
-        target: {
-          closest: (selector: string) => null // simulate click on body/bg
-        }
-      } as any;
+      const el = document.createElement('div');
+      document.body.appendChild(el);
 
       expect(() => {
-        component.onDocumentClick(mockEvent);
+        el.click(); // Triggers document.click and bubbles up to hit the HostListener
       }).not.toThrow();
 
       expect(component.isDropdownOpen).toBe(false);
       expect(component.isNotificationOpen).toBe(false);
+      
+      document.body.removeChild(el);
     });
 
     it('should keep panels open when click is inside notification/profile areas', () => {
       component.isDropdownOpen = true;
       component.isNotificationOpen = true;
 
-      const insideNotificationEvent = {
-        target: {
-          closest: (selector: string) => selector === '.notification-container' ? {} : null
-        }
-      } as any;
-      component.onDocumentClick(insideNotificationEvent);
+      const notificationEl = document.createElement('div');
+      notificationEl.classList.add('notification-container');
+      document.body.appendChild(notificationEl);
+      notificationEl.click();
+      
       expect(component.isDropdownOpen).toBe(true);
       expect(component.isNotificationOpen).toBe(true);
 
-      const insideProfileEvent = {
-        target: {
-          closest: (selector: string) => selector === '.profile-container' ? {} : null
-        }
-      } as any;
-      component.onDocumentClick(insideProfileEvent);
+      const profileEl = document.createElement('div');
+      profileEl.classList.add('profile-container');
+      document.body.appendChild(profileEl);
+      profileEl.click();
+      
       expect(component.isDropdownOpen).toBe(true);
       expect(component.isNotificationOpen).toBe(true);
+
+      document.body.removeChild(notificationEl);
+      document.body.removeChild(profileEl);
     });
 
     it('should stop propagation when toggling menus with event', () => {

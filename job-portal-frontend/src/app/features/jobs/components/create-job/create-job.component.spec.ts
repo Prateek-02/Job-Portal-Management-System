@@ -59,6 +59,15 @@ describe('CreateJobComponent', () => {
       expect(apiServiceMock.getJobById).not.toHaveBeenCalled();
     });
 
+    it('should return early from loadJobDetails if jobId is undefined', () => {
+      setupComponent();
+      fixture.detectChanges();
+      component.jobId = undefined;
+      component.loadJobDetails();
+      // Should not throw or call API
+      expect(apiServiceMock.getJobById).not.toHaveBeenCalled();
+    });
+
     it('should initialize in edit mode and patch valid data seamlessly', () => {
       routeMock.snapshot.paramMap.get.mockReturnValue('101');
       apiServiceMock.getJobById.mockReturnValue(of({ 
@@ -177,6 +186,20 @@ describe('CreateJobComponent', () => {
       component.jobForm.setValue(validFormState);
       component.onSubmit();
       
+      expect(component.errorMessage).toBe('Something went wrong on our end. Please try again shortly.');
+    });
+
+    it('should log submit errors for update appropriately', () => {
+      routeMock.snapshot.paramMap.get.mockReturnValue('101');
+      apiServiceMock.getJobById.mockReturnValue(of({ id: 101 }));
+      apiServiceMock.updateJob.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
+      setupComponent();
+      fixture.detectChanges();
+      
+      component.jobForm.setValue(validFormState);
+      component.onSubmit();
+      
+      // Verifies the this.isEditMode ternary inside getFriendlyError
       expect(component.errorMessage).toBe('Something went wrong on our end. Please try again shortly.');
     });
   });

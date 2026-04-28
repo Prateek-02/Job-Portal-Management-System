@@ -1,26 +1,26 @@
-<div class="space-y-10 animate-fade-in">
+<div class="space-y-8 animate-fade-in">
   <!-- Bio Section -->
-  <div class="celestial-card p-12">
-      <h3 class="text-[11px] font-bold text-text-muted uppercase tracking-[0.4em] mb-10 pb-4 border-b border-glass-border inline-block">Professional Bio</h3>
+  <div class="celestial-card p-8">
+      <h3 class="text-[10px] font-bold text-text-muted uppercase tracking-[0.4em] mb-6 pb-3 border-b border-glass-border inline-block">Professional Bio</h3>
       @if (hasBio()) {
-        <p class="text-2xl font-medium text-text-secondary leading-relaxed pl-10 border-l-4 border-royal-blue/30 italic">
+        <p class="text-xl font-medium text-text-secondary leading-relaxed pl-8 border-l-4 border-royal-blue/30 italic">
           {{ user?.bio }}
         </p>
       } @else {
-        <div class="py-12 text-center border-2 border-dashed border-glass-border rounded-3xl opacity-40">
-          <p class="text-sm font-bold text-text-muted uppercase tracking-widest">No biography provided yet</p>
+        <div class="py-10 text-center border-2 border-dashed border-glass-border rounded-2xl opacity-40">
+          <p class="text-xs font-bold text-text-muted uppercase tracking-widest">No biography provided yet</p>
         </div>
       }
   </div>
 
   <!-- Skills Section -->
-  <div class="celestial-card p-12 overflow-hidden relative">
-      <div class="absolute -top-12 -right-12 w-40 h-40 bg-energy-indigo/5 blur-3xl pointer-events-none"></div>
-      <h3 class="text-[11px] font-bold text-text-muted uppercase tracking-[0.4em] mb-10 pb-4 border-b border-glass-border inline-block">Skills & Expertise</h3>
-      <div class="flex flex-wrap gap-4">
+  <div class="celestial-card p-8 overflow-hidden relative">
+      <div class="absolute -top-10 -right-10 w-32 h-32 bg-energy-indigo/5 blur-3xl pointer-events-none"></div>
+      <h3 class="text-[10px] font-bold text-text-muted uppercase tracking-[0.4em] mb-6 pb-3 border-b border-glass-border inline-block">Skills & Expertise</h3>
+      <div class="flex flex-wrap gap-3">
         @if (getSkillsList().length > 0) {
           @for (skill of getSkillsList(); track skill) {
-            <span class="px-8 py-3.5 rounded-2xl bg-bg-secondary border border-glass-border text-text-primary text-sm font-black shadow-lg hover:border-royal-blue/40 transition-all">
+            <span class="px-6 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-text-primary text-xs font-black shadow-md hover:border-royal-blue/40 transition-all">
               {{ skill }}
             </span>
           }
@@ -33,14 +33,14 @@
   </div>
   
   <!-- Information Grid -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <div class="celestial-card p-8 bg-white/1">
-          <p class="text-[9px] font-black text-text-muted uppercase tracking-widest mb-2 opacity-50">Identity Verified</p>
-          <p class="text-lg font-bold text-text-primary">{{ getDisplayName() }}</p>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="celestial-card p-6 bg-white/1">
+          <p class="text-[8px] font-black text-text-muted uppercase tracking-widest mb-1.5 opacity-50">Identity Verified</p>
+          <p class="text-base font-bold text-text-primary">{{ getDisplayName() }}</p>
       </div>
-      <div class="celestial-card p-8 bg-white/1">
-          <p class="text-[9px] font-black text-text-muted uppercase tracking-widest mb-2 opacity-50">Contact Reliability</p>
-          <p class="text-lg font-bold text-text-primary">{{ getDisplayPhone() }}</p>
+      <div class="celestial-card p-6 bg-white/1">
+          <p class="text-[8px] font-black text-text-muted uppercase tracking-widest mb-1.5 opacity-50">Contact Reliability</p>
+          <p class="text-base font-bold text-text-primary">{{ getDisplayPhone() }}</p>
       </div>
   </div>
 </div>

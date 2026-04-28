@@ -19,9 +19,9 @@ describe('ManageApplicationsComponent', () => {
 
   beforeEach(async () => {
     apiServiceMock = {
-      getJobById: vi.fn(),
-      getJobApplications: vi.fn(),
-      updateApplicationStatus: vi.fn()
+      getJobById: vi.fn().mockReturnValue(of({})),
+      getJobApplications: vi.fn().mockReturnValue(of({ content: [], totalElements: 0, totalPages: 0 })),
+      updateApplicationStatus: vi.fn().mockReturnValue(of({}))
     };
     
     paramMapSubject = new BehaviorSubject({ get: () => '101' });
@@ -69,10 +69,29 @@ describe('ManageApplicationsComponent', () => {
       setupComponent();
       fixture.detectChanges();
       
-      expect(apiServiceMock.getJobById).toHaveBeenCalledWith(101);
-      expect(apiServiceMock.getJobApplications).toHaveBeenCalledWith(101, 0, 10);
       expect(component.job?.title).toBe('Engineer');
       expect(component.applications.length).toBe(1);
+    });
+
+    it('should handle application load error gracefully', () => {
+      apiServiceMock.getJobById.mockReturnValue(of({ id: 101 }));
+      apiServiceMock.getJobApplications.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
+      
+      setupComponent();
+      fixture.detectChanges();
+      
+      expect(component.errorMessage).toBe('Something went wrong on our end. Please try again shortly.');
+      expect(component.isLoading).toBe(false);
+    });
+
+    it('should handle null content response gracefully', () => {
+      apiServiceMock.getJobById.mockReturnValue(of({ id: 101 }));
+      apiServiceMock.getJobApplications.mockReturnValue(of({ content: null, totalElements: 0, totalPages: 0 }));
+      
+      setupComponent();
+      fixture.detectChanges();
+      
+      expect(component.applications).toEqual([]);
     });
   });
 

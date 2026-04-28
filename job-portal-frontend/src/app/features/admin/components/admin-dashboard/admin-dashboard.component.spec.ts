@@ -39,14 +39,7 @@ describe('AdminDashboardComponent', () => {
         { provide: NotificationService, useValue: notificationServiceMock }
       ],
       schemas: [NO_ERRORS_SCHEMA]
-    })
-    .overrideComponent(AdminDashboardComponent, {
-      set: { 
-        imports: [CommonModule, RouterLink], 
-        schemas: ['NO_ERRORS_SCHEMA' as any] 
-      }
-    })
-    .compileComponents();
+    }).compileComponents();
   });
 
   function setupComponent() {
@@ -124,6 +117,17 @@ describe('AdminDashboardComponent', () => {
       
       const stored = JSON.parse(localStorage.getItem('jp_seen_users_1')!);
       expect(stored).toEqual([101, 102]); // Merged
+    });
+
+    it('should handle null content response gracefully in user monitoring', () => {
+      apiServiceMock.getAdminReports.mockReturnValue(of({}));
+      apiServiceMock.getAdminUsers.mockReturnValue(of(null));
+      
+      setupComponent();
+      fixture.detectChanges();
+      
+      const stored = localStorage.getItem('jp_seen_users_1');
+      expect(stored).toBeNull();
     });
   });
 });

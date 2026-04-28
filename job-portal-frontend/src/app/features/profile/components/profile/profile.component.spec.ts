@@ -172,5 +172,18 @@ describe('ProfileComponent', () => {
       await vi.advanceTimersByTimeAsync(3000);
       vi.useRealTimers();
     });
+
+    it('should handle image upload errors gracefully', () => {
+      apiServiceMock.getProfile.mockReturnValue(of({ id: 99, name: 'User', role: 'JOB_SEEKER' }));
+      apiServiceMock.uploadProfileImage.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
+      setupComponent();
+      fixture.detectChanges();
+      
+      const ev = { target: { files: [new File([''], 'a.png')] } } as any;
+      component.onImageSelected(ev);
+      
+      expect(component.isUploadingImage).toBe(false);
+      expect(component.errorMessage).toBe('Something went wrong on our end. Please try again shortly.');
+    });
   });
 });

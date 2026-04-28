@@ -61,11 +61,7 @@ describe('JobDetailComponent', () => {
         { provide: Router, useValue: routerMock },
         { provide: ActivatedRoute, useValue: { paramMap: routeParamsSubject.asObservable() } }
       ]
-    })
-    .overrideComponent(JobDetailComponent, {
-      set: { imports: [ReactiveFormsModule, DatePipe, CommonModule], schemas: ['NO_ERRORS_SCHEMA' as any] }
-    })
-    .compileComponents();
+    }).compileComponents();
   });
 
   function setupComponent() {

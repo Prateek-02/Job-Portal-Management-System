@@ -11,11 +11,7 @@ describe('ApplicationDetailComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ApplicationDetailComponent],
       providers: [provideRouter([])]
-    })
-    .overrideComponent(ApplicationDetailComponent, {
-      set: { schemas: [NO_ERRORS_SCHEMA] }
-    })
-    .compileComponents();
+    }).compileComponents();
   });
 
   beforeEach(() => {

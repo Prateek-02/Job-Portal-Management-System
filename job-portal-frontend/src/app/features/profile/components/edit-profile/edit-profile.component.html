@@ -1,44 +1,44 @@
-<form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="celestial-card p-12 space-y-12 animate-fade-in relative overflow-hidden">
-  <div class="absolute -top-24 -right-24 w-80 h-80 bg-royal-blue/5 blur-[120px] pointer-events-none"></div>
+<form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="celestial-card p-8 space-y-8 animate-fade-in relative overflow-hidden">
+  <div class="absolute -top-16 -right-16 w-64 h-64 bg-royal-blue/5 blur-[100px] pointer-events-none"></div>
   
-  <div class="border-b border-glass-border pb-8 flex justify-between items-end">
+  <div class="border-b border-glass-border pb-6 flex justify-between items-end">
     <div>
-      <h3 class="text-3xl font-black text-text-primary tracking-tighter">Identity Management</h3>
-      <p class="text-[10px] font-bold text-text-muted uppercase tracking-widest mt-2">Securely update your digital presence</p>
+      <h3 class="text-2xl font-black text-text-primary tracking-tighter">Identity Management</h3>
+      <p class="text-[9px] font-bold text-text-muted uppercase tracking-widest mt-1.5">Securely update your digital presence</p>
     </div>
-    <div class="hidden md:flex w-12 h-12 bg-royal-blue/10 rounded-xl items-center justify-center">
-        <svg class="w-6 h-6 text-royal-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.0163z" /></svg>
-    </div>
-  </div>
-
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-    <div class="space-y-3">
-      <label class="text-[10px] font-extrabold text-text-muted uppercase tracking-[0.3em] ml-1">Full Identity</label>
-      <input type="text" formControlName="name" placeholder="Full Name" class="glass-input bg-bg-secondary! border-glass-border! py-5! px-6! text-lg! font-bold!">
-    </div>
-    <div class="space-y-3">
-      <label class="text-[10px] font-extrabold text-text-muted uppercase tracking-[0.3em] ml-1">Secure Contact</label>
-      <input type="tel" formControlName="phone" placeholder="9876543210" class="glass-input bg-bg-secondary! border-glass-border! py-5! px-6! text-lg! font-bold!">
-    </div>
-    <div class="md:col-span-2 space-y-3">
-      <label class="text-[10px] font-extrabold text-text-muted uppercase tracking-[0.3em] ml-1">Base Location</label>
-      <input type="text" formControlName="location" placeholder="City, Country" class="glass-input py-5! px-6! text-lg! font-bold!">
-    </div>
-    <div class="md:col-span-2 space-y-3">
-      <label class="text-[10px] font-extrabold text-text-muted uppercase tracking-[0.3em] ml-1">Skill Matrix (Tag System)</label>
-      <input type="text" formControlName="skills" placeholder="e.g. Java, Spring Boot, Angular" class="glass-input py-5! px-6! text-lg! font-bold!">
-    </div>
-    <div class="md:col-span-2 space-y-3">
-      <label class="text-[10px] font-extrabold text-text-muted uppercase tracking-[0.3em] ml-1">Manifesto (Professional Bio)</label>
-      <textarea formControlName="bio" rows="6" placeholder="Tell us about your professional background..." class="glass-input py-5! px-6! text-lg! font-bold! leading-relaxed"></textarea>
+    <div class="hidden md:flex w-10 h-10 bg-royal-blue/10 rounded-lg items-center justify-center">
+        <svg class="w-5 h-5 text-royal-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.0163z" /></svg>
     </div>
   </div>
 
-  <div class="flex flex-col sm:flex-row gap-6 pt-10 border-t border-glass-border">
-    <button type="button" (click)="onCancel()" class="px-10 py-5 rounded-2xl border border-glass-border font-bold text-text-muted uppercase tracking-widest hover:border-text-primary hover:text-text-primary transition-all">Discard Changes</button>
-    <button type="submit" [disabled]="isSubmitDisabled()" class="btn-celestial flex-1 py-5! rounded-2xl! text-xl shadow-2xl flex items-center justify-center gap-4">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div class="space-y-2">
+      <label class="text-[9px] font-extrabold text-text-muted uppercase tracking-[0.3em] ml-0.5">Full Identity</label>
+      <input type="text" formControlName="name" placeholder="Full Name" class="glass-input bg-bg-secondary! border-glass-border! py-3! px-4! text-base! font-bold!">
+    </div>
+    <div class="space-y-2">
+      <label class="text-[9px] font-extrabold text-text-muted uppercase tracking-[0.3em] ml-0.5">Secure Contact</label>
+      <input type="tel" formControlName="phone" placeholder="9876543210" class="glass-input bg-bg-secondary! border-glass-border! py-3! px-4! text-base! font-bold!">
+    </div>
+    <div class="md:col-span-2 space-y-2">
+      <label class="text-[9px] font-extrabold text-text-muted uppercase tracking-[0.3em] ml-0.5">Base Location</label>
+      <input type="text" formControlName="location" placeholder="City, Country" class="glass-input py-3! px-4! text-base! font-bold!">
+    </div>
+    <div class="md:col-span-2 space-y-2">
+      <label class="text-[9px] font-extrabold text-text-muted uppercase tracking-[0.3em] ml-0.5">Skill Matrix (Tag System)</label>
+      <input type="text" formControlName="skills" placeholder="e.g. Java, Spring Boot, Angular" class="glass-input py-3! px-4! text-base! font-bold!">
+    </div>
+    <div class="md:col-span-2 space-y-2">
+      <label class="text-[9px] font-extrabold text-text-muted uppercase tracking-[0.3em] ml-0.5">Manifesto (Professional Bio)</label>
+      <textarea formControlName="bio" rows="4" placeholder="Tell us about your professional background..." class="glass-input py-3! px-4! text-base! font-bold! leading-relaxed"></textarea>
+    </div>
+  </div>
+
+  <div class="flex flex-col sm:flex-row gap-4 pt-8 border-t border-glass-border">
+    <button type="button" (click)="onCancel()" class="px-8 py-3.5 rounded-xl border border-glass-border font-bold text-text-muted text-xs uppercase tracking-widest hover:border-text-primary hover:text-text-primary transition-all">Discard</button>
+    <button type="submit" [disabled]="isSubmitDisabled()" class="btn-celestial flex-1 py-3.5! rounded-xl! text-base shadow-xl flex items-center justify-center gap-3">
       @if (canShowSavingState()) {
-        <svg class="animate-spin h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+        <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
       }
       {{ getSubmitLabel() }}
     </button>

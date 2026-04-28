@@ -25,9 +25,9 @@ describe('getFriendlyError', () => {
   it('should apply login/register contextual fallbacks', () => {
     expect(getFriendlyError({ status: 401 }, 'login')).toBe('Invalid email or password.');
     expect(getFriendlyError({ status: 404 }, 'login')).toBe('Invalid email or password.');
-    expect(getFriendlyError({ status: 400 }, 'login')).toBe('Something went wrong. Please try again.');
+    expect(getFriendlyError({ status: 400 }, 'login')).toBe('Please enter a valid email and password.');
     expect(getFriendlyError({ status: 409 }, 'register')).toBe('An account with this email already exists.');
-    expect(getFriendlyError({ status: 400 }, 'register')).toBe('Something went wrong. Please try again.');
+    expect(getFriendlyError({ status: 400 }, 'register')).toBe('Please check your details and try again.');
   });
 
   it('should apply apply_job context fallbacks', () => {
@@ -54,6 +54,7 @@ describe('getFriendlyError', () => {
 
   it('should handle non-http string messages safely', () => {
     expect(getFriendlyError('Custom short error')).toBe('Custom short error');
+    expect(getFriendlyError({ message: 'Custom short object message' })).toBe('Custom short object message');
     expect(getFriendlyError('Http failure response for /api/xyz: 500')).toBe('Something went wrong. Please try again.');
     expect(getFriendlyError('Error from localhost dev proxy')).toBe('Something went wrong. Please try again.');
   });

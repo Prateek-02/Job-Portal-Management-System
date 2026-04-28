@@ -51,6 +51,13 @@ describe('JobManagementComponent', () => {
       expect(component.isLoading).toBe(false);
     });
 
+    it('should handle null content response gracefully', () => {
+      apiServiceMock.getAdminJobs.mockReturnValue(of(null));
+      setupComponent();
+      fixture.detectChanges();
+      expect(component.jobs).toEqual([]);
+    });
+
     it('should process navigation requests identically fetching bounds automatically', () => {
       apiServiceMock.getAdminJobs.mockReturnValue(of({ content: [], totalElements: 0, totalPages: 0 }));
       setupComponent();

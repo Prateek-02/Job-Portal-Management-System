@@ -32,15 +32,10 @@ describe('ForgotPasswordComponent', () => {
       imports: [ForgotPasswordComponent, ReactiveFormsModule],
       providers: [
         provideRouter([]),
-        { provide: ApiService, useValue: apiServiceMock },
-        { provide: Router, useValue: routerMock }
+        { provide: ApiService, useValue: apiServiceMock }
       ],
       schemas: [NO_ERRORS_SCHEMA]
-    })
-    .overrideComponent(ForgotPasswordComponent, {
-      set: { imports: [ReactiveFormsModule], schemas: ['NO_ERRORS_SCHEMA' as any] }
-    })
-    .compileComponents();
+    }).compileComponents();
     
     fixture = TestBed.createComponent(ForgotPasswordComponent);
     component = fixture.componentInstance;
@@ -111,9 +106,11 @@ describe('ForgotPasswordComponent', () => {
       expect(component.successMessage).toBe('Success');
       
       // Test the timeout boundary logic routing wrapper
-      expect(routerMock.navigate).not.toHaveBeenCalled();
+      const router = TestBed.inject(Router);
+      const navSpy = vi.spyOn(router, 'navigate');
+      expect(navSpy).not.toHaveBeenCalled();
       await vi.advanceTimersByTimeAsync(2000);
-      expect(routerMock.navigate).toHaveBeenCalledWith(['/auth/login']);
+      expect(navSpy).toHaveBeenCalledWith(['/auth/login']);
       vi.useRealTimers();
     });
 

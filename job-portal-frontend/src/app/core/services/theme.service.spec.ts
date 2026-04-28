@@ -54,6 +54,16 @@ describe('ThemeService', () => {
       expect(localStorage.getItem('jp_user_theme')).toBe('dark');
     });
 
+    it('should toggle from dark to light', () => {
+      service = TestBed.inject(ThemeService);
+      service.setTheme('dark');
+      
+      service.toggleTheme();
+      
+      expect(service.isDark()).toBe(false);
+      expect(localStorage.getItem('jp_user_theme')).toBe('light');
+    });
+
     // Exception handling / null boundary
     it('should safely add and remove transition classes using fake timers without throwing exceptions', async () => {
       vi.useFakeTimers();

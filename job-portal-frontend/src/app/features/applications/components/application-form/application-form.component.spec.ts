@@ -11,11 +11,7 @@ describe('ApplicationFormComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ApplicationFormComponent],
       providers: [provideRouter([])]
-    })
-    .overrideComponent(ApplicationFormComponent, {
-      set: { schemas: [NO_ERRORS_SCHEMA] }
-    })
-    .compileComponents();
+    }).compileComponents();
   });
 
   beforeEach(() => {

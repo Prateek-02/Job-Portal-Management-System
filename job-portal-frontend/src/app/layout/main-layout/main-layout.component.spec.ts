@@ -30,14 +30,7 @@ describe('MainLayoutComponent', () => {
         provideRouter([]),
         { provide: AuthService, useValue: authServiceMock }
       ]
-    })
-    .overrideComponent(MainLayoutComponent, {
-      set: { 
-        imports: [CommonModule, RouterOutlet, NavbarComponent, FooterComponent], 
-        schemas: [NO_ERRORS_SCHEMA] 
-      }
-    })
-    .compileComponents();
+    }).compileComponents();
     
     fixture = TestBed.createComponent(MainLayoutComponent);
     component = fixture.componentInstance;

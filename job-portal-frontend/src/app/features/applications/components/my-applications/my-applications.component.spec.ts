@@ -19,7 +19,7 @@ describe('MyApplicationsComponent', () => {
 
   beforeEach(async () => {
     apiServiceMock = {
-      getMyApplications: vi.fn().mockReturnValue(of({ content: [] }))
+      getMyApplications: vi.fn().mockReturnValue(of({ content: [], totalElements: 0, totalPages: 0 }))
     };
     
     authServiceMock = {
@@ -81,6 +81,70 @@ describe('MyApplicationsComponent', () => {
       // Should NOT have created a metadata string for null user limit bounding
       const metadataStr = localStorage.getItem('jp_app_metadata_10');
       expect(metadataStr).toBeNull();
+    });
+
+    it('should handle null content response gracefully', () => {
+      apiServiceMock.getMyApplications.mockReturnValue(of({ content: null, totalElements: 0, totalPages: 0 }));
+      setupComponent();
+      fixture.detectChanges();
+      expect(component.applications).toEqual([]);
+    });
+
+    it('should update metadata when status changes', () => {
+      const user = { id: 10 };
+      authServiceMock.getCurrentUser.mockReturnValue(user);
+      localStorage.setItem('jp_app_metadata_10', JSON.stringify({ '1': 'APPLIED' }));
+      
+      apiServiceMock.getMyApplications.mockReturnValue(of({
+        content: [{ id: 1, status: 'SHORTLISTED', job: { id: 11, title: 'Engineer', companyName: 'Acme', location: 'Remote' }, appliedAt: '2026-04-01' }],
+        totalElements: 1,
+        totalPages: 1
+      }));
+      
+      setupComponent();
+      fixture.detectChanges();
+      
+      const meta = JSON.parse(localStorage.getItem('jp_app_metadata_10')!);
+      expect(meta['1']).toBe('SHORTLISTED');
+    });
+
+    it('should skip metadata updates if status is unchanged boundary', () => {
+      const user = { id: 10 };
+      authServiceMock.getCurrentUser.mockReturnValue(user);
+      localStorage.setItem('jp_app_metadata_10', JSON.stringify({ '1': 'APPLIED' }));
+      
+      apiServiceMock.getMyApplications.mockReturnValue(of({
+        content: [{ id: 1, status: 'APPLIED', job: { id: 11, title: 'E', companyName: 'A', location: 'R' }, appliedAt: '2026-04-01' }],
+        totalElements: 1,
+        totalPages: 1
+      }));
+      
+      const setItemSpy = vi.spyOn(localStorage, 'setItem');
+      setupComponent();
+      fixture.detectChanges();
+      
+      // Should NOT have called setItem for the metadata key because nothing changed
+      expect(setItemSpy).not.toHaveBeenCalledWith('jp_app_metadata_10', expect.any(String));
+    });
+
+    it('should reload applications on page change', () => {
+      setupComponent();
+      fixture.detectChanges();
+      apiServiceMock.getMyApplications.mockClear();
+      
+      component.onPageChange(2);
+      expect(component.currentPage).toBe(2);
+      expect(apiServiceMock.getMyApplications).toHaveBeenCalledWith(2, 5);
+    });
+
+    it('should complete destroy$ subject on ngOnDestroy', () => {
+      setupComponent();
+      fixture.detectChanges();
+      const nextSpy = vi.spyOn((component as any).destroy$, 'next');
+      const completeSpy = vi.spyOn((component as any).destroy$, 'complete');
+      component.ngOnDestroy();
+      expect(nextSpy).toHaveBeenCalled();
+      expect(completeSpy).toHaveBeenCalled();
     });
   });
 

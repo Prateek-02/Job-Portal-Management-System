@@ -28,6 +28,11 @@ describe('ModalComponent', () => {
     const mockBackdropClick = { target: { classList: { contains: (cls: string) => cls === 'modal-backdrop' } } } as any;
     component.onBackdropClick(mockBackdropClick);
     expect(emitSpy).toHaveBeenCalledTimes(2);
+
+    // Simulate click inside modal content (not backdrop)
+    const mockContentClick = { target: { classList: { contains: (cls: string) => cls === 'modal-content' } } } as any;
+    component.onBackdropClick(mockContentClick);
+    expect(emitSpy).toHaveBeenCalledTimes(2); // Should not emit again
   });
 
   // Boundary value
@@ -50,16 +55,14 @@ describe('ModalComponent', () => {
     component.isOpen = false;
     const emitSpy = vi.spyOn(component.modalClose, 'emit');
     
-    // Should pass through handleEscape but not trigger anything
     expect(() => {
-      component.handleEscape(new KeyboardEvent('keydown', { key: 'Escape' }));
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
     }).not.toThrow();
     
     expect(emitSpy).not.toHaveBeenCalled();
     
-    // Conversely, if open, it emits safely
     component.isOpen = true;
-    component.handleEscape(new KeyboardEvent('keydown', { key: 'Escape' }));
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
     expect(emitSpy).toHaveBeenCalledTimes(1);
   });
 });

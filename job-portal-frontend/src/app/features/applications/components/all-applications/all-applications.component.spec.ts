@@ -17,8 +17,8 @@ describe('AllApplicationsComponent', () => {
 
   beforeEach(async () => {
     apiServiceMock = {
-      getAllRecruiterApplications: vi.fn(),
-      updateApplicationStatus: vi.fn()
+      getAllRecruiterApplications: vi.fn().mockReturnValue(of({ content: [], totalElements: 0, totalPages: 0 })),
+      updateApplicationStatus: vi.fn().mockReturnValue(of({}))
     };
 
     // ErrorHandlerUtil is mocked at top level
@@ -71,6 +71,24 @@ describe('AllApplicationsComponent', () => {
       expect(component.isLoading).toBe(false);
       expect(component.errorMessage).toBe('Something went wrong on our end. Please try again shortly.');
       expect(component.isLoading).toBe(false);
+    });
+
+    it('should handle null/undefined response gracefully', () => {
+      apiServiceMock.getAllRecruiterApplications.mockReturnValue(of(null));
+      setupComponent();
+      fixture.detectChanges();
+      expect(component.applications).toEqual([]);
+      expect(component.totalElements).toBe(0);
+    });
+
+    it('should complete destroy$ subject on ngOnDestroy', () => {
+      setupComponent();
+      fixture.detectChanges();
+      const nextSpy = vi.spyOn((component as any).destroy$, 'next');
+      const completeSpy = vi.spyOn((component as any).destroy$, 'complete');
+      component.ngOnDestroy();
+      expect(nextSpy).toHaveBeenCalled();
+      expect(completeSpy).toHaveBeenCalled();
     });
   });
 

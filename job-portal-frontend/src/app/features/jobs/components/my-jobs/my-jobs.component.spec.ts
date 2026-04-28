@@ -34,14 +34,7 @@ describe('MyJobsComponent', () => {
         { provide: ApiService, useValue: apiServiceMock },
         { provide: AuthService, useValue: authServiceMock }
       ]
-    })
-    .overrideComponent(MyJobsComponent, {
-      set: { 
-        imports: [DatePipe, PaginationComponent, RouterLink], 
-        schemas: ['NO_ERRORS_SCHEMA' as any] 
-      }
-    })
-    .compileComponents();
+    }).compileComponents();
   });
 
   function setupComponent() {
@@ -58,7 +51,6 @@ describe('MyJobsComponent', () => {
       expect(apiServiceMock.getJobsByRecruiter).not.toHaveBeenCalled();
       expect(component.isLoading).toBe(false);
     });
-
     it('should seamlessly execute API and map page metadata strictly when valid user exists natively', () => {
       authServiceMock.getCurrentUser.mockReturnValue({ id: 10 });
       apiServiceMock.getJobsByRecruiter.mockReturnValue(of({ 
@@ -70,6 +62,17 @@ describe('MyJobsComponent', () => {
       
       expect(apiServiceMock.getJobsByRecruiter).toHaveBeenCalledWith(10, 0, 8);
       expect(component.jobs.length).toBe(1);
+      expect(component.isLoading).toBe(false);
+    });
+
+    it('should handle API errors via catchError fallback gracefully', () => {
+      authServiceMock.getCurrentUser.mockReturnValue({ id: 10 });
+      apiServiceMock.getJobsByRecruiter.mockReturnValue(throwError(() => new Error('Stream fail')));
+      
+      setupComponent();
+      fixture.detectChanges();
+      
+      expect(component.jobs).toEqual([]);
       expect(component.isLoading).toBe(false);
     });
   });

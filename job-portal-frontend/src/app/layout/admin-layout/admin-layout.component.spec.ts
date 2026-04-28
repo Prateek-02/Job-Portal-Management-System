@@ -60,36 +60,38 @@ describe('AdminLayoutComponent', () => {
       component.toggleNotifications(new Event('click'));
       expect(component.isNotificationOpen).toBe(true);
     });
+
+    it('should toggle notification panel state without event', () => {
+      component.isNotificationOpen = false;
+      component.toggleNotifications();
+      expect(component.isNotificationOpen).toBe(true);
+    });
   });
 
   describe('Boundary value', () => {
     it('should correctly ignore clicks inside notification boundary', () => {
       component.isNotificationOpen = true;
-      const mockEvent = {
-        target: {
-          closest: (selector: string) => selector === '.notification-container' ? true : null
-        }
-      } as any;
-
-      component.onDocumentClick(mockEvent);
+      const el = document.createElement('div');
+      el.classList.add('notification-container');
+      document.body.appendChild(el);
+      el.click(); // Triggers document click bubbling up
       expect(component.isNotificationOpen).toBe(true); // Should remain open
+      document.body.removeChild(el);
     });
   });
 
   describe('Exception handling', () => {
     it('should safely process orphaned boundary clicks (null wrapper tree)', () => {
       component.isNotificationOpen = true;
-      const mockEvent = {
-        target: {
-          closest: () => null // completely outside
-        }
-      } as any;
-
+      const el = document.createElement('div');
+      document.body.appendChild(el);
+      
       expect(() => {
-        component.onDocumentClick(mockEvent);
+        el.click();
       }).not.toThrow();
 
       expect(component.isNotificationOpen).toBe(false); // Closed gracefully
+      document.body.removeChild(el);
     });
   });
 });

@@ -34,11 +34,7 @@ describe('SignupComponent', () => {
         { provide: AuthService, useValue: authServiceMock }
       ],
       schemas: [NO_ERRORS_SCHEMA]
-    })
-    .overrideComponent(SignupComponent, {
-      set: { imports: [ReactiveFormsModule, CommonModule], schemas: ['NO_ERRORS_SCHEMA' as any] } // Mock RouterLink
-    })
-    .compileComponents();
+    }).compileComponents();
     
     fixture = TestBed.createComponent(SignupComponent);
     component = fixture.componentInstance;

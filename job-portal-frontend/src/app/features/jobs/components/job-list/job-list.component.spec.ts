@@ -39,11 +39,7 @@ describe('JobListComponent', () => {
         { provide: AuthService, useValue: authServiceMock },
         { provide: ActivatedRoute, useValue: { queryParams: queryParamsSubject.asObservable(), snapshot: { queryParams: {} } } }
       ]
-    })
-    .overrideComponent(JobListComponent, {
-      set: { imports: [ReactiveFormsModule, DatePipe], schemas: ['NO_ERRORS_SCHEMA' as any] }
-    })
-    .compileComponents();
+    }).compileComponents();
   });
 
   function setupComponent() {
@@ -113,6 +109,20 @@ describe('JobListComponent', () => {
       expect(apiServiceMock.searchJobs).toHaveBeenCalledWith(
         expect.objectContaining({ title: 'Engineer' }), 0, 9
       );
+      vi.useRealTimers();
+    });
+
+    it('should ignore value changes that are string-equivalent but different objects in distinctUntilChanged', async () => {
+      vi.useFakeTimers();
+      setupComponent();
+      fixture.detectChanges();
+      apiServiceMock.getJobs.mockClear();
+      apiServiceMock.searchJobs.mockClear();
+      
+      // Patch with same value
+      component.filterForm.patchValue({ title: '' }); 
+      await vi.advanceTimersByTimeAsync(500);
+      expect(apiServiceMock.searchJobs).not.toHaveBeenCalled();
       vi.useRealTimers();
     });
 
