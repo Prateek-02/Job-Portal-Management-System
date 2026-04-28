@@ -77,7 +77,7 @@ public class AuthenticationFilter extends
         String method = request.getMethod().name();
 
         // Check Job related public routes
-        if (path.startsWith("/api/jobs") && !path.contains("/saved")) {
+        if (path.startsWith("/api/jobs") && !path.contains("/saved") && !path.contains("/recruiter")) {
             return method.equalsIgnoreCase("GET") || 
                    (method.equalsIgnoreCase("POST") && path.toLowerCase().contains("search"));
         }
