@@ -1,41 +1,43 @@
 <!-- Recruitment Insights -->
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
   <div class="celestial-card p-6 group overflow-hidden relative">
-    <div class="text-[9px] font-bold uppercase tracking-[0.2em] text-text-secondary mb-3 opacity-50">Live Job
+    <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary mb-3 opacity-50">Live Job
       Postings</div>
-    <div class="text-2xl font-bold text-text-primary mb-1.5">{{ myPostedJobs.length }}</div>
+    <div class="text-3xl font-bold text-text-primary mb-1.5">{{ myPostedJobs.length }}</div>
     <div class="h-1 w-6 bg-energy-emerald rounded-full"></div>
   </div>
 
   <div class="celestial-card p-6 group overflow-hidden relative border-none bg-slate-navy text-white transition-colors duration-500">
     <div class="relative z-10">
-      <div class="text-[9px] font-bold uppercase tracking-[0.2em] mb-3 opacity-30 text-white">Application
+      <div class="text-[10px] font-bold uppercase tracking-[0.2em] mb-3 opacity-30 text-white">Application
         Velocity</div>
       <div class="flex items-end justify-between">
         <div>
-          <div class="text-2xl font-bold mb-0.5">{{ totalAppsLast7Days }}</div>
-          <div class="text-[8px] font-bold text-energy-indigo uppercase tracking-widest">Last 7 Days</div>
+          <div class="text-3xl font-bold mb-0.5">{{ totalAppsLast7Days }}</div>
+          <div class="text-[9px] font-bold text-energy-indigo uppercase tracking-widest">Last 7 Days</div>
         </div>
         <!-- Sparkline (Velocity) -->
         <svg class="w-24 h-8 overflow-visible" viewBox="0 0 100 40">
-          <path [attr.d]="'M ' + appVelocityPoints" fill="none" stroke="#a18cd1" stroke-width="3"
-            stroke-linecap="round" stroke-linejoin="round" class="drop-shadow-[0_0_8px_rgba(161,140,209,0.5)]" />
+          @if (appVelocityPoints) {
+            <path [attr.d]="'M ' + appVelocityPoints" fill="none" stroke="#a18cd1" stroke-width="3"
+              stroke-linecap="round" stroke-linejoin="round" class="drop-shadow-[0_0_8px_rgba(161,140,209,0.5)]" />
+          }
         </svg>
       </div>
     </div>
   </div>
 
   <div class="celestial-card p-6">
-    <div class="text-[9px] font-bold uppercase tracking-[0.2em] text-text-secondary mb-3 opacity-50">Awaiting
+    <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary mb-3 opacity-50">Awaiting
       Review</div>
-    <div class="text-2xl font-bold text-text-primary mb-1.5">{{ pendingApplications.length }}</div>
+    <div class="text-3xl font-bold text-text-primary mb-1.5">{{ pendingApplications.length }}</div>
     <div class="h-1 w-6 bg-energy-violet rounded-full"></div>
   </div>
 
   <div class="celestial-card p-6">
-    <div class="text-[9px] font-bold uppercase tracking-[0.2em] text-text-secondary mb-3 opacity-50">Conversion
+    <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary mb-3 opacity-50">Conversion
       Rate</div>
-    <div class="text-2xl font-bold text-text-primary mb-1.5">
+    <div class="text-3xl font-bold text-text-primary mb-1.5">
       {{ (recentApplicationsForJobs.length > 0 ? (interviewCount / recentApplicationsForJobs.length *
       100).toFixed(0) : '0') }}%
     </div>
