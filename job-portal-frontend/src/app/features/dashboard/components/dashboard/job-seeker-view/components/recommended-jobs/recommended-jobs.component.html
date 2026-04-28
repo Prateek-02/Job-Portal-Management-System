@@ -32,18 +32,18 @@
           Match</span>
       </div>
       <div class="relative z-10">
-        <h4 class="text-xl font-bold text-text-primary mb-1 line-clamp-1">{{ job.title }}</h4>
-        <p class="text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] mb-6">{{ job.companyName }}
+        <h4 class="text-2xl font-bold text-text-primary mb-1 line-clamp-1">{{ job.title }}</h4>
+        <p class="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em] mb-6">{{ job.companyName }}
           • {{ job.location }}</p>
 
         <!-- Job Meta Pills -->
         <div class="flex flex-wrap gap-2 mb-8">
           <span
-            class="px-3 py-1.5 rounded-xl bg-bg-secondary border border-glass-border text-[10px] font-bold text-text-secondary flex items-center gap-1.5">
+            class="px-3 py-1.5 rounded-xl bg-bg-secondary border border-glass-border text-[12px] font-bold text-text-secondary flex items-center gap-1.5">
             <span class="w-1.5 h-1.5 rounded-full bg-energy-violet"></span> {{ formatSalary(job.salary) }}
           </span>
           <span
-            class="px-3 py-1.5 rounded-xl bg-bg-secondary border border-glass-border text-[10px] font-bold text-text-secondary flex items-center gap-1.5">
+            class="px-3 py-1.5 rounded-xl bg-bg-secondary border border-glass-border text-[12px] font-bold text-text-secondary flex items-center gap-1.5">
             <span class="w-1.5 h-1.5 rounded-full bg-energy-emerald"></span> {{ job.experience }}+ Yrs
           </span>
         </div>
@@ -53,7 +53,7 @@
           [innerHTML]="job.description"></div>
 
         <div class="flex items-center justify-between pt-6 border-t border-glass-border">
-          <span class="text-[9px] font-bold text-text-muted uppercase tracking-widest">POSTED: {{ job.createdAt
+          <span class="text-[11px] font-bold text-text-muted uppercase tracking-widest">POSTED: {{ job.createdAt
             | date:'MMM yyyy' }}</span>
           <a [routerLink]="['/jobs', job.id]"
             class="text-xs font-bold text-text-primary hover:text-energy-violet transition-all flex items-center gap-2">

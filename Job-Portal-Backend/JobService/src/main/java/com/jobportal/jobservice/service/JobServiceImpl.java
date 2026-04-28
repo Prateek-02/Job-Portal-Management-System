@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.jobportal.jobservice.config.RabbitMQConfig;
 import com.jobportal.jobservice.dto.JobFilter;
+import com.jobportal.jobservice.dto.JobDeletedEvent;
 import com.jobportal.jobservice.dto.JobPostedEvent;
 import com.jobportal.jobservice.dto.request.JobRequest;
 import com.jobportal.jobservice.dto.response.JobResponse;
@@ -184,8 +185,16 @@ public class JobServiceImpl implements JobService {
         }
 
         jobRepository.delete(job);
+        log.info("Job deleted from database | jobId: {}", id);
 
-        log.info("Job deleted | jobId: {}", id);
+        // Publish Job Deleted event for other services to sync
+        try {
+            JobDeletedEvent event = new JobDeletedEvent(id);
+            rabbitTemplate.convertAndSend(RabbitMQConfig.JOB_DELETED_QUEUE, event);
+            log.info("Job deleted event published | jobId: {}", id);
+        } catch (Exception e) {
+            log.error("Failed to publish job deleted event | jobId: {}", id, e);
+        }
     }
 
     @Override

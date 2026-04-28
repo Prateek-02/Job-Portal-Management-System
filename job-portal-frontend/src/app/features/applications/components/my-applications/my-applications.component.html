@@ -46,52 +46,54 @@
   @if (!isLoading && applications.length > 0) {
     <div class="space-y-6 animate-fade-in-up">
       @for (app of pagedApplications; track app.id) {
-        <div class="celestial-card p-6 md:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6 group inner-glow relative overflow-hidden">
-          <div class="absolute -top-32 -left-32 w-64 h-64 bg-energy-violet/5 blur-[100px] rounded-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"></div>
+        @if (app.job.title !== 'Job no longer available') {
+          <div class="celestial-card p-6 md:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6 group inner-glow relative overflow-hidden">
+            <div class="absolute -top-32 -left-32 w-64 h-64 bg-energy-violet/5 blur-[100px] rounded-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
-          <div class="flex items-center gap-6 relative z-10">
-            <div class="w-12 h-12 rounded-xl bg-bg-accent text-white flex items-center justify-center font-bold text-xl shadow-lg">
-              {{ app.job.companyName.charAt(0) }}
-            </div>
-            <div>
-              <h2 class="text-xl font-bold text-text-primary mb-0.5 tracking-tight">
-                <a [routerLink]="['/jobs', app.job.id]" class="hover:text-energy-violet transition-colors">
-                  {{ app.job.title }}
-                </a>
-              </h2>
-              <p class="text-base font-bold text-text-secondary opacity-60">{{ app.job.companyName }}</p>
-              
-              <div class="flex flex-wrap gap-4 mt-6">
-                <span class="flex items-center gap-2 px-4 py-1.5 rounded-xl bg-bg-secondary border border-glass-border text-[11px] font-bold text-text-secondary flex items-center gap-2 uppercase tracking-widest">
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /></svg>
-                  {{ app.job.location }}
-                </span>
-                <span class="flex items-center gap-2 px-4 py-1.5 rounded-xl bg-bg-secondary border border-glass-border text-[11px] font-bold text-text-muted flex items-center gap-2 uppercase tracking-widest">
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                  {{ app.appliedAt | date:'MMM d, yyyy' }}
-                </span>
-                @if (app.resumeUrl) {
-                  <a [href]="app.resumeUrl" target="_blank" class="flex items-center gap-2 px-4 py-1.5 rounded-xl bg-energy-violet/5 border border-energy-violet/20 text-[11px] font-bold text-energy-violet uppercase tracking-widest hover:bg-energy-violet hover:text-white transition-all">
-                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                    View Resume
+            <div class="flex items-center gap-6 relative z-10">
+              <div class="w-12 h-12 rounded-xl bg-bg-accent text-white flex items-center justify-center font-bold text-xl shadow-lg">
+                {{ app.job.companyName.charAt(0) }}
+              </div>
+              <div>
+                <h2 class="text-xl font-bold text-text-primary mb-0.5 tracking-tight">
+                  <a [routerLink]="['/jobs', app.job.id]" class="hover:text-energy-violet transition-colors">
+                    {{ app.job.title }}
                   </a>
-                }
+                </h2>
+                <p class="text-base font-bold text-text-secondary opacity-60">{{ app.job.companyName }}</p>
+                
+                <div class="flex flex-wrap gap-4 mt-6">
+                  <span class="flex items-center gap-2 px-4 py-1.5 rounded-xl bg-bg-secondary border border-glass-border text-[11px] font-bold text-text-secondary flex items-center gap-2 uppercase tracking-widest">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /></svg>
+                    {{ app.job.location }}
+                  </span>
+                  <span class="flex items-center gap-2 px-4 py-1.5 rounded-xl bg-bg-secondary border border-glass-border text-[11px] font-bold text-text-muted flex items-center gap-2 uppercase tracking-widest">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    {{ app.appliedAt | date:'MMM d, yyyy' }}
+                  </span>
+                  @if (app.resumeUrl) {
+                    <a [href]="app.resumeUrl" target="_blank" class="flex items-center gap-2 px-4 py-1.5 rounded-xl bg-energy-violet/5 border border-energy-violet/20 text-[11px] font-bold text-energy-violet uppercase tracking-widest hover:bg-energy-violet hover:text-white transition-all">
+                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                      View Resume
+                    </a>
+                  }
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="relative z-10">
-            <span class="px-6 py-2 rounded-xl text-[9px] font-bold tracking-[0.2em] uppercase border shadow-lg transition-colors"
-              [ngClass]="{
-                'bg-energy-violet/10 border-energy-violet/20 text-energy-violet': app.status === 'APPLIED',
-                'bg-amber-500/10 border-amber-500/20 text-amber-600': app.status === 'UNDER_REVIEW',
-                'bg-energy-emerald/10 border-energy-emerald/20 text-energy-emerald': app.status === 'SHORTLISTED',
-                'bg-red-500/10 border-red-500/20 text-red-600': app.status === 'REJECTED'
-              }">
-              {{ statusLabel(app.status) }}
-            </span>
+            <div class="relative z-10">
+              <span class="px-6 py-2 rounded-xl text-[9px] font-bold tracking-[0.2em] uppercase border shadow-lg transition-colors"
+                [ngClass]="{
+                  'bg-energy-violet/10 border-energy-violet/20 text-energy-violet': app.status === 'APPLIED',
+                  'bg-amber-500/10 border-amber-500/20 text-amber-600': app.status === 'UNDER_REVIEW',
+                  'bg-energy-emerald/10 border-energy-emerald/20 text-energy-emerald': app.status === 'SHORTLISTED',
+                  'bg-red-500/10 border-red-500/20 text-red-600': app.status === 'REJECTED'
+                }">
+                {{ statusLabel(app.status) }}
+              </span>
+            </div>
           </div>
-        </div>
+        }
       }
     </div>
 

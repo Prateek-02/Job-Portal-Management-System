@@ -17,6 +17,8 @@ public class RabbitMQConfig {
             "saga.application-deleted";
     public static final String JOBS_DELETED_QUEUE =
             "saga.jobs-deleted";
+    public static final String JOB_DELETED_QUEUE =
+            "saga.job-deleted";
 
     @Bean
     public Queue jobPostedQueue() {
@@ -31,6 +33,11 @@ public class RabbitMQConfig {
     @Bean
     public Queue jobsDeletedQueue() {
         return new Queue(JOBS_DELETED_QUEUE, true);
+    }
+
+    @Bean
+    public Queue jobDeletedQueue() {
+        return new Queue(JOB_DELETED_QUEUE, true);
     }
 
     @Bean

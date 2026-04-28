@@ -153,28 +153,28 @@
 
           <!-- Entity Details -->
           <div class="mb-2.5">
-            <h3 class="text-lg font-bold text-text-primary leading-tight mb-1 group-hover:text-energy-violet transition-colors">{{ job.title }}</h3>
+            <h3 class="text-xl font-bold text-text-primary leading-tight mb-1 group-hover:text-energy-violet transition-colors">{{ job.title }}</h3>
             <div class="flex items-center gap-1.5">
-              <span class="text-[9px] font-bold text-text-muted uppercase tracking-[0.2em]">{{ job.companyName }}</span>
+              <span class="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em]">{{ job.companyName }}</span>
               <span class="w-1 h-1 rounded-full bg-glass-border"></span>
-              <span class="text-[9px] font-bold text-text-muted uppercase tracking-[0.2em]">{{ job.location }}</span>
+              <span class="text-[11px] font-bold text-text-muted uppercase tracking-[0.2em]">{{ job.location }}</span>
             </div>
           </div>
 
           <!-- Job Details -->
           <div class="flex flex-wrap gap-2 mb-6 mt-4">
-            <span class="px-2.5 py-1 rounded-lg bg-bg-secondary border border-glass-border text-[10px] font-bold text-text-secondary flex items-center gap-1.5">
-              <span class="w-1 h-1 rounded-full bg-energy-violet"></span> {{ formatSalary(job.salary) }}
+            <span class="px-3 py-1.5 rounded-lg bg-bg-secondary border border-glass-border text-[12px] font-bold text-text-secondary flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-energy-violet"></span> {{ formatSalary(job.salary) }}
             </span>
-            <span class="px-2.5 py-1 rounded-lg bg-bg-secondary border border-glass-border text-[10px] font-bold text-text-secondary flex items-center gap-1.5">
+            <span class="px-3 py-1.5 rounded-lg bg-bg-secondary border border-glass-border text-[12px] font-bold text-text-secondary flex items-center gap-1.5">
               <span class="w-1.5 h-1.5 rounded-full bg-energy-emerald"></span> {{ job.experience }}+ Yrs
             </span>
           </div>
 
-          <div class="text-[12px] font-medium text-text-secondary opacity-60 line-clamp-2 mb-5 flex-1 leading-relaxed" [innerHTML]="job.description"></div>
+          <div class="text-[14px] font-medium text-text-secondary opacity-60 line-clamp-2 mb-5 flex-1 leading-relaxed" [innerHTML]="job.description"></div>
 
           <div class="mt-auto pt-5 border-t border-glass-border/50 flex items-center justify-between">
-            <span class="text-[9px] font-bold text-text-muted uppercase tracking-widest">Posted: {{ job.createdAt | date:'MMM yyyy' }}</span>
+            <span class="text-[11px] font-bold text-text-muted uppercase tracking-widest">Posted: {{ job.createdAt | date:'MMM yyyy' }}</span>
             <a [routerLink]="['/jobs', job.id]" class="text-xs font-bold text-text-primary group-hover:text-energy-violet transition-all flex items-center gap-1.5">
               View Job Details <svg class="w-3.5 h-3.5 transform transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M 17 8 l 4 4 m 0 0 l -4 4 m 4 -4 H 3" /></svg>
             </a>
