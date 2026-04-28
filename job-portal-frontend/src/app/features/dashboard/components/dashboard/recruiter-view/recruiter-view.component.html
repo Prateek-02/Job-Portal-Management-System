@@ -1,12 +1,12 @@
 <!-- ── RECRUITMENT PERSPECTIVE ───────────────────────── -->
 <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-8 animate-fade-in-up">
   <div>
-    <h1 class="text-3xl font-bold text-text-primary tracking-tighter mb-3">{{ getDashboardTitle() }}</h1>
-    <p class="text-[15px] font-medium text-text-secondary opacity-70">{{ getDashboardSubtitle() }}</p>
+    <h1 class="text-2xl font-bold text-text-primary tracking-tighter mb-2">{{ getDashboardTitle() }}</h1>
+    <p class="text-sm font-medium text-text-secondary opacity-70">{{ getDashboardSubtitle() }}</p>
   </div>
   @if (shouldShowCta()) {
   <a [routerLink]="getCreateJobRoute()"
-    class="btn-celestial py-3.5! px-8! text-sm! shadow-2xl! hover:scale-105 transition-all">
+    class="btn-celestial py-3 px-6 text-xs shadow-xl hover:scale-105 transition-all">
     {{ getCtaLabel() }}
   </a>
   }

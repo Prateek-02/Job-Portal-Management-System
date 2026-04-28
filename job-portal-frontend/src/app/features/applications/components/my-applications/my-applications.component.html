@@ -1,13 +1,12 @@
-<div class="max-w-5xl mx-auto px-6 lg:px-12 py-12 relative z-20">
-
+<div class="max-w-5xl mx-auto px-6 lg:px-12 py-8 relative z-20">
   <!-- Header -->
-  <div class="mb-14 animate-fade-in-up">
-    <div class="inline-block px-4 py-1.5 rounded-full bg-energy-violet/10 border border-energy-violet/20 text-energy-violet text-[10px] font-bold uppercase tracking-[0.3em] mb-4">
+  <div class="mb-10 animate-fade-in-up">
+    <div class="inline-block px-3 py-1 rounded-full bg-energy-violet/10 border border-energy-violet/20 text-energy-violet text-[9px] font-bold uppercase tracking-[0.3em] mb-3">
       History & Tracking
     </div>
-    <h1 class="text-6xl font-bold text-text-primary tracking-tighter">My Applications</h1>
-    <p class="text-xl font-medium text-text-secondary opacity-60 mt-4 leading-relaxed">View and track the status of all your job applications.</p>
-    <p class="text-sm font-bold text-text-muted uppercase tracking-widest mt-2">{{ totalElements }} application{{ totalElements !== 1 ? 's' : '' }} total</p>
+    <h1 class="text-4xl font-bold text-text-primary tracking-tighter">My Applications</h1>
+    <p class="text-base font-medium text-text-secondary opacity-60 mt-2 leading-relaxed">View and track the status of all your job applications.</p>
+    <p class="text-xs font-bold text-text-muted uppercase tracking-widest mt-1.5">{{ totalElements }} application{{ totalElements !== 1 ? 's' : '' }} total</p>
   </div>
 
   @if (errorMessage) {
@@ -18,14 +17,14 @@
   }
 
   @if (isLoading) {
-    <div class="space-y-8">
+    <div class="space-y-6">
       @for (i of [1,2,3]; track i) {
-        <div class="celestial-card p-10 animate-pulse inner-glow">
-          <div class="flex gap-8 items-center">
-            <div class="w-16 h-16 bg-glass-bg rounded-2xl"></div>
-            <div class="flex-grow space-y-4">
-              <div class="h-6 bg-glass-bg rounded-lg w-1/3"></div>
-              <div class="h-4 bg-glass-bg rounded-md w-1/4"></div>
+        <div class="celestial-card p-6 animate-pulse inner-glow">
+          <div class="flex gap-6 items-center">
+            <div class="w-12 h-12 bg-glass-bg rounded-xl"></div>
+            <div class="flex-grow space-y-3">
+              <div class="h-5 bg-glass-bg rounded w-1/3"></div>
+              <div class="h-3 bg-glass-bg rounded w-1/4"></div>
             </div>
           </div>
         </div>
@@ -45,22 +44,22 @@
   }
 
   @if (!isLoading && applications.length > 0) {
-    <div class="space-y-8 animate-fade-in-up">
+    <div class="space-y-6 animate-fade-in-up">
       @for (app of pagedApplications; track app.id) {
-        <div class="celestial-card p-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8 group inner-glow relative overflow-hidden">
+        <div class="celestial-card p-6 md:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6 group inner-glow relative overflow-hidden">
           <div class="absolute -top-32 -left-32 w-64 h-64 bg-energy-violet/5 blur-[100px] rounded-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
-          <div class="flex items-center gap-8 relative z-10">
-            <div class="w-16 h-16 rounded-[20px] bg-bg-accent text-white flex items-center justify-center font-bold text-2xl shadow-xl">
+          <div class="flex items-center gap-6 relative z-10">
+            <div class="w-12 h-12 rounded-xl bg-bg-accent text-white flex items-center justify-center font-bold text-xl shadow-lg">
               {{ app.job.companyName.charAt(0) }}
             </div>
             <div>
-              <h2 class="text-2xl font-bold text-text-primary mb-1 tracking-tight">
+              <h2 class="text-xl font-bold text-text-primary mb-0.5 tracking-tight">
                 <a [routerLink]="['/jobs', app.job.id]" class="hover:text-energy-violet transition-colors">
                   {{ app.job.title }}
                 </a>
               </h2>
-              <p class="text-lg font-bold text-text-secondary opacity-60">{{ app.job.companyName }}</p>
+              <p class="text-base font-bold text-text-secondary opacity-60">{{ app.job.companyName }}</p>
               
               <div class="flex flex-wrap gap-4 mt-6">
                 <span class="flex items-center gap-2 px-4 py-1.5 rounded-xl bg-bg-secondary border border-glass-border text-[11px] font-bold text-text-secondary flex items-center gap-2 uppercase tracking-widest">
@@ -82,7 +81,7 @@
           </div>
 
           <div class="relative z-10">
-            <span class="px-8 py-3 rounded-2xl text-[11px] font-bold tracking-[0.2em] uppercase border shadow-xl transition-colors"
+            <span class="px-6 py-2 rounded-xl text-[9px] font-bold tracking-[0.2em] uppercase border shadow-lg transition-colors"
               [ngClass]="{
                 'bg-energy-violet/10 border-energy-violet/20 text-energy-violet': app.status === 'APPLIED',
                 'bg-amber-500/10 border-amber-500/20 text-amber-600': app.status === 'UNDER_REVIEW',

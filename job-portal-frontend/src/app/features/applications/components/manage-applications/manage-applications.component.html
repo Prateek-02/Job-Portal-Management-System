@@ -7,9 +7,9 @@
     </a>
     
     <div class="animate-fade-in-up">
-      <h1 class="text-4xl font-extrabold text-[#1A1A1A] tracking-tight">Manage Candidates</h1>
+      <h1 class="text-3xl font-extrabold text-[#1A1A1A] tracking-tight">Manage Candidates</h1>
       @if (job) {
-        <p class="text-[#4A4A4A] font-bold mt-2 text-lg">
+        <p class="text-[#4A4A4A] font-bold mt-1.5 text-base">
           {{ totalElements }} applicant(s) for <span class="text-[#A18CD1]">{{ job.title }}</span>
         </p>
       }
@@ -51,22 +51,22 @@
 
   <!-- Applicants List -->
   @if (!isLoading && applications.length > 0) {
-    <div class="space-y-8 animate-fade-in-up">
+    <div class="space-y-6 animate-fade-in-up">
       @for (app of pagedApplications; track app.id) {
-        <div class="glass-card p-8 group relative overflow-hidden">
+        <div class="glass-card p-6 group relative overflow-hidden">
           <!-- Left Gradient Border overlay effect -->
-          <div class="absolute left-0 top-0 bottom-0 w-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style="background: linear-gradient(180deg, #A18CD1, #FBC2EB)"></div>
+          <div class="absolute left-0 top-0 bottom-0 w-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style="background: linear-gradient(180deg, #A18CD1, #FBC2EB)"></div>
 
-          <div class="flex flex-col md:flex-row gap-6 md:items-start justify-between relative z-10">
+          <div class="flex flex-col md:flex-row gap-5 md:items-start justify-between relative z-10">
             <!-- Applicant Info -->
-            <div class="flex items-start gap-5">
-              <div class="w-16 h-16 rounded-[16px] flex items-center justify-center text-2xl font-extrabold text-[#1A1A1A] border-4 border-white shadow-md" style="background: linear-gradient(135deg, #FF9A9E, #FBC2EB)">
+            <div class="flex items-start gap-4">
+              <div class="w-12 h-12 rounded-[12px] flex items-center justify-center text-xl font-extrabold text-[#1A1A1A] border-2 border-white shadow-md" style="background: linear-gradient(135deg, #FF9A9E, #FBC2EB)">
                 {{ app.applicantName.charAt(0) }}
               </div>
               <div>
-                <h3 class="text-2xl font-extrabold text-[#1A1A1A] mb-1 tracking-tight">{{ app.applicantName }}</h3>
-                <p class="text-[#4A4A4A] font-bold text-sm flex items-center gap-2 mb-4">
-                  <svg class="w-4 h-4 text-[#A18CD1]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                <h3 class="text-xl font-extrabold text-[#1A1A1A] mb-0.5 tracking-tight">{{ app.applicantName }}</h3>
+                <p class="text-[#4A4A4A] font-bold text-[13px] flex items-center gap-2 mb-3">
+                  <svg class="w-3.5 h-3.5 text-[#A18CD1]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                   {{ app.applicantEmail }}
                 </p>
 
@@ -88,7 +88,7 @@
 
             <!-- Current Status Badge -->
             <div class="shrink-0 flex items-start justify-end">
-              <span class="px-5 py-2 rounded-full text-[12px] font-extrabold tracking-widest uppercase shadow-sm border"
+              <span class="px-4 py-1.5 rounded-full text-[10px] font-extrabold tracking-widest uppercase shadow-sm border"
                     [ngClass]="{
                       'badge-glass-info': app.status === 'APPLIED',
                       'badge-glass-warning': app.status === 'UNDER_REVIEW',
@@ -101,24 +101,24 @@
           </div>
 
           <!-- Status Actions Panel -->
-          <div class="mt-8 pt-6 border-t border-white/40 flex flex-wrap gap-3 items-center relative z-10 w-full rounded-2xl overflow-hidden p-2 bg-white/20 shadow-inner">
+          <div class="mt-6 pt-5 border-t border-white/40 flex flex-wrap gap-2.5 items-center relative z-10 w-full rounded-2xl overflow-hidden p-2 bg-white/20 shadow-inner">
             <button (click)="updateStatus(app, 'APPLIED')"
-                    class="flex-1 py-3 px-4 rounded-xl text-[13px] font-bold uppercase tracking-wider transition-all"
+                    class="flex-1 py-2.5 px-4 rounded-xl text-[12px] font-bold uppercase tracking-wider transition-all"
                     [ngClass]="app.status === 'APPLIED' ? 'bg-[#1A1A1A] text-white shadow-md' : 'text-[#4A4A4A] hover:bg-white/40'">
               Applied
             </button>
             <button (click)="updateStatus(app, 'UNDER_REVIEW')"
-                    class="flex-1 py-3 px-4 rounded-xl text-[13px] font-bold uppercase tracking-wider transition-all"
+                    class="flex-1 py-2.5 px-4 rounded-xl text-[12px] font-bold uppercase tracking-wider transition-all"
                     [ngClass]="app.status === 'UNDER_REVIEW' ? 'bg-[#F59E0B] text-white shadow-md' : 'text-[#4A4A4A] hover:bg-yellow-500/20'">
               Under Review
             </button>
             <button (click)="updateStatus(app, 'SHORTLISTED')"
-                    class="flex-1 py-3 px-4 rounded-xl text-[13px] font-bold uppercase tracking-wider transition-all"
+                    class="flex-1 py-2.5 px-4 rounded-xl text-[12px] font-bold uppercase tracking-wider transition-all"
                     [ngClass]="app.status === 'SHORTLISTED' ? 'bg-[#10B981] text-white shadow-md' : 'text-[#4A4A4A] hover:bg-green-500/20'">
               Shortlist
             </button>
             <button (click)="updateStatus(app, 'REJECTED')"
-                    class="flex-1 py-3 px-4 rounded-xl text-[13px] font-bold uppercase tracking-wider transition-all"
+                    class="flex-1 py-2.5 px-4 rounded-xl text-[12px] font-bold uppercase tracking-wider transition-all"
                     [ngClass]="app.status === 'REJECTED' ? 'bg-[#EF4444] text-white shadow-md' : 'text-[#4A4A4A] hover:bg-red-500/20'">
               Reject
             </button>

@@ -1,8 +1,8 @@
-<div class="p-8">
+<div class="p-6 md:p-8">
   <div class="flex items-center justify-between mb-8">
     <div>
-      <h1 class="text-3xl font-bold text-text-primary">Manage Jobs</h1>
-      <p class="text-text-secondary mt-1">{{ totalElements }} total job listings &mdash; Page {{ currentPage + 1 }} of {{ totalPages || 1 }}</p>
+      <h1 class="text-2xl font-bold text-text-primary tracking-tight">Manage Jobs</h1>
+      <p class="text-sm font-medium text-text-secondary opacity-60">{{ totalElements }} total job listings &mdash; Page {{ currentPage + 1 }} of {{ totalPages || 1 }}</p>
     </div>
   </div>
 
@@ -34,26 +34,26 @@
         <table class="w-full text-left">
           <thead>
             <tr class="bg-bg-secondary border-b border-glass-border">
-              <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] font-semibold">Job Title</th>
-              <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] font-semibold">Company</th>
-              <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] font-semibold">Location</th>
-              <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] font-semibold">Salary</th>
-              <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] font-semibold">Posted</th>
-              <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] font-semibold text-right">Actions</th>
+              <th class="px-5 py-3.5 text-[9px] font-bold text-text-muted uppercase tracking-[0.2em]">Job Title</th>
+              <th class="px-5 py-3.5 text-[9px] font-bold text-text-muted uppercase tracking-[0.2em]">Company</th>
+              <th class="px-5 py-3.5 text-[9px] font-bold text-text-muted uppercase tracking-[0.2em]">Location</th>
+              <th class="px-5 py-3.5 text-[9px] font-bold text-text-muted uppercase tracking-[0.2em]">Salary</th>
+              <th class="px-5 py-3.5 text-[9px] font-bold text-text-muted uppercase tracking-[0.2em]">Posted</th>
+              <th class="px-5 py-3.5 text-[9px] font-bold text-text-muted uppercase tracking-[0.2em] text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             @for (job of pagedJobs; track job.id) {
               <tr class="border-b border-glass-border hover:bg-bg-secondary transition-colors">
-                <td class="px-6 py-4 text-text-primary font-bold text-sm max-w-xs truncate tracking-tight">{{ job.title }}</td>
-                <td class="px-6 py-4 text-text-secondary font-medium text-sm">{{ job.companyName }}</td>
-                <td class="px-6 py-4 text-text-secondary font-medium text-sm">{{ job.location }}</td>
-                <td class="px-6 py-4 text-energy-emerald text-sm font-black">₹{{ job.salary | number:'1.0-0' }}</td>
-                <td class="px-6 py-4 text-text-muted font-medium text-sm">{{ job.createdAt | date:'mediumDate' }}</td>
-                <td class="px-6 py-4 text-right">
+                <td class="px-5 py-3.5 text-text-primary font-bold text-sm max-w-xs truncate tracking-tight">{{ job.title }}</td>
+                <td class="px-5 py-3.5 text-text-secondary font-medium text-xs">{{ job.companyName }}</td>
+                <td class="px-5 py-3.5 text-text-secondary font-medium text-xs">{{ job.location }}</td>
+                <td class="px-5 py-3.5 text-energy-emerald text-xs font-black">₹{{ job.salary | number:'1.0-0' }}</td>
+                <td class="px-5 py-3.5 text-text-muted font-medium text-xs">{{ job.createdAt | date:'mediumDate' }}</td>
+                <td class="px-5 py-3.5 text-right">
                   <button (click)="deleteJob(job.id)"
                           [disabled]="deletingId === job.id"
-                          class="w-10 h-10 flex items-center justify-center bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-all shadow-sm border border-red-500/20 disabled:opacity-50 ml-auto"
+                          class="w-9 h-9 flex items-center justify-center bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-all shadow-sm border border-red-500/20 disabled:opacity-50 ml-auto"
                           title="Delete job">
                     @if (deletingId === job.id) {
                       <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle></svg>

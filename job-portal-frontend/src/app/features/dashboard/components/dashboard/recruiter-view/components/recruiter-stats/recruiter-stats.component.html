@@ -1,20 +1,20 @@
 <!-- Recruitment Insights -->
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-  <div class="celestial-card p-8 group overflow-hidden relative">
-    <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary mb-4 opacity-50">Live Job
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+  <div class="celestial-card p-6 group overflow-hidden relative">
+    <div class="text-[9px] font-bold uppercase tracking-[0.2em] text-text-secondary mb-3 opacity-50">Live Job
       Postings</div>
-    <div class="text-4xl font-bold text-text-primary mb-2">{{ myPostedJobs.length }}</div>
-    <div class="h-1 w-8 bg-energy-emerald rounded-full"></div>
+    <div class="text-2xl font-bold text-text-primary mb-1.5">{{ myPostedJobs.length }}</div>
+    <div class="h-1 w-6 bg-energy-emerald rounded-full"></div>
   </div>
 
-  <div class="celestial-card p-8 group overflow-hidden relative border-none bg-slate-navy text-white transition-colors duration-500">
+  <div class="celestial-card p-6 group overflow-hidden relative border-none bg-slate-navy text-white transition-colors duration-500">
     <div class="relative z-10">
-      <div class="text-[10px] font-bold uppercase tracking-[0.2em] mb-4 opacity-30 text-white">Application
+      <div class="text-[9px] font-bold uppercase tracking-[0.2em] mb-3 opacity-30 text-white">Application
         Velocity</div>
       <div class="flex items-end justify-between">
         <div>
-          <div class="text-4xl font-bold mb-1">{{ totalAppsLast7Days }}</div>
-          <div class="text-[9px] font-bold text-energy-indigo uppercase tracking-widest">Last 7 Days</div>
+          <div class="text-2xl font-bold mb-0.5">{{ totalAppsLast7Days }}</div>
+          <div class="text-[8px] font-bold text-energy-indigo uppercase tracking-widest">Last 7 Days</div>
         </div>
         <!-- Sparkline (Velocity) -->
         <svg class="w-24 h-8 overflow-visible" viewBox="0 0 100 40">
@@ -25,20 +25,20 @@
     </div>
   </div>
 
-  <div class="celestial-card p-8">
-    <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary mb-4 opacity-50">Awaiting
+  <div class="celestial-card p-6">
+    <div class="text-[9px] font-bold uppercase tracking-[0.2em] text-text-secondary mb-3 opacity-50">Awaiting
       Review</div>
-    <div class="text-4xl font-bold text-text-primary mb-2">{{ pendingApplications.length }}</div>
-    <div class="h-1 w-8 bg-energy-violet rounded-full"></div>
+    <div class="text-2xl font-bold text-text-primary mb-1.5">{{ pendingApplications.length }}</div>
+    <div class="h-1 w-6 bg-energy-violet rounded-full"></div>
   </div>
 
-  <div class="celestial-card p-8">
-    <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary mb-4 opacity-50">Conversion
+  <div class="celestial-card p-6">
+    <div class="text-[9px] font-bold uppercase tracking-[0.2em] text-text-secondary mb-3 opacity-50">Conversion
       Rate</div>
-    <div class="text-4xl font-bold text-text-primary mb-2">
+    <div class="text-2xl font-bold text-text-primary mb-1.5">
       {{ (recentApplicationsForJobs.length > 0 ? (interviewCount / recentApplicationsForJobs.length *
       100).toFixed(0) : '0') }}%
     </div>
-    <div class="h-1 w-8 bg-energy-indigo rounded-full"></div>
+    <div class="h-1 w-6 bg-energy-indigo rounded-full"></div>
   </div>
 </div>

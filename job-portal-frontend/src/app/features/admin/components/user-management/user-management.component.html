@@ -1,8 +1,8 @@
-<div class="p-8">
+<div class="p-6 md:p-8">
   <div class="flex items-center justify-between mb-8">
     <div>
-      <h1 class="text-3xl font-bold text-text-primary">Manage Users</h1>
-      <p class="text-text-secondary mt-1">{{ totalElements }} registered users &mdash; Page {{ currentPage + 1 }} of {{ totalPages || 1 }}</p>
+      <h1 class="text-2xl font-bold text-text-primary tracking-tight">Manage Users</h1>
+      <p class="text-sm font-medium text-text-secondary opacity-60">{{ totalElements }} registered users &mdash; Page {{ currentPage + 1 }} of {{ totalPages || 1 }}</p>
     </div>
   </div>
 
@@ -34,39 +34,39 @@
         <table class="w-full text-left">
           <thead>
             <tr class="bg-bg-secondary border-b border-glass-border">
-              <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] font-semibold">User</th>
-              <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] font-semibold">Email</th>
-              <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] font-semibold">Phone</th>
-              <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] font-semibold">Role</th>
-              <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] font-semibold">Joined</th>
-              <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] font-semibold text-right">Actions</th>
+              <th class="px-5 py-3.5 text-[9px] font-bold text-text-muted uppercase tracking-[0.2em]">User</th>
+              <th class="px-5 py-3.5 text-[9px] font-bold text-text-muted uppercase tracking-[0.2em]">Email</th>
+              <th class="px-5 py-3.5 text-[9px] font-bold text-text-muted uppercase tracking-[0.2em]">Phone</th>
+              <th class="px-5 py-3.5 text-[9px] font-bold text-text-muted uppercase tracking-[0.2em]">Role</th>
+              <th class="px-5 py-3.5 text-[9px] font-bold text-text-muted uppercase tracking-[0.2em]">Joined</th>
+              <th class="px-5 py-3.5 text-[9px] font-bold text-text-muted uppercase tracking-[0.2em] text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             @for (user of pagedUsers; track user.id) {
               <tr class="border-b border-glass-border hover:bg-bg-secondary transition-colors">
-                <td class="px-6 py-4 text-sm">
+                <td class="px-5 py-3.5 text-sm">
                   <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-bg-accent text-white flex items-center justify-center font-bold text-lg shadow-xl shrink-0">
+                    <div class="w-9 h-9 rounded-xl bg-bg-accent text-white flex items-center justify-center font-bold text-base shadow-lg shrink-0">
                       {{ user.name.charAt(0).toUpperCase() }}
                     </div>
-                    <span class="text-text-primary font-bold text-[15px] tracking-tight">{{ user.name }}</span>
+                    <span class="text-text-primary font-bold text-sm tracking-tight">{{ user.name }}</span>
                   </div>
                 </td>
-                <td class="px-6 py-4 text-text-secondary font-medium text-sm">{{ user.email }}</td>
-                <td class="px-6 py-4 text-text-secondary font-medium text-sm">{{ user.phone || '—' }}</td>
-                <td class="px-6 py-4">
+                <td class="px-5 py-3.5 text-text-secondary font-medium text-xs">{{ user.email }}</td>
+                <td class="px-5 py-3.5 text-text-secondary font-medium text-xs">{{ user.phone || '—' }}</td>
+                <td class="px-5 py-3.5">
                   <span [ngClass]="roleClass(user.role)"
-                        class="px-3 py-1.5 text-[9px] font-black rounded-lg border border-dashed uppercase tracking-widest shadow-sm">
+                        class="px-2.5 py-1 text-[8px] font-black rounded-lg border border-dashed uppercase tracking-widest shadow-sm">
                     {{ user.role.replace('_', ' ') }}
                   </span>
                 </td>
-                <td class="px-6 py-4 text-text-secondary font-medium text-sm">{{ user.createdAt | date:'mediumDate' }}</td>
-                <td class="px-6 py-4 text-right">
+                <td class="px-5 py-3.5 text-text-secondary font-medium text-xs">{{ user.createdAt | date:'mediumDate' }}</td>
+                <td class="px-5 py-3.5 text-right">
                   @if (user.role !== 'ADMIN') {
                     <button (click)="deleteUser(user.id)"
                             [disabled]="deletingId === user.id"
-                            class="w-10 h-10 flex items-center justify-center bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-all shadow-sm border border-red-500/20 disabled:opacity-50 ml-auto"
+                            class="w-9 h-9 flex items-center justify-center bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-all shadow-sm border border-red-500/20 disabled:opacity-50 ml-auto"
                             title="Delete user">
                       @if (deletingId === user.id) {
                         <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle></svg>

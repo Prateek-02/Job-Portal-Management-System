@@ -1,7 +1,7 @@
 <div class="p-4 md:p-6">
-  <div class="mb-6">
-    <h1 class="text-2xl font-bold text-text-primary">Dashboard Overview</h1>
-    <p class="text-text-secondary mt-1">System-wide statistics and metrics</p>
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-text-primary tracking-tight">Dashboard Overview</h1>
+    <p class="text-sm font-medium text-text-secondary opacity-60">System-wide statistics and metrics</p>
   </div>
 
   @if (isLoading) {
@@ -19,19 +19,19 @@
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 animate-fade-in-up">
 
     <!-- Total Users -->
-    <div class="celestial-card p-6 md:p-8 group hover:shadow-2xl transition-all">
-      <div class="flex items-center justify-between mb-6">
+    <div class="celestial-card p-6 group hover:shadow-xl transition-all">
+      <div class="flex items-center justify-between mb-5">
         <div
-          class="w-14 h-14 rounded-2xl bg-royal-blue/10 flex items-center justify-center group-hover:bg-royal-blue/20 transition-all shadow-inner">
-          <svg class="w-7 h-7 text-royal-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          class="w-12 h-12 rounded-xl bg-royal-blue/10 flex items-center justify-center group-hover:bg-royal-blue/20 transition-all shadow-inner">
+          <svg class="w-6 h-6 text-royal-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
         </div>
-        <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary opacity-40">System Core</div>
+        <div class="text-[9px] font-bold uppercase tracking-[0.2em] text-text-secondary opacity-40">System Core</div>
       </div>
-      <div class="text-xs font-bold text-text-secondary uppercase tracking-widest mb-1 opacity-60">Total Users</div>
-      <div class="text-[40px] leading-tight font-bold text-text-primary tracking-tighter mb-4">{{ reports.totalUsers ?? '0' }}</div>
+      <div class="text-[10px] font-bold text-text-secondary uppercase tracking-widest mb-1 opacity-60">Total Users</div>
+      <div class="text-3xl leading-tight font-bold text-text-primary tracking-tighter mb-4">{{ reports.totalUsers ?? '0' }}</div>
       <div class="pt-4 border-t border-glass-border">
         <a routerLink="/admin/users"
           class="text-[10px] font-black text-royal-blue uppercase tracking-[0.15em] flex items-center gap-2 hover:gap-3 transition-all group/link">
@@ -44,56 +44,56 @@
     </div>
 
     <!-- Job Seekers -->
-    <div class="celestial-card p-6 md:p-8 group hover:shadow-2xl transition-all border-l-4 border-l-energy-emerald/30">
-      <div class="flex items-center justify-between mb-6">
+    <div class="celestial-card p-6 group hover:shadow-xl transition-all border-l-4 border-l-energy-emerald/30">
+      <div class="flex items-center justify-between mb-5">
         <div
-          class="w-14 h-14 rounded-2xl bg-energy-emerald/10 flex items-center justify-center group-hover:bg-energy-emerald/20 transition-all shadow-inner">
-          <svg class="w-7 h-7 text-energy-emerald" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          class="w-12 h-12 rounded-xl bg-energy-emerald/10 flex items-center justify-center group-hover:bg-energy-emerald/20 transition-all shadow-inner">
+          <svg class="w-6 h-6 text-energy-emerald" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
           </svg>
         </div>
-        <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-energy-emerald opacity-40">Talent Pool</div>
+        <div class="text-[9px] font-bold uppercase tracking-[0.2em] text-energy-emerald opacity-40">Talent Pool</div>
       </div>
-      <div class="text-xs font-bold text-text-secondary uppercase tracking-widest mb-1 opacity-60">Job Seekers</div>
-      <div class="text-[40px] leading-tight font-bold text-text-primary tracking-tighter mb-4">{{ reports.jobSeekers ?? '0' }}</div>
+      <div class="text-[10px] font-bold text-text-secondary uppercase tracking-widest mb-1 opacity-60">Job Seekers</div>
+      <div class="text-3xl leading-tight font-bold text-text-primary tracking-tighter mb-4">{{ reports.jobSeekers ?? '0' }}</div>
       <div class="pt-4 border-t border-glass-border">
         <p class="text-[10px] font-bold text-text-secondary opacity-40 uppercase tracking-widest">Active Candidates</p>
       </div>
     </div>
 
     <!-- Recruiters -->
-    <div class="celestial-card p-6 md:p-8 group hover:shadow-2xl transition-all border-l-4 border-l-energy-indigo/30">
-      <div class="flex items-center justify-between mb-6">
+    <div class="celestial-card p-6 group hover:shadow-xl transition-all border-l-4 border-l-energy-indigo/30">
+      <div class="flex items-center justify-between mb-5">
         <div
-          class="w-14 h-14 rounded-2xl bg-energy-indigo/10 flex items-center justify-center group-hover:bg-energy-indigo/20 transition-all shadow-inner">
-          <svg class="w-7 h-7 text-energy-indigo" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          class="w-12 h-12 rounded-xl bg-energy-indigo/10 flex items-center justify-center group-hover:bg-energy-indigo/20 transition-all shadow-inner">
+          <svg class="w-6 h-6 text-energy-indigo" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
           </svg>
         </div>
-        <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-energy-indigo opacity-40">Partners</div>
+        <div class="text-[9px] font-bold uppercase tracking-[0.2em] text-energy-indigo opacity-40">Partners</div>
       </div>
-      <div class="text-xs font-bold text-text-secondary uppercase tracking-widest mb-1 opacity-60">Recruiters</div>
-      <div class="text-[40px] leading-tight font-bold text-text-primary tracking-tighter mb-4">{{ reports.recruiters ?? '0' }}</div>
+      <div class="text-[10px] font-bold text-text-secondary uppercase tracking-widest mb-1 opacity-60">Recruiters</div>
+      <div class="text-3xl leading-tight font-bold text-text-primary tracking-tighter mb-4">{{ reports.recruiters ?? '0' }}</div>
       <div class="pt-4 border-t border-glass-border">
         <p class="text-[10px] font-bold text-text-secondary opacity-40 uppercase tracking-widest">Company Partners</p>
       </div>
     </div>
 
     <!-- Total Jobs -->
-    <div class="celestial-card p-6 md:p-8 group hover:shadow-2xl transition-all">
-      <div class="flex items-center justify-between mb-6">
+    <div class="celestial-card p-6 group hover:shadow-xl transition-all">
+      <div class="flex items-center justify-between mb-5">
         <div
-          class="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center group-hover:bg-amber-500/20 transition-all shadow-inner">
-          <svg class="w-7 h-7 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          class="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center group-hover:bg-amber-500/20 transition-all shadow-inner">
+          <svg class="w-6 h-6 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
         </div>
-        <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-500 opacity-40">Opportunities</div>
+        <div class="text-[9px] font-bold uppercase tracking-[0.2em] text-amber-500 opacity-40">Opportunities</div>
       </div>
-      <div class="text-xs font-bold text-text-secondary uppercase tracking-widest mb-1 opacity-60">Total Jobs</div>
-      <div class="text-[40px] leading-tight font-bold text-text-primary tracking-tighter mb-4">{{ reports.totalJobs ?? '0' }}</div>
+      <div class="text-[10px] font-bold text-text-secondary uppercase tracking-widest mb-1 opacity-60">Total Jobs</div>
+      <div class="text-3xl leading-tight font-bold text-text-primary tracking-tighter mb-4">{{ reports.totalJobs ?? '0' }}</div>
       <div class="pt-4 border-t border-glass-border">
         <a routerLink="/admin/jobs"
           class="text-[10px] font-black text-amber-600 uppercase tracking-[0.15em] flex items-center gap-2 hover:gap-3 transition-all group/link">
@@ -108,13 +108,13 @@
   </div>
 
   <!-- Total Applications & Detailed Table Section -->
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-10">
-    <div class="celestial-card p-6 md:p-8 flex flex-col justify-between bg-bg-accent text-white border-none inner-glow">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+    <div class="celestial-card p-6 flex flex-col justify-between bg-bg-accent text-white border-none inner-glow">
       <div>
-        <div class="text-[10px] font-bold uppercase tracking-[0.2em] mb-4 opacity-50 text-white">Global Engagement</div>
-        <h3 class="text-3xl font-bold tracking-tighter mb-2 text-white">Total Applications</h3>
-        <p class="text-sm opacity-60 text-white">Cumulative system-wide job applications</p>
-        <div class="text-6xl font-black text-white mt-8 group-hover:scale-110 transition-transform brightness-125">{{
+        <div class="text-[9px] font-bold uppercase tracking-[0.2em] mb-3 opacity-50 text-white">Global Engagement</div>
+        <h3 class="text-2xl font-bold tracking-tighter mb-1.5 text-white">Total Applications</h3>
+        <p class="text-xs opacity-60 text-white">Cumulative system-wide job applications</p>
+        <div class="text-4xl font-black text-white mt-6 group-hover:scale-110 transition-transform brightness-125">{{
         reports.totalApplications ?? '0' }}</div>
       </div>
     </div>
