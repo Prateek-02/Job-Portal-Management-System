@@ -42,7 +42,7 @@ export class RecommendedJobsComponent implements OnInit, OnDestroy {
   private loadRecentJobs(userId: number): void {
     this.apiService.getJobs(0, 4).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
-        const pageJobs = res.content || [];
+        const pageJobs = res?.content || [];
         this.recentJobs = pageJobs;
         this.isLoadingJobs = false;
         this.checkNewJobs(userId, pageJobs);

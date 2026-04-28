@@ -108,7 +108,7 @@ export class JobListComponent implements OnInit, OnDestroy {
 
     request$.pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: PageResponse<Job>) => {
-        this.jobs = res.content || [];
+        this.jobs = res?.content || [];
         this.totalPages = res.totalPages;
         this.currentPage = res.pageNumber;
         this.totalElements = res.totalElements;
