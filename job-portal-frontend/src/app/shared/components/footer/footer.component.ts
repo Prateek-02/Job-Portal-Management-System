@@ -19,7 +19,7 @@ export class FooterComponent {
 
   normalizeCompanyName(name?: string): string {
     const value = (name || '').trim();
-    return value || 'Job Portal';
+    return value || 'TalentSphere';
   }
 
   getFooterText(company?: string): string {

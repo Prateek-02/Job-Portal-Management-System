@@ -44,7 +44,13 @@ describe('FooterComponent', () => {
     expect(component.getCopyrightYear(new Date('2025-01-01'))).toBe(2025);
     expect(component.getCopyrightYear()).toBe(new Date().getFullYear());
     expect(component.normalizeCompanyName('  Acme  ')).toBe('Acme');
-    expect(component.normalizeCompanyName('')).toBe('Job Portal');
+  });
+
+  it('should return default company name if none provided', () => {
+    expect(component.normalizeCompanyName('')).toBe('TalentSphere');
+  });
+
+  it('should evaluate footer helper logic', () => {
     expect(component.getFooterText('Acme')).toContain('Acme');
     expect(component.shouldShowDivider(0)).toBe(false);
     expect(component.shouldShowDivider(2)).toBe(true);
