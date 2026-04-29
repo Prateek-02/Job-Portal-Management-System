@@ -62,14 +62,22 @@ public class RateLimitingFilter extends AbstractGatewayFilterFactory<RateLimitin
             String userId = request.getHeaders().getFirst("X-User-Id");
             if (enableUserIdLimit && userId != null && !userId.isEmpty()) {
                 return rateLimitingService.checkUserRateLimit(Long.parseLong(userId), maxRequests, timeWindowSeconds)
-                        .flatMap(status -> handleRateLimitStatus(exchange, chain, status, "User", userId));
+                        .flatMap(status -> handleRateLimitStatus(exchange, chain, status, "User", userId))
+                        .onErrorResume(e -> {
+                            log.error("Error in User ID rate limiting check", e);
+                            return chain.filter(exchange);
+                        });
             }
             
             // 2. Check API Key Rate Limit
             String apiKey = request.getHeaders().getFirst("X-API-Key");
             if (enableApiKeyLimit && apiKey != null && !apiKey.isEmpty()) {
                 return rateLimitingService.checkApiKeyRateLimit(apiKey, maxRequests, timeWindowSeconds)
-                        .flatMap(status -> handleRateLimitStatus(exchange, chain, status, "API key", apiKey));
+                        .flatMap(status -> handleRateLimitStatus(exchange, chain, status, "API key", apiKey))
+                        .onErrorResume(e -> {
+                            log.error("Error in API Key rate limiting check", e);
+                            return chain.filter(exchange);
+                        });
             }
             
             // 3. Check IP Address Rate Limit

@@ -6,7 +6,7 @@
       }}</span>
   </h3>
 
-  <div class="relative min-h-[340px]">
+  <div class="relative min-h-[420px]">
     @if (pendingApplications.length > 0) {
     @for (app of pendingApplications.slice(0, 3); track app.id; let i = $index) {
     <div class="absolute inset-0 transition-all duration-500 ease-out" [ngClass]="{
