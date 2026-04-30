@@ -8,6 +8,7 @@ export interface ApplicationJobInfo {
   salary: number;
   location: string;
   recruiterId: number;
+  jobType: string;
 }
 
 // Returned for JOB_SEEKER - viewApplications
@@ -34,4 +35,5 @@ export interface JobApplicationResponse {
   applicantEmail: string;
   jobTitle?: string;
   companyName?: string;
+  jobType?: string;
 }

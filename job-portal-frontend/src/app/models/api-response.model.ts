@@ -19,6 +19,7 @@ export interface AdminJobResponse {
   description: string;
   recruiterId: number;
   createdAt: string;
+  jobType: string;
 }
 
 // Admin page response (generic)

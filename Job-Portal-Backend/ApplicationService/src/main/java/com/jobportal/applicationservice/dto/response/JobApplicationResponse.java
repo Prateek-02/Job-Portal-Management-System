@@ -20,4 +20,5 @@ public class JobApplicationResponse {
     // Job details
     private String jobTitle;
     private String companyName;
+    private String jobType;
 }

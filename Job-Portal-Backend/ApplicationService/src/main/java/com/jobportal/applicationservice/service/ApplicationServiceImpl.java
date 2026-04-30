@@ -220,6 +220,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                     response.setAppliedAt(app.getAppliedAt());
                     response.setJobTitle(job.getTitle());
                     response.setCompanyName(job.getCompanyName());
+                    response.setJobType(job.getJobType());
 
                     try {
                         UserResponse user =

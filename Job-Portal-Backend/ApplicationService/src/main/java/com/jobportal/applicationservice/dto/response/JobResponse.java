@@ -10,4 +10,5 @@ public class JobResponse {
     private Double salary;
     private String location;
     private Long recruiterId;
+    private String jobType;
 }
