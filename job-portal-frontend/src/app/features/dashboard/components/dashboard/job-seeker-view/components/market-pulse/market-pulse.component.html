@@ -17,8 +17,10 @@
         </div>
         <!-- Sparkline -->
         <svg class="w-32 h-10 overflow-visible" viewBox="0 0 100 40">
-          <path [attr.d]="'M ' + salaryTrendPoints" fill="none" stroke="url(#lineGradient)" stroke-width="3"
-            stroke-linecap="round" stroke-linejoin="round" class="drop-shadow-lg" />
+          @if (salaryTrendPoints) {
+            <path [attr.d]="'M' + salaryTrendPoints" fill="none" stroke="url(#lineGradient)" stroke-width="3"
+              stroke-linecap="round" stroke-linejoin="round" class="drop-shadow-lg" />
+          }
           <defs>
             <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stop-color="#a18cd1" />
@@ -43,8 +45,10 @@
         </div>
         <!-- Sparkline (Demand) -->
         <svg class="w-32 h-10 overflow-visible" viewBox="0 0 100 40">
-          <polyline [attr.points]="marketDemandPoints" fill="none" stroke="#a18cd1" stroke-width="2"
-            stroke-dasharray="4 4" />
+          @if (marketDemandPoints) {
+            <polyline [attr.points]="marketDemandPoints" fill="none" stroke="#a18cd1" stroke-width="2"
+              stroke-dasharray="4 4" />
+          }
         </svg>
       </div>
     </div>
