@@ -103,23 +103,43 @@
           <!-- Status Actions Panel -->
           <div class="mt-6 pt-5 border-t border-white/40 flex flex-wrap gap-2.5 items-center relative z-10 w-full rounded-2xl p-2 bg-white/20 shadow-inner">
             <button (click)="updateStatus(app, 'APPLIED')"
+                    [disabled]="!isStatusReachable(app.status, 'APPLIED')"
                     class="flex-1 py-2.5 px-4 rounded-xl text-[12px] font-bold uppercase tracking-wider transition-all"
-                    [ngClass]="app.status === 'APPLIED' ? 'bg-[#1A1A1A] text-white shadow-md' : 'text-[#4A4A4A] hover:bg-white/40'">
+                    [ngClass]="{
+                      'bg-[#1A1A1A] text-white shadow-md': app.status === 'APPLIED',
+                      'text-[#4A4A4A] hover:bg-white/40': app.status !== 'APPLIED' && isStatusReachable(app.status, 'APPLIED'),
+                      'text-[#4A4A4A]/20 cursor-not-allowed': !isStatusReachable(app.status, 'APPLIED')
+                    }">
               Applied
             </button>
             <button (click)="updateStatus(app, 'UNDER_REVIEW')"
+                    [disabled]="!isStatusReachable(app.status, 'UNDER_REVIEW')"
                     class="flex-1 py-2.5 px-4 rounded-xl text-[12px] font-bold uppercase tracking-wider transition-all"
-                    [ngClass]="app.status === 'UNDER_REVIEW' ? 'bg-[#F59E0B] text-white shadow-md' : 'text-[#4A4A4A] hover:bg-yellow-500/20'">
+                    [ngClass]="{
+                      'bg-[#F59E0B] text-white shadow-md': app.status === 'UNDER_REVIEW',
+                      'text-[#4A4A4A] hover:bg-yellow-500/20': app.status !== 'UNDER_REVIEW' && isStatusReachable(app.status, 'UNDER_REVIEW'),
+                      'text-[#4A4A4A]/20 cursor-not-allowed': !isStatusReachable(app.status, 'UNDER_REVIEW')
+                    }">
               Under Review
             </button>
             <button (click)="updateStatus(app, 'SHORTLISTED')"
+                    [disabled]="!isStatusReachable(app.status, 'SHORTLISTED')"
                     class="flex-1 py-2.5 px-4 rounded-xl text-[12px] font-bold uppercase tracking-wider transition-all"
-                    [ngClass]="app.status === 'SHORTLISTED' ? 'bg-[#10B981] text-white shadow-md' : 'text-[#4A4A4A] hover:bg-green-500/20'">
+                    [ngClass]="{
+                      'bg-[#10B981] text-white shadow-md': app.status === 'SHORTLISTED',
+                      'text-[#4A4A4A] hover:bg-green-500/20': app.status !== 'SHORTLISTED' && isStatusReachable(app.status, 'SHORTLISTED'),
+                      'text-[#4A4A4A]/20 cursor-not-allowed': !isStatusReachable(app.status, 'SHORTLISTED')
+                    }">
               Shortlist
             </button>
             <button (click)="updateStatus(app, 'REJECTED')"
+                    [disabled]="!isStatusReachable(app.status, 'REJECTED')"
                     class="flex-1 py-2.5 px-4 rounded-xl text-[12px] font-bold uppercase tracking-wider transition-all"
-                    [ngClass]="app.status === 'REJECTED' ? 'bg-[#EF4444] text-white shadow-md' : 'text-[#4A4A4A] hover:bg-red-500/20'">
+                    [ngClass]="{
+                      'bg-[#EF4444] text-white shadow-md': app.status === 'REJECTED',
+                      'text-[#4A4A4A] hover:bg-red-500/20': app.status !== 'REJECTED' && isStatusReachable(app.status, 'REJECTED'),
+                      'text-[#4A4A4A]/20 cursor-not-allowed': !isStatusReachable(app.status, 'REJECTED')
+                    }">
               Reject
             </button>
           </div>

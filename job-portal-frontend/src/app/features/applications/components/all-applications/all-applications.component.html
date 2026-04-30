@@ -138,7 +138,12 @@
                         <div class="px-3 py-2 text-[9px] font-bold text-text-muted uppercase tracking-[0.2em] border-b border-glass-border mb-2">Update Status</div>
                         @for (st of statuses; track st) {
                           <button (click)="updateStatus(app, st)"
-                            class="w-full text-left px-4 py-3 text-[11px] font-bold text-text-muted hover:bg-energy-emerald hover:text-white rounded-xl transition-all flex items-center justify-between group/item">
+                            [disabled]="!isStatusReachable(app.status, st)"
+                            class="w-full text-left px-4 py-3 text-[11px] font-bold rounded-xl transition-all flex items-center justify-between group/item"
+                            [ngClass]="{
+                              'text-text-muted hover:bg-energy-emerald hover:text-white': isStatusReachable(app.status, st),
+                              'text-text-muted/20 cursor-not-allowed': !isStatusReachable(app.status, st)
+                            }">
                             {{ st.replace('_', ' ') }}
                             @if (app.status === st) {
                               <svg class="w-4 h-4 text-energy-emerald group-hover/item:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>

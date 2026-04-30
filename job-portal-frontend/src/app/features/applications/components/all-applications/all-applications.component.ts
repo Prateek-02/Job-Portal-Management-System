@@ -96,4 +96,15 @@ export class AllApplicationsComponent implements OnInit, OnDestroy {
     };
     return map[status] || 'bg-gray-500/10 text-gray-900 border-gray-500/20';
   }
+
+  isStatusReachable(current: string, next: string): boolean {
+    if (current === next) return true;
+    if (current === 'REJECTED') return false;
+    if (next === 'REJECTED') return true;
+
+    if (current === 'APPLIED') return next === 'UNDER_REVIEW';
+    if (current === 'UNDER_REVIEW') return next === 'SHORTLISTED';
+
+    return false;
+  }
 }

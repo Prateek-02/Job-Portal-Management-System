@@ -282,6 +282,9 @@ public class ApplicationServiceImpl implements ApplicationService {
                     "Access Denied! You can only update applications for your own jobs.");
         }
 
+        // Validate status transition (forward only)
+        validateStatusTransition(application.getStatus(), status);
+
         application.setStatus(status);
         JobApplication updated = applicationRepository.save(application);
 
@@ -429,5 +432,29 @@ public class ApplicationServiceImpl implements ApplicationService {
                 .empty(allApplications.isEmpty())
                 .build();
     }
+
+    private void validateStatusTransition(ApplicationStatus current, ApplicationStatus next) {
+        if (current == next) return;
+
+        // Sequence: APPLIED (0) -> UNDER_REVIEW (1) -> SHORTLISTED (2)
+        // REJECTED (3) can be reached from any state but is terminal.
+        
+        if (current == ApplicationStatus.REJECTED) {
+            throw new RuntimeException("Cannot change status of a rejected application.");
+        }
+
+        if (next == ApplicationStatus.REJECTED) {
+            return; // Can always reject
+        }
+
+        if (current == ApplicationStatus.APPLIED && next == ApplicationStatus.UNDER_REVIEW) return;
+        if (current == ApplicationStatus.UNDER_REVIEW && next == ApplicationStatus.SHORTLISTED) return;
+        
+        // If we want to allow skipping UNDER_REVIEW
+        // if (current == ApplicationStatus.APPLIED && next == ApplicationStatus.SHORTLISTED) return;
+
+        throw new RuntimeException("Invalid status transition from " + current + " to " + next);
+    }
 }
+
 
