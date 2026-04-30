@@ -118,6 +118,27 @@ public class AdminController {
         return ResponseEntity.ok(job);
     }
 
+    @PostMapping("/jobs/search")
+    public ResponseEntity<PageResponse<JobResponse>> searchJobs(
+            @RequestHeader("X-User-Role") String role,
+            @RequestBody Object filter,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction) {
+
+        log.info("Search jobs requested by admin | role: {} | filter: {}", role, filter);
+
+        if (!role.equalsIgnoreCase("ADMIN")) {
+            log.warn("Unauthorized search attempt | role: {}", role);
+            throw new UnauthorizedException("Access Denied! Only Admin can search jobs.");
+        }
+
+        PageResponse<JobResponse> response = adminService.searchJobs(filter, page, size, sortBy, direction);
+
+        return ResponseEntity.ok(response);
+    }
+
     // REPORTS
     @GetMapping("/reports")
     public ResponseEntity<Map<String, Object>> getReports(

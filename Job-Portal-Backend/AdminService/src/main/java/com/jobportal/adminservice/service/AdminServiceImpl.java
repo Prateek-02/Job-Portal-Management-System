@@ -146,6 +146,23 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    public PageResponse<JobResponse> searchJobs(Object filter, int page, int size, String sortBy, String direction) {
+        log.info("Searching jobs for admin | page: {} | size: {} | filter: {}", page, size, filter);
+
+        PageResponse<JobResponse> jobs =
+                circuitBreakerFactory.create("adminJobService")
+                        .run(() -> jobServiceClient.searchJobs(filter, page, size, sortBy, direction),
+                                throwable -> {
+                                    log.error("JobService unavailable while searching jobs", throwable);
+                                    throw new RuntimeException("JobService is unavailable for searching. Please try again.");
+                                });
+
+        log.debug("Jobs searched successfully | count: {}", jobs.getContent().size());
+
+        return jobs;
+    }
+
+    @Override
     public Map<String, Object> getReports() {
 
         log.info("Generating platform reports");

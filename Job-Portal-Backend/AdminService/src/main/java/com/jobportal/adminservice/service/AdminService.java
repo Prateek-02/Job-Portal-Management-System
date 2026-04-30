@@ -17,6 +17,7 @@ public interface AdminService {
     // Job Management
     PageResponse<JobResponse> getAllJobs(int page, int size, String sortBy, String direction);
     JobResponse getJobById(Long id);
+    PageResponse<JobResponse> searchJobs(Object filter, int page, int size, String sortBy, String direction);
 
     // Reports
     Map<String, Object> getReports();

@@ -202,6 +202,15 @@ export class ApiService {
     return this.http.get<AdminJobResponse>(`${this.apiUrl}/admin/jobs/${id}`);
   }
 
+  searchAdminJobs(filter: any, page = 0, size = 10, sortBy = 'createdAt', direction = 'desc'): Observable<AdminPageResponse<AdminJobResponse>> {
+    const params = new HttpParams()
+      .set('page', page)
+      .set('size', size)
+      .set('sortBy', sortBy)
+      .set('direction', direction);
+    return this.http.post<AdminPageResponse<AdminJobResponse>>(`${this.apiUrl}/admin/jobs/search`, filter, { params });
+  }
+
   getAdminReports(): Observable<AdminReports> {
     return this.http.get<AdminReports>(`${this.apiUrl}/admin/reports`);
   }

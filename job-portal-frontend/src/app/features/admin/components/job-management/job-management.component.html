@@ -1,8 +1,23 @@
 <div class="p-6 md:p-8">
-  <div class="flex items-center justify-between mb-8">
+  <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-6">
     <div>
       <h1 class="text-2xl font-bold text-text-primary tracking-tight">Manage Jobs</h1>
       <p class="text-sm font-medium text-text-secondary opacity-60">{{ totalElements }} total job listings &mdash; Page {{ currentPage + 1 }} of {{ totalPages || 1 }}</p>
+    </div>
+
+    <!-- Company Filter -->
+    <div class="relative w-full md:w-80 group">
+      <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-energy-emerald">
+        <svg class="w-4 h-4 text-text-muted/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </div>
+      <input type="text" 
+             [value]="companyFilter"
+             (input)="onFilterChange(companyInput.value)"
+             #companyInput
+             placeholder="Search by company..." 
+             class="w-full pl-11 pr-4 py-3 bg-bg-secondary border border-glass-border rounded-xl text-xs font-bold text-text-primary placeholder:text-text-muted/30 focus:bg-bg-primary focus:border-energy-emerald/40 focus:ring-4 focus:ring-energy-emerald/5 transition-all outline-none shadow-inner">
     </div>
   </div>
 

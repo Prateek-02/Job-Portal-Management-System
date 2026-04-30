@@ -23,6 +23,7 @@ export class JobManagementComponent implements OnInit, OnDestroy {
   showDeleteModal = false;
   jobToDelete: AdminJobResponse | null = null;
   totalElements = 0;
+  companyFilter = '';
 
   private destroy$ = new Subject<void>();
 
@@ -40,6 +41,12 @@ export class JobManagementComponent implements OnInit, OnDestroy {
     this.loadJobs();
   }
 
+  onFilterChange(value: string): void {
+    this.companyFilter = value;
+    this.currentPage = 0;
+    this.loadJobs();
+  }
+
   constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
@@ -48,7 +55,12 @@ export class JobManagementComponent implements OnInit, OnDestroy {
 
   loadJobs(): void {
     this.isLoading = true;
-    this.apiService.getAdminJobs(this.currentPage, this.pageSize).pipe(takeUntil(this.destroy$)).subscribe({
+    
+    const request$ = this.companyFilter.trim()
+      ? this.apiService.searchAdminJobs({ companyName: this.companyFilter.trim() }, this.currentPage, this.pageSize)
+      : this.apiService.getAdminJobs(this.currentPage, this.pageSize);
+
+    request$.pipe(takeUntil(this.destroy$)).subscribe({
       next: (data) => {
         this.jobs = data?.content || [];
         this.totalElements = data?.totalElements || 0;
