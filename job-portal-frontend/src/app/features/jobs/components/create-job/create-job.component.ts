@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
@@ -7,11 +8,12 @@ import { ApiService } from '../../../../core/services/api.service';
 import { Job, JobRequest } from '../../../../models/job.model';
 import { getFriendlyError } from '../../../../core/utils/error-handler.util';
 import { Editor, Toolbar, NgxEditorModule } from 'ngx-editor';
+import { ModalComponent } from '../../../../shared/components/modal/modal.component';
 
 @Component({
   selector: 'app-create-job',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgxEditorModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgxEditorModule, ModalComponent],
   templateUrl: './create-job.component.html'
 })
 export class CreateJobComponent implements OnInit, OnDestroy, CanComponentDeactivate {
@@ -22,6 +24,8 @@ export class CreateJobComponent implements OnInit, OnDestroy, CanComponentDeacti
   successMessage = '';
   errorMessage = '';
   jobTypes = ['Full-time', 'Part-time', 'Internship', 'Contract', 'Freelance'];
+  showDeactivateModal = false;
+  private deactivateSubject?: Subject<boolean>;
 
   editor!: Editor;
   toolbar: Toolbar = [
@@ -61,11 +65,25 @@ export class CreateJobComponent implements OnInit, OnDestroy, CanComponentDeacti
     this.editor.destroy();
   }
 
-  canDeactivate(): boolean {
+  canDeactivate(): Observable<boolean> | boolean {
     if (this.jobForm.dirty && !this.isSubmitting) {
-      return confirm('You have unsaved changes! Are you sure you want to discard them and leave this page?');
+      this.showDeactivateModal = true;
+      this.deactivateSubject = new Subject<boolean>();
+      return this.deactivateSubject.asObservable();
     }
     return true;
+  }
+
+  onConfirmDeactivate(): void {
+    this.showDeactivateModal = false;
+    this.deactivateSubject?.next(true);
+    this.deactivateSubject?.complete();
+  }
+
+  onCancelDeactivate(): void {
+    this.showDeactivateModal = false;
+    this.deactivateSubject?.next(false);
+    this.deactivateSubject?.complete();
   }
 
   loadJobDetails(): void {

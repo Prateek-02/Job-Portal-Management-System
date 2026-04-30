@@ -9,6 +9,8 @@ import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 import * as ErrorHandlerUtil from '../../../../core/utils/error-handler.util';
 import { provideRouter, Router } from '@angular/router';
+import { ModalComponent } from '../../../../shared/components/modal/modal.component';
+import { Observable } from 'rxjs';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('ProfileComponent', () => {
@@ -34,7 +36,7 @@ describe('ProfileComponent', () => {
     vi.spyOn(window, 'confirm').mockReturnValue(true);
 
     await TestBed.configureTestingModule({
-      imports: [ProfileComponent, ReactiveFormsModule, DatePipe, CommonModule],
+      imports: [ProfileComponent, ReactiveFormsModule, DatePipe, CommonModule, ModalComponent],
       providers: [
         provideRouter([]),
         { provide: ApiService, useValue: apiServiceMock },
@@ -88,7 +90,7 @@ describe('ProfileComponent', () => {
       expect(component.profileForm.value.name).toBe('John'); // Restored
     });
 
-    it('canDeactivate should allow routing if pristine OR block and alert if dirty boundary', () => {
+    it('canDeactivate should allow routing if pristine OR block and show custom modal if dirty', () => {
       apiServiceMock.getProfile.mockReturnValue(of({ id: 1, name: 'John', role: 'JOB_SEEKER', phone: '1234567890' }));
       setupComponent();
       fixture.detectChanges();
@@ -96,12 +98,37 @@ describe('ProfileComponent', () => {
       // Not editing -> safe
       expect(component.canDeactivate()).toBe(true);
       
-      // Editing + dirty -> requires confirm prompt
+      // Editing + dirty -> requires custom modal
       component.isEditing = true;
       component.profileForm.markAsDirty();
       
-      component.canDeactivate();
-      expect(window.confirm).toHaveBeenCalled();
+      const deactivate$ = component.canDeactivate() as Observable<boolean>;
+      expect(component.showDeactivateModal).toBe(true);
+      
+      let resolvedValue: boolean | undefined;
+      deactivate$.subscribe(val => resolvedValue = val);
+      
+      component.onConfirmDeactivate();
+      expect(resolvedValue).toBe(true);
+      expect(component.showDeactivateModal).toBe(false);
+    });
+
+    it('should stay on page when cancel is clicked in profile deactivate modal', () => {
+      apiServiceMock.getProfile.mockReturnValue(of({ id: 1, name: 'John', role: 'JOB_SEEKER', phone: '1234567890' }));
+      setupComponent();
+      fixture.detectChanges();
+      
+      component.isEditing = true;
+      component.profileForm.markAsDirty();
+      
+      const deactivate$ = component.canDeactivate() as Observable<boolean>;
+      
+      let resolvedValue: boolean | undefined;
+      deactivate$.subscribe(val => resolvedValue = val);
+      
+      component.onCancelDeactivate();
+      expect(resolvedValue).toBe(false);
+      expect(component.showDeactivateModal).toBe(false);
     });
   });
 

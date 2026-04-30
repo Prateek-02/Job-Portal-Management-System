@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CanComponentDeactivate } from '../../../../core/guards/can-deactivate.guard';
@@ -10,11 +11,12 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { EditProfileComponent } from '../edit-profile/edit-profile.component';
 import { ViewProfileComponent } from '../view-profile/view-profile.component';
+import { ModalComponent } from '../../../../shared/components/modal/modal.component';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, DatePipe, EditProfileComponent, ViewProfileComponent],
+  imports: [CommonModule, ReactiveFormsModule, DatePipe, EditProfileComponent, ViewProfileComponent, ModalComponent],
   templateUrl: './profile.component.html'
 })
 export class ProfileComponent implements OnInit, OnDestroy, CanComponentDeactivate {
@@ -27,6 +29,8 @@ export class ProfileComponent implements OnInit, OnDestroy, CanComponentDeactiva
   isUploadingImage = false;
   successMessage = '';
   errorMessage = '';
+  showDeactivateModal = false;
+  private deactivateSubject?: Subject<boolean>;
 
   private destroy$ = new Subject<void>();
 
@@ -52,11 +56,25 @@ export class ProfileComponent implements OnInit, OnDestroy, CanComponentDeactiva
     this.destroy$.complete();
   }
 
-  canDeactivate(): boolean {
+  canDeactivate(): Observable<boolean> | boolean {
     if (this.isEditing && this.profileForm.dirty && !this.isSaving) {
-      return confirm('You have unsaved changes to your profile! Are you sure you want to discard them and leave?');
+      this.showDeactivateModal = true;
+      this.deactivateSubject = new Subject<boolean>();
+      return this.deactivateSubject.asObservable();
     }
     return true;
+  }
+
+  onConfirmDeactivate(): void {
+    this.showDeactivateModal = false;
+    this.deactivateSubject?.next(true);
+    this.deactivateSubject?.complete();
+  }
+
+  onCancelDeactivate(): void {
+    this.showDeactivateModal = false;
+    this.deactivateSubject?.next(false);
+    this.deactivateSubject?.complete();
   }
 
   loadProfile(): void {

@@ -8,6 +8,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { vi } from 'vitest';
 import * as ErrorHandlerUtil from '../../../../core/utils/error-handler.util';
 import { provideRouter } from '@angular/router';
+import { ModalComponent } from '../../../../shared/components/modal/modal.component';
 import { NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 describe('CreateJobComponent', () => {
@@ -33,7 +34,7 @@ describe('CreateJobComponent', () => {
     vi.spyOn(window, 'confirm').mockReturnValue(true);
 
     await TestBed.configureTestingModule({
-      imports: [CreateJobComponent, ReactiveFormsModule],
+      imports: [CreateJobComponent, ReactiveFormsModule, ModalComponent],
       providers: [
         provideRouter([]),
         { provide: ApiService, useValue: apiServiceMock },
@@ -106,18 +107,40 @@ describe('CreateJobComponent', () => {
       expect(apiServiceMock.createJob).not.toHaveBeenCalled();
     });
 
-    it('should protect unsaved data navigating away strictly via strict confirmation', () => {
+    it('should protect unsaved data navigating away strictly via custom modal', () => {
       setupComponent();
       fixture.detectChanges();
       
       expect(component.canDeactivate()).toBe(true); // unaffected clean
       
       component.jobForm.markAsDirty();
-      component.canDeactivate(); 
-      expect(window.confirm).toHaveBeenCalled(); // dirty form raises modal
+      const deactivate$ = component.canDeactivate() as Observable<boolean>;
+      expect(component.showDeactivateModal).toBe(true);
+      
+      let resolvedValue: boolean | undefined;
+      deactivate$.subscribe(val => resolvedValue = val);
+      
+      component.onConfirmDeactivate();
+      expect(resolvedValue).toBe(true);
+      expect(component.showDeactivateModal).toBe(false);
       
       component.isSubmitting = true; // active submitting bypasses confirm
       expect(component.canDeactivate()).toBe(true);
+    });
+
+    it('should stay on page when cancel is clicked in deactivate modal', () => {
+      setupComponent();
+      fixture.detectChanges();
+      
+      component.jobForm.markAsDirty();
+      const deactivate$ = component.canDeactivate() as Observable<boolean>;
+      
+      let resolvedValue: boolean | undefined;
+      deactivate$.subscribe(val => resolvedValue = val);
+      
+      component.onCancelDeactivate();
+      expect(resolvedValue).toBe(false);
+      expect(component.showDeactivateModal).toBe(false);
     });
   });
 
