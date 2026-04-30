@@ -78,6 +78,7 @@ describe('JobManagementComponent', () => {
     });
   });
 
+  describe('Deletion Handling Strategy (Boundary / Exception / Normal)', () => {
     it('should show delete modal when confirmDelete is called', () => {
       const job = { id: 10, title: 'Role', companyName: 'Acme', location: 'Remote', salary: 100000, createdAt: '2026-04-01' } as any;
       apiServiceMock.getAdminJobs.mockReturnValue(of({ content: [job] }));
