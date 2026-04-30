@@ -64,7 +64,7 @@ describe('CreateJobComponent', () => {
       fixture.detectChanges();
       component.jobId = undefined;
       component.loadJobDetails();
-      // Should not throw or call API
+    
       expect(apiServiceMock.getJobById).not.toHaveBeenCalled();
     });
 
