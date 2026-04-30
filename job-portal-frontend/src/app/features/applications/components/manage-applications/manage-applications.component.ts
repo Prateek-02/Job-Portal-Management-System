@@ -112,4 +112,10 @@ export class ManageApplicationsComponent implements OnInit, OnDestroy {
 
     return false;
   }
+
+  getAvailableStatuses(current: string): ApplicationStatus[] {
+    if (current === 'REJECTED') return [];
+    const all: ApplicationStatus[] = ['APPLIED', 'UNDER_REVIEW', 'SHORTLISTED', 'REJECTED'];
+    return all.filter(st => st !== current && this.isStatusReachable(current, st));
+  }
 }

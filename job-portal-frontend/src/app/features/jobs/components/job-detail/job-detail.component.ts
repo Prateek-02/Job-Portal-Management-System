@@ -19,6 +19,7 @@ export class JobDetailComponent implements OnInit, OnDestroy {
   job: Job | null = null;
   isLoading = true;
   errorMessage = '';
+  hasApplied = false;
 
   // Apply modal
   showApplyModal = false;
@@ -61,6 +62,9 @@ export class JobDetailComponent implements OnInit, OnDestroy {
       next: (job) => {
         this.job = job;
         this.isLoading = false;
+        if (this.authService.isJobSeeker()) {
+          this.checkApplicationStatus(job.id);
+        }
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -100,11 +104,24 @@ export class JobDetailComponent implements OnInit, OnDestroy {
       next: () => {
         this.isApplying = false;
         this.applySuccess = true;
+        this.hasApplied = true;
         setTimeout(() => { this.showApplyModal = false; }, 2500);
       },
       error: (err) => {
         this.isApplying = false;
         this.applyError = getFriendlyError(err, 'apply_job');
+      }
+    });
+  }
+
+  checkApplicationStatus(jobId: number): void {
+    this.apiService.checkHasApplied(jobId).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (applied) => {
+        this.hasApplied = applied;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        // Silently fail, default to false
       }
     });
   }

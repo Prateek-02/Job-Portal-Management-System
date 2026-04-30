@@ -48,7 +48,14 @@
 
           <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
             @if (authService.isJobSeeker()) {
-              <button (click)="openApplyModal()" class="btn-celestial !px-8 !py-3 shadow-xl !rounded-xl text-sm hover:scale-105 transition-transform">Apply Now</button>
+              @if (hasApplied) {
+                <button disabled class="btn-celestial !bg-energy-emerald/20 !text-energy-emerald !border-energy-emerald/30 !px-8 !py-3 shadow-xl !rounded-xl text-sm flex items-center gap-2">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                  Already Applied
+                </button>
+              } @else {
+                <button (click)="openApplyModal()" class="btn-celestial !px-8 !py-3 shadow-xl !rounded-xl text-sm hover:scale-105 transition-transform">Apply Now</button>
+              }
             }
             @if (authService.isRecruiter()) {
               <a [routerLink]="['/applications/job', job.id]" class="btn-celestial !px-8 !py-3 shadow-xl !rounded-xl text-sm">View Applications</a>

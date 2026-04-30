@@ -455,6 +455,11 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         throw new RuntimeException("Invalid status transition from " + current + " to " + next);
     }
+
+    @Override
+    public boolean hasApplied(Long userId, Long jobId) {
+        return applicationRepository.existsByUserIdAndJobId(userId, jobId);
+    }
 }
 
 

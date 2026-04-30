@@ -169,4 +169,9 @@ public class ApplicationController {
         
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/check/{jobId}")
+    public ResponseEntity<Boolean> hasApplied(@PathVariable Long jobId, @RequestHeader("X-User-Id") Long userId) {
+        return ResponseEntity.ok(service.hasApplied(userId, jobId));
+    }
 }

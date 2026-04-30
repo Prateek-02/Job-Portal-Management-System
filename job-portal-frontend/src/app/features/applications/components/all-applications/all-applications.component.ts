@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../../../core/services/api.service';
@@ -19,6 +19,7 @@ export class AllApplicationsComponent implements OnInit, OnDestroy {
   isLoading = true;
   errorMessage = '';
   updatingId: number | null = null;
+  activeDropdownId: number | null = null;
 
   readonly statuses: ApplicationStatus[] = ['APPLIED', 'UNDER_REVIEW', 'SHORTLISTED', 'REJECTED'];
 
@@ -79,12 +80,26 @@ export class AllApplicationsComponent implements OnInit, OnDestroy {
       next: (updated) => {
         app.status = updated.status;
         this.updatingId = null;
+        this.activeDropdownId = null;
       },
       error: (err) => {
         this.updatingId = null;
+        this.activeDropdownId = null;
         alert(getFriendlyError(err, 'update_status'));
       }
     });
+  }
+
+  toggleDropdown(id: number, event: MouseEvent): void {
+    event.stopPropagation();
+    this.activeDropdownId = this.activeDropdownId === id ? null : id;
+  }
+
+  getAvailableStatuses(current: string): ApplicationStatus[] {
+    if (current === 'REJECTED') return [];
+    
+    const all: ApplicationStatus[] = ['APPLIED', 'UNDER_REVIEW', 'SHORTLISTED', 'REJECTED'];
+    return all.filter(st => st !== current && this.isStatusReachable(current, st));
   }
 
   statusClass(status: ApplicationStatus): string {
@@ -95,6 +110,11 @@ export class AllApplicationsComponent implements OnInit, OnDestroy {
       REJECTED: 'bg-red-500/10 text-red-900 border-red-500/20'
     };
     return map[status] || 'bg-gray-500/10 text-gray-900 border-gray-500/20';
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    this.activeDropdownId = null;
   }
 
   isStatusReachable(current: string, next: string): boolean {

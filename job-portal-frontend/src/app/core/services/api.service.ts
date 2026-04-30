@@ -162,6 +162,10 @@ export class ApiService {
     return this.http.get<number>(`${this.apiUrl}/applications/count`);
   }
 
+  checkHasApplied(jobId: number): Observable<boolean> {
+    return this.http.get<boolean>(`${this.apiUrl}/applications/check/${jobId}`);
+  }
+
   deleteJobApplications(jobId: number): Observable<{ message: string }> {
     return this.http.delete<{ message: string }>(`${this.apiUrl}/applications/job/${jobId}`);
   }
