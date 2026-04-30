@@ -8,7 +8,7 @@ export interface Job {
   description: string;
   recruiterId: number;
   createdAt: string;
-  jobType?: string;
+  jobType: string;
   skills?: string[];
   status?: string;
 }
@@ -20,6 +20,7 @@ export interface JobRequest {
   salary: number;
   experience: number;
   description: string;
+  jobType: string;
   skills?: string[];
 }
 

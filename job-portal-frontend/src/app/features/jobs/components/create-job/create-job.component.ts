@@ -21,6 +21,7 @@ export class CreateJobComponent implements OnInit, OnDestroy, CanComponentDeacti
   jobId?: number;
   successMessage = '';
   errorMessage = '';
+  jobTypes = ['Full-time', 'Part-time', 'Internship', 'Contract', 'Freelance'];
 
   editor!: Editor;
   toolbar: Toolbar = [
@@ -40,6 +41,7 @@ export class CreateJobComponent implements OnInit, OnDestroy, CanComponentDeacti
       location: ['', Validators.required],
       salary: [null, [Validators.required, Validators.min(0)]],
       experience: [null, [Validators.required, Validators.min(0)]],
+      jobType: ['Full-time', Validators.required],
       description: ['', [Validators.required, Validators.minLength(30)]],
       skills: ['']
     });
@@ -76,6 +78,7 @@ export class CreateJobComponent implements OnInit, OnDestroy, CanComponentDeacti
           location: job.location,
           salary: job.salary,
           experience: job.experience,
+          jobType: job.jobType,
           description: job.description,
           skills: job.skills?.join(', ') || ''
         });

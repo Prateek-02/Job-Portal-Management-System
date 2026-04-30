@@ -61,7 +61,7 @@
     </div>
   }
 
-  <div class="celestial-card overflow-hidden inner-glow relative">
+  <div class="celestial-card inner-glow relative">
     <div class="absolute -top-32 -right-32 w-80 h-80 bg-energy-emerald/5 blur-[100px] rounded-full pointer-events-none"></div>
 
     @if (isLoading) {
@@ -79,7 +79,7 @@
         <a routerLink="/jobs/create/new" class="btn-celestial !px-12 !py-5 !rounded-2xl">Post a Job</a>
       </div>
     } @else {
-      <div class="overflow-x-auto">
+      <div class="overflow-visible">
         <table class="w-full text-left">
           <thead>
             <tr class="border-b border-glass-border bg-bg-secondary">

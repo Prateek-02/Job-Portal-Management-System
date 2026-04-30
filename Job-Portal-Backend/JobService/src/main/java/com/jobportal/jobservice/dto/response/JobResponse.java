@@ -12,6 +12,7 @@ public class JobResponse {
     private String location;
     private Double salary;
     private Integer experience;
+    private String jobType;
     private String description;
     private Long recruiterId;
     private LocalDateTime createdAt;

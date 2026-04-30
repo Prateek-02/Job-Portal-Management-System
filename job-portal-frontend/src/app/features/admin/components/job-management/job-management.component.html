@@ -38,6 +38,7 @@
               <th class="px-5 py-3.5 text-[9px] font-bold text-text-muted uppercase tracking-[0.2em]">Company</th>
               <th class="px-5 py-3.5 text-[9px] font-bold text-text-muted uppercase tracking-[0.2em]">Location</th>
               <th class="px-5 py-3.5 text-[9px] font-bold text-text-muted uppercase tracking-[0.2em]">Salary</th>
+              <th class="px-5 py-3.5 text-[9px] font-bold text-text-muted uppercase tracking-[0.2em]">Type</th>
               <th class="px-5 py-3.5 text-[9px] font-bold text-text-muted uppercase tracking-[0.2em]">Posted</th>
               <th class="px-5 py-3.5 text-[9px] font-bold text-text-muted uppercase tracking-[0.2em] text-right">Actions</th>
             </tr>
@@ -49,6 +50,9 @@
                 <td class="px-5 py-3.5 text-text-secondary font-medium text-xs">{{ job.companyName }}</td>
                 <td class="px-5 py-3.5 text-text-secondary font-medium text-xs">{{ job.location }}</td>
                 <td class="px-5 py-3.5 text-energy-emerald text-xs font-black">₹{{ job.salary | number:'1.0-0' }}</td>
+                <td class="px-5 py-3.5 text-text-secondary font-medium text-xs">
+                  <span class="px-2 py-0.5 rounded-lg bg-bg-secondary border border-glass-border">{{ job.jobType }}</span>
+                </td>
                 <td class="px-5 py-3.5 text-text-muted font-medium text-xs">{{ job.createdAt | date:'mediumDate' }}</td>
                 <td class="px-5 py-3.5 text-right">
                   <button (click)="deleteJob(job.id)"

@@ -23,6 +23,9 @@ public class JobRequest {
     @NotNull(message = "Experience is required")
     private Integer experience;
 
+    @NotBlank(message = "Job type is required")
+    private String jobType;
+
     @NotBlank(message = "Description is required")
     private String description;
 

@@ -25,6 +25,7 @@ public class Job {
     private String location;
     private Double salary;
     private Integer experience;
+    private String jobType;
 
     @Column(length = 2000)
     private String description;
