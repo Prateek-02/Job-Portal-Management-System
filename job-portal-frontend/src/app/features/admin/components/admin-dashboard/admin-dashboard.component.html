@@ -114,8 +114,29 @@
         <div class="text-[10px] font-bold uppercase tracking-[0.2em] mb-3 opacity-50 text-white">Global Engagement</div>
         <h3 class="text-2xl font-bold tracking-tighter mb-1.5 text-white">Total Applications</h3>
         <p class="text-xs opacity-60 text-white">Cumulative system-wide job applications</p>
-        <div class="text-4xl font-black text-white mt-6 group-hover:scale-110 transition-transform brightness-125">{{
-        reports.totalApplications ?? '0' }}</div>
+        <div class="text-4xl font-black text-white mt-6 group-hover:scale-110 transition-transform brightness-125">
+          {{ reports.totalApplications ?? '0' }}
+        </div>
+
+        <!-- Application Status Pills -->
+        <div class="flex flex-wrap gap-2 mt-6 pt-6 border-t border-white/10">
+          <div class="px-2.5 py-1 rounded-lg bg-white/10 border border-white/10 flex items-center gap-2 transition-all hover:bg-white/20">
+            <div class="w-1.5 h-1.5 rounded-full bg-blue-300"></div>
+            <span class="text-[9px] font-black uppercase tracking-widest text-white/90">Applied: {{ reports['APPLIED'] ?? 0 }}</span>
+          </div>
+          <div class="px-2.5 py-1 rounded-lg bg-white/10 border border-white/10 flex items-center gap-2 transition-all hover:bg-white/20">
+            <div class="w-1.5 h-1.5 rounded-full bg-amber-400"></div>
+            <span class="text-[9px] font-black uppercase tracking-widest text-white/90">Review: {{ reports['UNDER_REVIEW'] ?? 0 }}</span>
+          </div>
+          <div class="px-2.5 py-1 rounded-lg bg-white/10 border border-white/10 flex items-center gap-2 transition-all hover:bg-white/20">
+            <div class="w-1.5 h-1.5 rounded-full bg-green-400"></div>
+            <span class="text-[9px] font-black uppercase tracking-widest text-white/90">Selected: {{ reports['SHORTLISTED'] ?? 0 }}</span>
+          </div>
+          <div class="px-2.5 py-1 rounded-lg bg-white/10 border border-white/10 flex items-center gap-2 transition-all hover:bg-white/20">
+            <div class="w-1.5 h-1.5 rounded-full bg-red-400"></div>
+            <span class="text-[9px] font-black uppercase tracking-widest text-white/90">Rejected: {{ reports['REJECTED'] ?? 0 }}</span>
+          </div>
+        </div>
       </div>
     </div>
 
