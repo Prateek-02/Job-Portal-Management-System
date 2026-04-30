@@ -5,16 +5,16 @@
     <a routerLink="/applications/recruiter" class="text-xs font-bold text-energy-indigo">View All Candidates</a>
   </div>
 
-  <div class="overflow-visible">
-    <table class="w-full text-left">
+  <div class="overflow-x-auto">
+    <table class="w-full text-left min-w-[700px]">
       <thead>
         <tr class="bg-bg-secondary">
-          <th class="px-8 py-4 text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em]">Candidate
+          <th class="px-8 py-4 text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] whitespace-nowrap">Candidate
           </th>
-          <th class="px-8 py-4 text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em]">Applied For
+          <th class="px-8 py-4 text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] whitespace-nowrap">Applied For
           </th>
-          <th class="px-8 py-4 text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em]">Date</th>
-          <th class="px-8 py-4 text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] text-right">
+          <th class="px-8 py-4 text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] whitespace-nowrap">Date</th>
+          <th class="px-8 py-4 text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] text-right whitespace-nowrap">
             Status</th>
         </tr>
       </thead>
@@ -22,28 +22,30 @@
         @for (app of recentApplicationsForJobs; track app.id) {
         <tr class="hover:bg-bg-secondary transition-colors group">
           <td class="px-8 py-6">
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3 min-w-[180px]">
               <div
-                class="w-8 h-8 rounded-lg bg-energy-indigo/10 text-energy-indigo flex items-center justify-center font-bold text-xs">
+                class="w-8 h-8 rounded-lg bg-energy-indigo/10 text-energy-indigo flex items-center justify-center font-bold text-xs shrink-0">
                 {{ app.applicantName.charAt(0) }}
               </div>
               <div>
-                <p class="font-bold text-text-primary text-sm">{{ app.applicantName }}</p>
-                <p class="text-[10px] text-text-muted font-bold uppercase tracking-wider">{{ app.applicantEmail
+                <p class="font-bold text-text-primary text-sm whitespace-nowrap">{{ app.applicantName }}</p>
+                <p class="text-[10px] text-text-muted font-bold uppercase tracking-wider whitespace-nowrap">{{ app.applicantEmail
                   }}</p>
               </div>
             </div>
           </td>
           <td class="px-8 py-6">
-            <p class="text-sm font-bold text-text-primary">{{ app.jobTitle || 'Job #' + app.jobId }}</p>
+            <p class="text-sm font-bold text-text-primary whitespace-nowrap">{{ app.jobTitle || 'Job #' + app.jobId }}</p>
           </td>
           <td class="px-8 py-6">
-            <p class="text-xs font-bold text-text-secondary">{{ app.appliedAt | date:'MMM d' }}</p>
-            <p class="text-[9px] font-bold text-text-muted mt-1">{{ app.appliedAt | date:'HH:mm':'+0530' }} IST
-            </p>
+            <div class="min-w-[100px]">
+              <p class="text-xs font-bold text-text-secondary whitespace-nowrap">{{ app.appliedAt | date:'MMM d' }}</p>
+              <p class="text-[9px] font-bold text-text-muted mt-1 whitespace-nowrap">{{ app.appliedAt | date:'HH:mm':'+0530' }} IST
+              </p>
+            </div>
           </td>
           <td class="px-8 py-6 text-right">
-            <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border transition-colors" [ngClass]="{
+            <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border transition-colors whitespace-nowrap" [ngClass]="{
                     'bg-blue-500/10 text-blue-500 border-blue-500/20': app.status === 'APPLIED',
                     'bg-orange-500/10 text-orange-500 border-orange-500/20': app.status === 'UNDER_REVIEW',
                     'bg-green-500/10 text-green-500 border-green-500/20': app.status === 'SHORTLISTED',

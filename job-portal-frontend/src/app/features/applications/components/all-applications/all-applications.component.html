@@ -79,41 +79,45 @@
         <a routerLink="/jobs/create/new" class="btn-celestial !px-12 !py-5 !rounded-2xl">Post a Job</a>
       </div>
     } @else {
-      <div class="overflow-visible">
-        <table class="w-full text-left">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left min-w-[900px]">
           <thead>
             <tr class="border-b border-glass-border bg-bg-secondary">
-              <th class="px-6 py-4 text-[9px] font-bold text-text-muted uppercase tracking-[0.3em]">Candidate Name</th>
-              <th class="px-6 py-4 text-[9px] font-bold text-text-muted uppercase tracking-[0.3em]">Applied For</th>
-              <th class="px-6 py-4 text-[9px] font-bold text-text-muted uppercase tracking-[0.3em]">Date</th>
-              <th class="px-6 py-4 text-[9px] font-bold text-text-muted uppercase tracking-[0.3em]">Status</th>
-              <th class="px-6 py-4 text-[9px] font-bold text-text-muted uppercase tracking-[0.3em] text-right">Actions</th>
+              <th class="px-6 py-4 text-[9px] font-bold text-text-muted uppercase tracking-[0.3em] whitespace-nowrap">Candidate Name</th>
+              <th class="px-6 py-4 text-[9px] font-bold text-text-muted uppercase tracking-[0.3em] whitespace-nowrap">Applied For</th>
+              <th class="px-6 py-4 text-[9px] font-bold text-text-muted uppercase tracking-[0.3em] whitespace-nowrap">Date</th>
+              <th class="px-6 py-4 text-[9px] font-bold text-text-muted uppercase tracking-[0.3em] whitespace-nowrap">Status</th>
+              <th class="px-6 py-4 text-[9px] font-bold text-text-muted uppercase tracking-[0.3em] text-right whitespace-nowrap">Actions</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-glass-border">
             @for (app of pagedApplications; track app.id) {
               <tr class="hover:bg-bg-secondary transition-all group">
                 <td class="px-6 py-5">
-                  <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 rounded-xl bg-bg-accent text-white flex items-center justify-center font-bold text-lg shadow-lg">
+                  <div class="flex items-center gap-4 min-w-[200px]">
+                    <div class="w-10 h-10 rounded-xl bg-bg-accent text-white flex items-center justify-center font-bold text-lg shadow-lg shrink-0">
                       {{ app.applicantName.charAt(0) }}
                     </div>
                     <div>
-                      <p class="text-sm font-bold text-text-primary tracking-tight">{{ app.applicantName }}</p>
-                      <p class="text-[10px] font-bold text-text-muted uppercase tracking-wider mt-0.5">{{ app.applicantEmail }}</p>
+                      <p class="text-sm font-bold text-text-primary tracking-tight whitespace-nowrap">{{ app.applicantName }}</p>
+                      <p class="text-[10px] font-bold text-text-muted uppercase tracking-wider mt-0.5 whitespace-nowrap">{{ app.applicantEmail }}</p>
                     </div>
                   </div>
                 </td>
                 <td class="px-6 py-5">
-                  <p class="text-sm font-bold text-text-primary group-hover:text-energy-emerald transition-colors tracking-tight">{{ app.jobTitle }}</p>
-                  <p class="text-[10px] font-bold text-text-muted/40 uppercase tracking-widest mt-0.5">{{ app.companyName }}</p>
+                  <div class="min-w-[180px]">
+                    <p class="text-sm font-bold text-text-primary group-hover:text-energy-emerald transition-colors tracking-tight">{{ app.jobTitle }}</p>
+                    <p class="text-[10px] font-bold text-text-muted/40 uppercase tracking-widest mt-0.5">{{ app.companyName }}</p>
+                  </div>
                 </td>
                 <td class="px-6 py-5">
-                  <p class="text-[12px] font-bold text-text-secondary">{{ app.appliedAt | date:'MMM d, yyyy' }}</p>
-                  <p class="text-[9px] font-bold text-text-muted/30 uppercase mt-0.5">{{ app.appliedAt | date:'HH:mm':'+0530' }} IST</p>
+                  <div class="min-w-[120px]">
+                    <p class="text-[12px] font-bold text-text-secondary whitespace-nowrap">{{ app.appliedAt | date:'MMM d, yyyy' }}</p>
+                    <p class="text-[9px] font-bold text-text-muted/30 uppercase mt-0.5 whitespace-nowrap">{{ app.appliedAt | date:'HH:mm':'+0530' }} IST</p>
+                  </div>
                 </td>
                 <td class="px-6 py-5">
-                  <span class="px-3 py-1 rounded-lg text-[9px] font-bold tracking-widest uppercase border border-dashed"
+                  <span class="px-3 py-1 rounded-lg text-[9px] font-bold tracking-widest uppercase border border-dashed whitespace-nowrap"
                     [ngClass]="{
                       'border-energy-violet/40 text-energy-violet bg-energy-violet/5': app.status === 'APPLIED',
                       'border-amber-500/40 text-amber-600 bg-amber-500/5': app.status === 'UNDER_REVIEW',
@@ -125,10 +129,10 @@
                 </td>
                 <td class="px-6 py-5 text-right">
                   <div class="flex items-center justify-end gap-2.5">
-                    <a [href]="app.resumeUrl" target="_blank" class="w-9 h-9 rounded-xl bg-bg-secondary border border-glass-border text-text-muted hover:text-energy-emerald hover:border-energy-emerald/40 hover:bg-energy-emerald/5 flex items-center justify-center transition-all shadow-sm" title="View Resume">
+                    <a [href]="app.resumeUrl" target="_blank" class="w-9 h-9 rounded-xl bg-bg-secondary border border-glass-border text-text-muted hover:text-energy-emerald hover:border-energy-emerald/40 hover:bg-energy-emerald/5 flex items-center justify-center transition-all shadow-sm shrink-0" title="View Resume">
                       <svg class="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                     </a>
-                    <div class="relative">
+                    <div class="relative shrink-0">
                       <button (click)="toggleDropdown(app.id, $event)" 
                         class="w-9 h-9 rounded-xl bg-bg-accent text-white/40 hover:text-white flex items-center justify-center transition-all shadow-lg"
                         [ngClass]="{'ring-2 ring-energy-emerald text-white': activeDropdownId === app.id}">

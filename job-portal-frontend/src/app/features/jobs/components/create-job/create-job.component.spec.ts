@@ -3,7 +3,7 @@ import { CreateJobComponent } from './create-job.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ApiService } from '../../../../core/services/api.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { of, throwError } from 'rxjs';
+import { of, throwError, Observable } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { vi } from 'vitest';
 import * as ErrorHandlerUtil from '../../../../core/utils/error-handler.util';
@@ -118,7 +118,7 @@ describe('CreateJobComponent', () => {
       expect(component.showDeactivateModal).toBe(true);
       
       let resolvedValue: boolean | undefined;
-      deactivate$.subscribe(val => resolvedValue = val);
+      deactivate$.subscribe((val: boolean) => resolvedValue = val);
       
       component.onConfirmDeactivate();
       expect(resolvedValue).toBe(true);
@@ -136,7 +136,7 @@ describe('CreateJobComponent', () => {
       const deactivate$ = component.canDeactivate() as Observable<boolean>;
       
       let resolvedValue: boolean | undefined;
-      deactivate$.subscribe(val => resolvedValue = val);
+      deactivate$.subscribe((val: boolean) => resolvedValue = val);
       
       component.onCancelDeactivate();
       expect(resolvedValue).toBe(false);

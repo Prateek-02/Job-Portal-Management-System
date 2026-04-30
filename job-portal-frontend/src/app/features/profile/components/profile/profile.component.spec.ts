@@ -106,7 +106,7 @@ describe('ProfileComponent', () => {
       expect(component.showDeactivateModal).toBe(true);
       
       let resolvedValue: boolean | undefined;
-      deactivate$.subscribe(val => resolvedValue = val);
+      deactivate$.subscribe((val: boolean) => resolvedValue = val);
       
       component.onConfirmDeactivate();
       expect(resolvedValue).toBe(true);
@@ -124,7 +124,7 @@ describe('ProfileComponent', () => {
       const deactivate$ = component.canDeactivate() as Observable<boolean>;
       
       let resolvedValue: boolean | undefined;
-      deactivate$.subscribe(val => resolvedValue = val);
+      deactivate$.subscribe((val: boolean) => resolvedValue = val);
       
       component.onCancelDeactivate();
       expect(resolvedValue).toBe(false);

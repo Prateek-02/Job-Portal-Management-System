@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CanComponentDeactivate } from '../../../../core/guards/can-deactivate.guard';
@@ -7,7 +6,7 @@ import { ApiService } from '../../../../core/services/api.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { User } from '../../../../models/user.model';
 import { getFriendlyError } from '../../../../core/utils/error-handler.util';
-import { Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { EditProfileComponent } from '../edit-profile/edit-profile.component';
 import { ViewProfileComponent } from '../view-profile/view-profile.component';
