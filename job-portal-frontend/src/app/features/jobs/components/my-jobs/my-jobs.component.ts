@@ -7,17 +7,24 @@ import { Job } from '../../../../models/job.model';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { of, Subject } from 'rxjs';
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
+import { ModalComponent } from '../../../../shared/components/modal/modal.component';
+import { getFriendlyError } from '../../../../core/utils/error-handler.util';
 
 @Component({
   selector: 'app-my-jobs',
   standalone: true,
-  imports: [CommonModule, RouterLink, DatePipe, PaginationComponent],
+  imports: [CommonModule, RouterLink, DatePipe, PaginationComponent, ModalComponent],
   templateUrl: './my-jobs.component.html'
 })
 export class MyJobsComponent implements OnInit, OnDestroy {
   jobs: Job[] = [];
   isLoading = true;
   user: any;
+  showDeleteModal = false;
+  jobToDelete: Job | null = null;
+  deletingId: number | null = null;
+  successMessage: string | null = null;
+  errorMessage: string | null = null;
 
   private destroy$ = new Subject<void>();
 
@@ -71,16 +78,37 @@ export class MyJobsComponent implements OnInit, OnDestroy {
     });
   }
 
-  deleteJob(jobId: number): void {
-    if (confirm('Are you sure you want to delete this job posting? This action cannot be undone.')) {
-      this.apiService.deleteJob(jobId).pipe(takeUntil(this.destroy$)).subscribe({
-        next: () => {
-          this.jobs = this.jobs.filter(j => j.id !== jobId);
-          this.cdr.detectChanges();
-        },
-        error: (err) => alert(err.message || 'Failed to delete job.')
-      });
-    }
+  confirmDelete(job: Job): void {
+    this.jobToDelete = job;
+    this.showDeleteModal = true;
+  }
+
+  closeDeleteModal(): void {
+    this.showDeleteModal = false;
+    this.jobToDelete = null;
+  }
+
+  executeDelete(): void {
+    if (!this.jobToDelete) return;
+
+    this.deletingId = this.jobToDelete.id!;
+    this.apiService.deleteJob(this.jobToDelete.id!).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.jobs = this.jobs.filter(j => j.id !== this.deletingId);
+        this.successMessage = 'Job deleted successfully';
+        this.deletingId = null;
+        this.closeDeleteModal();
+        this.cdr.detectChanges();
+        setTimeout(() => this.successMessage = null, 3000);
+      },
+      error: (err) => {
+        this.errorMessage = getFriendlyError(err, 'delete_job');
+        this.deletingId = null;
+        this.closeDeleteModal();
+        this.cdr.detectChanges();
+        setTimeout(() => this.errorMessage = null, 5000);
+      }
+    });
   }
 
   formatSalary(amount: number | undefined): string {

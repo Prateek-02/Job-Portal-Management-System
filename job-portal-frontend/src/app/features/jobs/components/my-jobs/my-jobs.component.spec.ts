@@ -7,6 +7,7 @@ import { DatePipe } from '@angular/common';
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
 import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
+import { ModalComponent } from '../../../../shared/components/modal/modal.component';
 
 describe('MyJobsComponent', () => {
   let component: MyJobsComponent;
@@ -28,7 +29,7 @@ describe('MyJobsComponent', () => {
     vi.spyOn(window, 'alert').mockImplementation(() => {});
 
     await TestBed.configureTestingModule({
-      imports: [MyJobsComponent, DatePipe, PaginationComponent],
+      imports: [MyJobsComponent, DatePipe, PaginationComponent, ModalComponent],
       providers: [
         provideRouter([]),
         { provide: ApiService, useValue: apiServiceMock },
@@ -78,21 +79,24 @@ describe('MyJobsComponent', () => {
   });
 
   describe('Deletion Strategy (Normal / Exception / Boundary)', () => {
-    it('should conditionally halt payload submission natively when prompt boundary confirms implicitly false', () => {
+    it('should show delete modal when confirmDelete is called', () => {
       authServiceMock.getCurrentUser.mockReturnValue({ id: 10 });
-      apiServiceMock.getJobsByRecruiter.mockReturnValue(of({ content: [{ id: 99, companyName: 'TestCorp' }] }));
+      const job = { id: 99, title: 'Job 1', companyName: 'TestCorp' } as any;
+      apiServiceMock.getJobsByRecruiter.mockReturnValue(of({ content: [job] }));
       setupComponent();
       fixture.detectChanges();
       
-      vi.spyOn(window, 'confirm').mockReturnValue(false);
+      component.confirmDelete(job);
       
-      component.deleteJob(99);
-      expect(apiServiceMock.deleteJob).not.toHaveBeenCalled();
+      expect(component.showDeleteModal).toBe(true);
+      expect(component.jobToDelete).toEqual(job);
     });
 
     it('should safely omit structurally deleted entities locally seamlessly', () => {
       authServiceMock.getCurrentUser.mockReturnValue({ id: 10 });
-      apiServiceMock.getJobsByRecruiter.mockReturnValue(of({ content: [{ id: 99, companyName: 'TestCorp' }, { id: 100, companyName: 'TestCorp' }] }));
+      const job1 = { id: 99, title: 'Job 1', companyName: 'TestCorp' } as any;
+      const job2 = { id: 100, title: 'Job 2', companyName: 'TestCorp' } as any;
+      apiServiceMock.getJobsByRecruiter.mockReturnValue(of({ content: [job1, job2] }));
       apiServiceMock.deleteJob.mockReturnValue(of({}));
       
       setupComponent();
@@ -100,24 +104,28 @@ describe('MyJobsComponent', () => {
       
       expect(component.jobs.length).toBe(2);
       
-      component.deleteJob(99);
+      component.confirmDelete(job1);
+      component.executeDelete();
       
       expect(apiServiceMock.deleteJob).toHaveBeenCalledWith(99);
       expect(component.jobs.length).toBe(1);
-      expect(component.jobs[0].id).toBe(100); // Verified correctly filtered
+      expect(component.jobs[0].id).toBe(100);
+      expect(component.successMessage).toBe('Job deleted successfully');
     });
 
-    it('should securely handle API exceptions structurally propagating error signals explicitly via core logic alerts directly mapped limit constraints', () => {
+    it('should securely handle API exceptions structurally setting error message logically dynamically', () => {
       authServiceMock.getCurrentUser.mockReturnValue({ id: 10 });
-      apiServiceMock.getJobsByRecruiter.mockReturnValue(of({ content: [{ id: 99, companyName: 'TestCorp' }] }));
+      const job = { id: 99, title: 'Job 1', companyName: 'TestCorp' } as any;
+      apiServiceMock.getJobsByRecruiter.mockReturnValue(of({ content: [job] }));
       apiServiceMock.deleteJob.mockReturnValue(throwError(() => new Error('Delete constraint limit')));
       
       setupComponent();
       fixture.detectChanges();
       
-      component.deleteJob(99);
+      component.confirmDelete(job);
+      component.executeDelete();
       
-      expect(window.alert).toHaveBeenCalledWith('Delete constraint limit');
+      expect(component.errorMessage).toBe('Something went wrong on our end. Please try again shortly.');
       expect(component.jobs.length).toBe(1); // Wasn't removed natively
     });
   });
