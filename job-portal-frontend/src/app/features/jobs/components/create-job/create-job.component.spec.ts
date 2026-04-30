@@ -71,7 +71,7 @@ describe('CreateJobComponent', () => {
     it('should initialize in edit mode and patch valid data seamlessly', () => {
       routeMock.snapshot.paramMap.get.mockReturnValue('101');
       apiServiceMock.getJobById.mockReturnValue(of({ 
-        id: 101, title: 'Engineer', companyName: 'XYZ', location: 'Remote', salary: 100, experience: 3, description: 'Long text 12345678901234567890', skills: ['Java', 'Spring']
+        id: 101, title: 'Engineer', companyName: 'XYZ', location: 'Remote', salary: 100, experience: 3, description: 'Long text 12345678901234567890', jobType: 'Full-time', skills: ['Java', 'Spring']
       }));
       
       setupComponent();
@@ -132,6 +132,7 @@ describe('CreateJobComponent', () => {
         salary: 50,
         experience: 2,
         description: 'Test descriptions that is over thirty characters long',
+        jobType: 'Full-time',
         skills: 'Testing, Protractor'
       };
     });
