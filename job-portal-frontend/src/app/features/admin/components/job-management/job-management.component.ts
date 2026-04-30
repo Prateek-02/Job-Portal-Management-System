@@ -4,13 +4,14 @@ import { ApiService } from '../../../../core/services/api.service';
 import { AdminJobResponse } from '../../../../models/api-response.model';
 import { getFriendlyError } from '../../../../core/utils/error-handler.util';
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
+import { ModalComponent } from '../../../../shared/components/modal/modal.component';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-job-management',
   standalone: true,
-  imports: [CommonModule, DatePipe, PaginationComponent],
+  imports: [CommonModule, DatePipe, PaginationComponent, ModalComponent],
   templateUrl: './job-management.component.html'
 })
 export class JobManagementComponent implements OnInit, OnDestroy {
@@ -18,6 +19,9 @@ export class JobManagementComponent implements OnInit, OnDestroy {
   isLoading = true;
   deletingId: number | null = null;
   errorMessage = '';
+  successMessage = '';
+  showDeleteModal = false;
+  jobToDelete: AdminJobResponse | null = null;
   totalElements = 0;
 
   private destroy$ = new Subject<void>();
@@ -55,12 +59,38 @@ export class JobManagementComponent implements OnInit, OnDestroy {
     });
   }
 
-  deleteJob(id: number): void {
-    if (!confirm('Delete this job and all its applications? This cannot be undone.')) return;
+  confirmDelete(job: AdminJobResponse): void {
+    this.jobToDelete = job;
+    this.showDeleteModal = true;
+  }
+
+  closeDeleteModal(): void {
+    this.showDeleteModal = false;
+    this.jobToDelete = null;
+  }
+
+  executeDelete(): void {
+    if (!this.jobToDelete) return;
+    
+    const id = this.jobToDelete.id;
     this.deletingId = id;
+    this.showDeleteModal = false;
+    this.errorMessage = '';
+    this.successMessage = '';
+
     this.apiService.deleteJob(id).subscribe({
-      next: () => { this.jobs = this.jobs.filter(j => j.id !== id); this.deletingId = null; },
-      error: (err) => { this.deletingId = null; alert(getFriendlyError(err, 'delete_job')); }
+      next: () => { 
+        this.jobs = this.jobs.filter(j => j.id !== id); 
+        this.deletingId = null;
+        this.successMessage = 'Job deleted successfully';
+        this.jobToDelete = null;
+        setTimeout(() => this.successMessage = '', 3000);
+      },
+      error: (err) => { 
+        this.deletingId = null; 
+        this.errorMessage = getFriendlyError(err, 'delete_job');
+        this.jobToDelete = null;
+      }
     });
   }
 

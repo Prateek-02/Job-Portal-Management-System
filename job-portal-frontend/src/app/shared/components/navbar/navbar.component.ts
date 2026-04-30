@@ -6,11 +6,12 @@ import { CacheService } from '../../../core/services/cache.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
 import { NotificationPanelComponent } from '../../../features/notifications/components/notification-panel/notification-panel.component';
+import { ModalComponent } from '../modal/modal.component';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterModule, ThemeToggleComponent, NotificationPanelComponent],
+  imports: [CommonModule, RouterModule, ThemeToggleComponent, NotificationPanelComponent, ModalComponent],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
@@ -19,6 +20,7 @@ export class NavbarComponent implements OnInit {
   isMenuOpen = false;
   isDropdownOpen = false;
   isNotificationOpen = false;
+  showLogoutModal = false;
 
   constructor(
     public authService: AuthService,
@@ -47,7 +49,18 @@ export class NavbarComponent implements OnInit {
     return '/';
   }
 
-  logout(): void {
+  confirmLogout(): void {
+    this.isDropdownOpen = false;
+    this.isMenuOpen = false;
+    this.showLogoutModal = true;
+  }
+
+  closeLogoutModal(): void {
+    this.showLogoutModal = false;
+  }
+
+  executeLogout(): void {
+    this.showLogoutModal = false;
     this.authService.logout();
     this.router.navigate(['/auth/login']);
   }

@@ -217,9 +217,8 @@ class AuthenticationFilterTest {
     }
 
     @Test
-    void apply_JobsSaved_RequiresAuth_Explicit() {
-        // Path starts with /api/jobs but contains /saved
-        MockServerHttpRequest request = MockServerHttpRequest.get("/api/jobs/saved/all")
+    void apply_JobsRecruiter_RequiresAuth() {
+        MockServerHttpRequest request = MockServerHttpRequest.get("/api/jobs/recruiter/applications")
                 .build();
         ServerWebExchange exchange = MockServerWebExchange.from(request);
 

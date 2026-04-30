@@ -4,13 +4,14 @@ import { ApiService } from '../../../../core/services/api.service';
 import { AdminUserResponse } from '../../../../models/api-response.model';
 import { getFriendlyError } from '../../../../core/utils/error-handler.util';
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
+import { ModalComponent } from '../../../../shared/components/modal/modal.component';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-user-management',
   standalone: true,
-  imports: [CommonModule, DatePipe, PaginationComponent],
+  imports: [CommonModule, DatePipe, PaginationComponent, ModalComponent],
   templateUrl: './user-management.component.html'
 })
 export class UserManagementComponent implements OnInit, OnDestroy {
@@ -18,6 +19,9 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   isLoading = true;
   deletingId: number | null = null;
   errorMessage = '';
+  successMessage = '';
+  showDeleteModal = false;
+  userToDelete: AdminUserResponse | null = null;
 
   private destroy$ = new Subject<void>();
 
@@ -55,12 +59,38 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     });
   }
 
-  deleteUser(id: number): void {
-    if (!confirm('Delete this user? This action cannot be undone.')) return;
+  confirmDelete(user: AdminUserResponse): void {
+    this.userToDelete = user;
+    this.showDeleteModal = true;
+  }
+
+  closeDeleteModal(): void {
+    this.showDeleteModal = false;
+    this.userToDelete = null;
+  }
+
+  executeDelete(): void {
+    if (!this.userToDelete) return;
+    
+    const id = this.userToDelete.id;
     this.deletingId = id;
+    this.showDeleteModal = false;
+    this.errorMessage = '';
+    this.successMessage = '';
+
     this.apiService.deleteUser(id).subscribe({
-      next: () => { this.users = this.users.filter(u => u.id !== id); this.deletingId = null; },
-      error: (err) => { this.deletingId = null; alert(getFriendlyError(err, 'delete_user')); }
+      next: () => { 
+        this.users = this.users.filter(u => u.id !== id); 
+        this.deletingId = null;
+        this.successMessage = 'User deleted successfully';
+        this.userToDelete = null;
+        setTimeout(() => this.successMessage = '', 3000);
+      },
+      error: (err) => { 
+        this.deletingId = null; 
+        this.errorMessage = getFriendlyError(err, 'delete_user');
+        this.userToDelete = null;
+      }
     });
   }
 
