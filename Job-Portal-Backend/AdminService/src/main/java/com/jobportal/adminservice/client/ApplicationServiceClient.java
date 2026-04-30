@@ -8,4 +8,7 @@ public interface ApplicationServiceClient {
 
     @GetMapping("/api/applications/count")
     Long getTotalApplications();
+
+    @GetMapping("/api/applications/status-counts")
+    java.util.Map<String, Long> getStatusCounts();
 }

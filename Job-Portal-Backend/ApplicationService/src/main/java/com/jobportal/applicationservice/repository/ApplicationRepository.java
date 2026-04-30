@@ -33,4 +33,7 @@ public interface ApplicationRepository extends JpaRepository<JobApplication, Lon
 
     // Count all applications
     long count();
+
+    // Count by status
+    long countByStatus(com.jobportal.applicationservice.enums.ApplicationStatus status);
 }

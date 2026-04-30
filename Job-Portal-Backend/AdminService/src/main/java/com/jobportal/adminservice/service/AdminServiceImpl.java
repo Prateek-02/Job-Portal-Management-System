@@ -184,15 +184,25 @@ public class AdminServiceImpl implements AdminService {
                                     throw new RuntimeException("ApplicationService is unavailable (" + throwable.getMessage() + "). Cannot build reports.");
                                 });
 
+        java.util.Map<String, Long> statusCounts =
+                circuitBreakerFactory.create("adminApplicationService")
+                        .run(applicationServiceClient::getStatusCounts,
+                                throwable -> {
+                                    log.warn("Failed to fetch status counts, defaulting to empty. Reason: {}", throwable.getMessage());
+                                    return java.util.Map.of();
+                                });
+
         log.info("Reports generated | users: {} | jobSeekers: {} | recruiters: {} | jobs: {} | applications: {}",
                 totalUsers, jobSeekers, recruiters, totalJobs, totalApplications);
 
-        return Map.of(
-                "totalUsers", totalUsers,
-                "jobSeekers", jobSeekers,
-                "recruiters", recruiters,
-                "totalJobs", totalJobs,
-                "totalApplications", totalApplications
-        );
+        java.util.Map<String, Object> reportMap = new java.util.HashMap<>();
+        reportMap.put("totalUsers", totalUsers);
+        reportMap.put("jobSeekers", jobSeekers);
+        reportMap.put("recruiters", recruiters);
+        reportMap.put("totalJobs", totalJobs);
+        reportMap.put("totalApplications", totalApplications);
+        reportMap.putAll(statusCounts);
+
+        return reportMap;
     }
 }

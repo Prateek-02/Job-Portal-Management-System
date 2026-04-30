@@ -350,6 +350,16 @@ public class ApplicationServiceImpl implements ApplicationService {
         return count;
     }
 
+    @Override
+    public java.util.Map<String, Long> getCountByStatus() {
+        log.info("Fetching application counts by status");
+        java.util.Map<String, Long> counts = new java.util.HashMap<>();
+        for (ApplicationStatus status : ApplicationStatus.values()) {
+            counts.put(status.name(), applicationRepository.countByStatus(status));
+        }
+        return counts;
+    }
+
     private UserResponse fetchUserByIdWithCircuitBreaker(Long userId) {
         return circuitBreakerFactory.create("applicationAuthService")
                 .run(() -> userClient.getUserById(userId, internalSecret),

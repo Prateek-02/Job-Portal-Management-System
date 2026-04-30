@@ -22,6 +22,8 @@ public interface ApplicationService {
 
     Long getTotalApplications();
 
+    java.util.Map<String, Long> getCountByStatus();
+
     boolean hasApplied(Long userId, Long jobId);
 
     PageResponse<JobApplicationResponse> getAllApplicationsForRecruiter(Long recruiterId, String role, int page, int size, String sortBy, String direction);

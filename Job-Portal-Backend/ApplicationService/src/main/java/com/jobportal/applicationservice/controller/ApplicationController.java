@@ -140,7 +140,6 @@ public class ApplicationController {
                 Map.of("message", "All applications for job deleted successfully!"));
     }
 
-    // GET TOTAL APPLICATION COUNT
     @GetMapping("/count")
     public ResponseEntity<Long> getTotalApplications() {
 
@@ -151,6 +150,12 @@ public class ApplicationController {
         log.debug("Total applications count: {}", count);
 
         return ResponseEntity.ok(count);
+    }
+
+    @GetMapping("/status-counts")
+    public ResponseEntity<java.util.Map<String, Long>> getCountByStatus() {
+        log.info("Status-wise application counts requested internally.");
+        return ResponseEntity.ok(service.getCountByStatus());
     }
 
     // VIEW ALL APPLICATIONS (Recruiter)
