@@ -108,7 +108,7 @@
   </div>
 
   <!-- Total Applications & Detailed Table Section -->
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
     <div class="celestial-card p-6 flex flex-col justify-between bg-bg-accent text-white border-none inner-glow">
       <div>
         <div class="text-[10px] font-bold uppercase tracking-[0.2em] mb-3 opacity-50 text-white">Global Engagement</div>
@@ -140,29 +140,29 @@
       </div>
     </div>
 
-    <div class="lg:col-span-2 celestial-card p-8 min-h-[300px]">
+    <div class="celestial-card p-8 min-h-[300px]">
       <div class="flex items-center justify-between mb-6">
         <h3 class="text-xl font-bold text-text-primary">Detailed Metrics</h3>
-        <span class="px-3 py-1 bg-royal-blue/10 text-royal-blue text-[10px] font-bold rounded-full uppercase">Real-time
-          Data</span>
+        <span class="px-3 py-1 bg-royal-blue/10 text-royal-blue text-[10px] font-bold rounded-full uppercase">Real-time Data</span>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full text-sm text-left">
           <thead class="border-b border-glass-border">
             <tr>
               <th class="pb-4 text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em]">Metric Name</th>
-              <th class="pb-4 text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] text-right">Magnitude
-              </th>
+              <th class="pb-4 text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] text-right">Magnitude</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-glass-border/50">
             @for (entry of reports | keyvalue; track entry.key) {
-            <tr class="hover:bg-royal-blue/[0.02] transition-colors group">
-              <td class="py-3 text-sm font-semibold text-text-secondary group-hover:text-text-primary capitalize">
-                {{ entry.key.replace(/([A-Z])/g, ' $1') }}
-              </td>
-              <td class="py-3 text-base font-black text-text-primary text-right">{{ entry.value }}</td>
-            </tr>
+              @if (entry.key !== 'APPLIED' && entry.key !== 'UNDER_REVIEW' && entry.key !== 'SHORTLISTED' && entry.key !== 'REJECTED') {
+                <tr class="hover:bg-royal-blue/[0.02] transition-colors group">
+                  <td class="py-3 text-sm font-semibold text-text-secondary group-hover:text-text-primary capitalize">
+                    {{ entry.key.replace(/([A-Z])/g, ' $1') }}
+                  </td>
+                  <td class="py-3 text-base font-black text-text-primary text-right">{{ entry.value }}</td>
+                </tr>
+              }
             }
           </tbody>
         </table>
