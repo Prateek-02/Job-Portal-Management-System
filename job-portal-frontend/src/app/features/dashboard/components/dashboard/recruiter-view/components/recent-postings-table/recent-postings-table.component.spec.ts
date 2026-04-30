@@ -7,6 +7,9 @@ import { AuthService } from '../../../../../../../core/services/auth.service';
 import { DashboardPollingService } from '../../../../../../../core/services/dashboard-polling.service';
 import { ChangeDetectorRef } from '@angular/core';
 
+import { ModalComponent } from '../../../../../../../shared/components/modal/modal.component';
+import { vi } from 'vitest';
+
 describe('RecentPostingsTableComponent', () => {
   let component: RecentPostingsTableComponent;
   let fixture: ComponentFixture<RecentPostingsTableComponent>;
@@ -24,7 +27,7 @@ describe('RecentPostingsTableComponent', () => {
     cdrMock = { detectChanges: vi.fn() };
 
     await TestBed.configureTestingModule({
-      imports: [RecentPostingsTableComponent],
+      imports: [RecentPostingsTableComponent, ModalComponent],
       providers: [
         provideRouter([]),
         { provide: ApiService, useValue: apiServiceMock },
@@ -61,30 +64,36 @@ describe('RecentPostingsTableComponent', () => {
     expect(component.myPostedJobs).toEqual([]);
   });
 
-  it('should delete posting on confirm true and remove item from list', () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
-    component.myPostedJobs = [{ id: 10 } as any, { id: 20 } as any];
+  it('should show delete modal when confirmDelete is called', () => {
+    const job = { id: 10 } as any;
+    component.confirmDelete(job);
+    expect(component.showDeleteModal).toBe(true);
+    expect(component.jobToDelete).toEqual(job);
+  });
+
+  it('should delete posting on executeDelete and remove item from list', () => {
+    const job = { id: 10 } as any;
+    component.myPostedJobs = [job, { id: 20 } as any];
     apiServiceMock.deleteJob.mockReturnValue(of({}));
 
-    component.onDelete(10);
+    component.confirmDelete(job);
+    component.executeDelete();
+    
     expect(apiServiceMock.deleteJob).toHaveBeenCalledWith(10);
     expect(component.myPostedJobs.map(x => x.id)).toEqual([20]);
+    expect(component.successMessage).toBe('Job deleted successfully');
   });
 
-  it('should not call delete when user cancels confirmation', () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(false);
-    component.onDelete(10);
-    expect(apiServiceMock.deleteJob).not.toHaveBeenCalled();
-  });
+  it('should set error message on delete failure', () => {
+    const job = { id: 10 } as any;
+    component.myPostedJobs = [job];
+    apiServiceMock.deleteJob.mockReturnValue(throwError(() => ({ status: 500 })));
 
-  it('should alert on delete failure', () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
-    apiServiceMock.deleteJob.mockReturnValue(throwError(() => ({ message: 'boom' })));
-
-    component.onDelete(10);
-    expect(alertSpy).toHaveBeenCalledWith('boom');
-    alertSpy.mockRestore();
+    component.confirmDelete(job);
+    component.executeDelete();
+    
+    expect(component.errorMessage).toBe('Something went wrong on our end. Please try again shortly.');
+    expect(component.myPostedJobs.length).toBe(1);
   });
 
   it('should cleanup destroy subject', () => {
