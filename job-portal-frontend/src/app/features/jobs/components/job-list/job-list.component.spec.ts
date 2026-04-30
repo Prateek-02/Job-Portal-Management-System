@@ -25,7 +25,12 @@ describe('JobListComponent', () => {
       searchJobs: vi.fn().mockReturnValue(of({ content: [], totalPages: 0, pageNumber: 0, totalElements: 0 }))
     };
     
-    authServiceMock = { isAuthenticated: vi.fn() };
+    authServiceMock = { 
+      isAuthenticated: vi.fn(),
+      isAdmin: vi.fn().mockReturnValue(false),
+      isRecruiter: vi.fn().mockReturnValue(false),
+      isJobSeeker: vi.fn().mockReturnValue(false)
+    };
     routerMock = { navigate: vi.fn() };
     queryParamsSubject = new BehaviorSubject({});
 

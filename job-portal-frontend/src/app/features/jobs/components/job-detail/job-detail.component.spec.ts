@@ -41,7 +41,8 @@ describe('JobDetailComponent', () => {
     authServiceMock = {
       isAuthenticated: vi.fn(),
       isJobSeeker: vi.fn().mockReturnValue(false),
-      isRecruiter: vi.fn().mockReturnValue(false)
+      isRecruiter: vi.fn().mockReturnValue(false),
+      isAdmin: vi.fn().mockReturnValue(false)
     };
 
     routerMock = {
