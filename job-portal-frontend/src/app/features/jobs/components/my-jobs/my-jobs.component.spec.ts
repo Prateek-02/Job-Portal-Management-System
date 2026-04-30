@@ -5,6 +5,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { Router, provideRouter, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
+import { HttpErrorResponse } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 import { ModalComponent } from '../../../../shared/components/modal/modal.component';
@@ -117,7 +118,7 @@ describe('MyJobsComponent', () => {
       authServiceMock.getCurrentUser.mockReturnValue({ id: 10 });
       const job = { id: 99, title: 'Job 1', companyName: 'TestCorp' } as any;
       apiServiceMock.getJobsByRecruiter.mockReturnValue(of({ content: [job] }));
-      apiServiceMock.deleteJob.mockReturnValue(throwError(() => new Error('Delete constraint limit')));
+      apiServiceMock.deleteJob.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
       
       setupComponent();
       fixture.detectChanges();
