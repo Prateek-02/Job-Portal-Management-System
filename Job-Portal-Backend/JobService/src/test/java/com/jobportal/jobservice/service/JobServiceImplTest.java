@@ -62,10 +62,12 @@ class JobServiceImplTest {
         job.setSalary(100000.0);
         job.setExperience(3);
         job.setRecruiterId(200L);
+        job.setJobType("Full-time");
         job.setSkills(Arrays.asList("Java", "Spring Boot"));
 
         jobRequest = new JobRequest();
         jobRequest.setTitle("Software Engineer");
+        jobRequest.setJobType("Full-time");
         
         jobResponse = new JobResponse();
         jobResponse.setId(1L);

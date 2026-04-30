@@ -47,6 +47,7 @@ class JobControllerTest {
         jobRequest.setSalary(100000.0);
         jobRequest.setExperience(3);
         jobRequest.setDescription("Job Desc");
+        jobRequest.setJobType("Full-time");
         jobRequest.setSkills(Collections.singletonList("Java"));
 
         jobResponse = new JobResponse();
