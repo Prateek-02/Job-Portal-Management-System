@@ -78,41 +78,47 @@ describe('JobManagementComponent', () => {
     });
   });
 
-  describe('Deletion Handling Strategy (Boundary / Exception / Normal)', () => {
-    it('should block logic paths when DOM confirm is false implicitly naturally mapping limits', () => {
-      apiServiceMock.getAdminJobs.mockReturnValue(of({ content: [{ id: 10, title: 'Role', companyName: 'Acme', location: 'Remote', salary: 100000, createdAt: '2026-04-01' }] }));
+    it('should show delete modal when confirmDelete is called', () => {
+      const job = { id: 10, title: 'Role', companyName: 'Acme', location: 'Remote', salary: 100000, createdAt: '2026-04-01' } as any;
+      apiServiceMock.getAdminJobs.mockReturnValue(of({ content: [job] }));
       setupComponent();
       fixture.detectChanges();
       
-      vi.spyOn(window, 'confirm').mockReturnValue(false);
-      component.deleteJob(10);
+      component.confirmDelete(job);
       
-      expect(apiServiceMock.deleteJob).not.toHaveBeenCalled();
+      expect(component.showDeleteModal).toBe(true);
+      expect(component.jobToDelete).toEqual(job);
     });
 
     it('should trigger delete and mutate structural collections purely omitting filtered elements', () => {
-      apiServiceMock.getAdminJobs.mockReturnValue(of({ content: [{ id: 10, title: 'Role 1', companyName: 'Acme', location: 'Remote', salary: 100000, createdAt: '2026-04-01' }, { id: 20, title: 'Role 2', companyName: 'Acme', location: 'Remote', salary: 110000, createdAt: '2026-04-01' }] }));
+      const job1 = { id: 10, title: 'Role 1', companyName: 'Acme', location: 'Remote', salary: 100000, createdAt: '2026-04-01' } as any;
+      const job2 = { id: 20, title: 'Role 2', companyName: 'Acme', location: 'Remote', salary: 110000, createdAt: '2026-04-01' } as any;
+      apiServiceMock.getAdminJobs.mockReturnValue(of({ content: [job1, job2] }));
       apiServiceMock.deleteJob.mockReturnValue(of({}));
       setupComponent();
       fixture.detectChanges();
       
-      component.deleteJob(10);
+      component.confirmDelete(job1);
+      component.executeDelete();
       
       expect(apiServiceMock.deleteJob).toHaveBeenCalledWith(10);
       expect(component.deletingId).toBeNull();
       expect(component.jobs.length).toBe(1);
       expect(component.jobs[0].id).toBe(20);
+      expect(component.successMessage).toBe('Job deleted successfully');
     });
 
-    it('should intercept failing deletions dynamically raising system alerts manually bound', () => {
-      apiServiceMock.getAdminJobs.mockReturnValue(of({ content: [{ id: 10, title: 'Role', companyName: 'Acme', location: 'Remote', salary: 100000, createdAt: '2026-04-01' }] }));
+    it('should intercept failing deletions dynamically setting error message manually bound', () => {
+      const job = { id: 10, title: 'Role', companyName: 'Acme', location: 'Remote', salary: 100000, createdAt: '2026-04-01' } as any;
+      apiServiceMock.getAdminJobs.mockReturnValue(of({ content: [job] }));
       apiServiceMock.deleteJob.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
       setupComponent();
       fixture.detectChanges();
       
-      component.deleteJob(10);
+      component.confirmDelete(job);
+      component.executeDelete();
       
-      expect(window.alert).toHaveBeenCalledWith('Something went wrong on our end. Please try again shortly.');
+      expect(component.errorMessage).toBe('Something went wrong on our end. Please try again shortly.');
       expect(component.deletingId).toBeNull();
       expect(component.jobs.length).toBe(1); // Undamaged
     });

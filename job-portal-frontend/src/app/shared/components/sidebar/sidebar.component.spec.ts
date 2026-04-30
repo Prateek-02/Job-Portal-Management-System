@@ -29,12 +29,17 @@ describe('SidebarComponent', () => {
   });
 
   describe('Normal working', () => {
-    it('should successfully trigger logout sequence and route', () => {
+    it('should show logout modal and navigate to login page on execute', () => {
       const router = TestBed.inject(Router);
       vi.spyOn(router, 'navigate');
-      component.logout();
+      
+      component.confirmLogout();
+      expect(component.showLogoutModal).toBe(true);
+      
+      component.executeLogout();
       expect(authServiceMock.logout).toHaveBeenCalled();
       expect(router.navigate).toHaveBeenCalledWith(['/auth/login']);
+      expect(component.showLogoutModal).toBe(false);
     });
   });
 
@@ -42,7 +47,8 @@ describe('SidebarComponent', () => {
     it('should handle repeated rapid consecutive clicks (boundary state exhaustion)', () => {
       // Though visually handled by button disabling, code itself should endure rapid clicks
       for (let i = 0; i < 10; i++) {
-        component.logout();
+        component.confirmLogout();
+        component.executeLogout();
       }
       expect(authServiceMock.logout).toHaveBeenCalledTimes(10);
     });
@@ -61,13 +67,14 @@ describe('SidebarComponent', () => {
   });
 
   describe('Exception handling', () => {
-    it('should pass unhandled promise rejections properly without crashing DOM when router fails', async () => {
+    it('should pass unhandled promise rejections properly properly without crashing DOM when router fails', async () => {
       const router = TestBed.inject(Router);
       vi.spyOn(router, 'navigate').mockRejectedValue(new Error('Router failure'));
       
       // Attempting logout shouldn't throw synchronously
       expect(() => {
-        component.logout();
+        component.confirmLogout();
+        component.executeLogout();
       }).not.toThrow();
     });
   });

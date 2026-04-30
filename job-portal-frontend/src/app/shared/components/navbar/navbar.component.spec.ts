@@ -120,12 +120,17 @@ describe('NavbarComponent', () => {
   });
 
   describe('Exception handling', () => {
-    it('should logout and navigate to login page', () => {
+    it('should show logout modal and navigate to login page on execute', () => {
       const router = TestBed.inject(Router);
       const navSpy = vi.spyOn(router, 'navigate');
-      component.logout();
+      
+      component.confirmLogout();
+      expect(component.showLogoutModal).toBe(true);
+      
+      component.executeLogout();
       expect(authServiceMock.logout).toHaveBeenCalled();
       expect(navSpy).toHaveBeenCalledWith(['/auth/login']);
+      expect(component.showLogoutModal).toBe(false);
     });
 
     it('should update currentUser from auth stream', () => {

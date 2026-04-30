@@ -79,40 +79,47 @@ describe('UserManagementComponent', () => {
   });
 
   describe('Deletion Strategy & CSS Bindings (Boundary / Exception / Normal)', () => {
-    it('should boundary protect bypass deletions natively when prompt maps confirm inherently false manually', () => {
-      apiServiceMock.getAdminUsers.mockReturnValue(of({ content: [{ id: 10, name: 'A', email: 'a@example.com', role: 'JOB_SEEKER', createdAt: '2026-04-01' }] }));
+    it('should show delete modal when confirmDelete is called', () => {
+      const user = { id: 10, name: 'A', email: 'a@example.com', role: 'JOB_SEEKER', createdAt: '2026-04-01' } as any;
+      apiServiceMock.getAdminUsers.mockReturnValue(of({ content: [user] }));
       setupComponent();
       fixture.detectChanges();
       
-      vi.spyOn(window, 'confirm').mockReturnValue(false);
-      component.deleteUser(10);
+      component.confirmDelete(user);
       
-      expect(apiServiceMock.deleteUser).not.toHaveBeenCalled();
+      expect(component.showDeleteModal).toBe(true);
+      expect(component.userToDelete).toEqual(user);
     });
 
     it('should trigger user delete correctly mutating structural limits seamlessly mapped internally', () => {
-      apiServiceMock.getAdminUsers.mockReturnValue(of({ content: [{ id: 10, name: 'A', email: 'a@example.com', role: 'JOB_SEEKER', createdAt: '2026-04-01' }, { id: 20, name: 'B', email: 'b@example.com', role: 'RECRUITER', createdAt: '2026-04-01' }] }));
+      const user1 = { id: 10, name: 'A', email: 'a@example.com', role: 'JOB_SEEKER', createdAt: '2026-04-01' } as any;
+      const user2 = { id: 20, name: 'B', email: 'b@example.com', role: 'RECRUITER', createdAt: '2026-04-01' } as any;
+      apiServiceMock.getAdminUsers.mockReturnValue(of({ content: [user1, user2] }));
       apiServiceMock.deleteUser.mockReturnValue(of({}));
       setupComponent();
       fixture.detectChanges();
       
-      component.deleteUser(10);
+      component.confirmDelete(user1);
+      component.executeDelete();
       
       expect(apiServiceMock.deleteUser).toHaveBeenCalledWith(10);
       expect(component.deletingId).toBeNull();
       expect(component.users.length).toBe(1);
       expect(component.users[0].id).toBe(20);
+      expect(component.successMessage).toBe('User deleted successfully');
     });
 
-    it('should throw UI intercept exception alerts propagating errors gracefully unblocking locks logically dynamically', () => {
-      apiServiceMock.getAdminUsers.mockReturnValue(of({ content: [{ id: 10, name: 'A', email: 'a@example.com', role: 'JOB_SEEKER', createdAt: '2026-04-01' }] }));
+    it('should throw UI intercept exception alerts propagating errors gracefully setting error message logically dynamically', () => {
+      const user = { id: 10, name: 'A', email: 'a@example.com', role: 'JOB_SEEKER', createdAt: '2026-04-01' } as any;
+      apiServiceMock.getAdminUsers.mockReturnValue(of({ content: [user] }));
       apiServiceMock.deleteUser.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
       setupComponent();
       fixture.detectChanges();
       
-      component.deleteUser(10);
+      component.confirmDelete(user);
+      component.executeDelete();
       
-      expect(window.alert).toHaveBeenCalledWith('Something went wrong on our end. Please try again shortly.');
+      expect(component.errorMessage).toBe('Something went wrong on our end. Please try again shortly.');
       expect(component.deletingId).toBeNull();
       expect(component.users.length).toBe(1); // Undamaged structure bounds mapping
     });
