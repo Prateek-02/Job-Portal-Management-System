@@ -155,7 +155,7 @@ class ApplicationServiceImplTest {
         when(userClient.getUserById(anyLong(), anyString())).thenReturn(user);
 
         ApplicationResponse res =
-                service.updateStatus(1L, ApplicationStatus.SHORTLISTED, 1L, "RECRUITER");
+                service.updateStatus(1L, ApplicationStatus.UNDER_REVIEW, 1L, "RECRUITER");
 
         assertThat(res).isNotNull();
         verify(repository).save(any());
@@ -165,7 +165,7 @@ class ApplicationServiceImplTest {
     @Test
     void update_notRecruiter_ThrowsUnauthorized() {
         assertThatThrownBy(() ->
-                service.updateStatus(1L, ApplicationStatus.SHORTLISTED, 1L, "JOB_SEEKER"))
+                service.updateStatus(1L, ApplicationStatus.UNDER_REVIEW, 1L, "JOB_SEEKER"))
                 .isInstanceOf(UnauthorizedException.class);
     }
 
@@ -174,7 +174,7 @@ class ApplicationServiceImplTest {
         when(repository.findById(1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() ->
-                service.updateStatus(1L, ApplicationStatus.SHORTLISTED, 1L, "RECRUITER"))
+                service.updateStatus(1L, ApplicationStatus.UNDER_REVIEW, 1L, "RECRUITER"))
                 .isInstanceOf(ApplicationNotFoundException.class);
     }
 
@@ -189,7 +189,7 @@ class ApplicationServiceImplTest {
         when(jobClient.getJobById(anyLong())).thenReturn(jobOwnedByOther);
 
         assertThatThrownBy(() ->
-                service.updateStatus(1L, ApplicationStatus.SHORTLISTED, 1L, "RECRUITER"))
+                service.updateStatus(1L, ApplicationStatus.UNDER_REVIEW, 1L, "RECRUITER"))
                 .isInstanceOf(UnauthorizedException.class);
     }
 
@@ -497,7 +497,7 @@ class ApplicationServiceImplTest {
         doThrow(new RuntimeException("Rabbit down")).when(rabbitTemplate).convertAndSend(anyString(), any(Object.class));
 
         ApplicationResponse res =
-                service.updateStatus(1L, ApplicationStatus.SHORTLISTED, 1L, "RECRUITER");
+                service.updateStatus(1L, ApplicationStatus.UNDER_REVIEW, 1L, "RECRUITER");
 
         assertThat(res).isNotNull();
         verify(rabbitTemplate).convertAndSend(anyString(), any(Object.class));
