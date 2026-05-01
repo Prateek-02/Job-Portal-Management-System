@@ -88,7 +88,9 @@ public class AuthenticationFilter extends
                path.contains("/api/auth/reset-password") ||
                path.contains("/api/auth/register") ||
                path.contains("/api/auth/login") ||
-               path.startsWith("/api/admin/public/");
+               path.startsWith("/api/admin/public/") ||
+               path.contains("v3/api-docs") ||
+               path.contains("swagger-ui");
     }
 
     private boolean isInvalidHeader(String authHeader) {
