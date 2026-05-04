@@ -2,6 +2,7 @@ package com.jobportal.adminservice.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
@@ -15,6 +16,7 @@ import com.jobportal.adminservice.dto.response.PageResponse;
 import com.jobportal.adminservice.dto.response.UserResponse;
 import com.jobportal.adminservice.event.UserDeleteEvent;
 import com.jobportal.adminservice.producer.UserDeleteProducer;
+import feign.FeignException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -60,7 +62,7 @@ public class AdminServiceImpl implements AdminService {
                 circuitBreakerFactory.create("adminAuthService")
                         .run(() -> authServiceClient.getUserById(id, internalSecret),
                                 throwable -> {
-                                    if (throwable instanceof feign.FeignException fe && fe.status() == 404) {
+                                    if (throwable instanceof FeignException fe && fe.status() == 404) {
                                         log.warn("User not found | userId: {}", id);
                                         throw new RuntimeException("User not found with id: " + id);
                                     }
@@ -82,7 +84,7 @@ public class AdminServiceImpl implements AdminService {
                 circuitBreakerFactory.create("adminAuthService")
                         .run(() -> authServiceClient.getUserById(id, internalSecret),
                                 throwable -> {
-                                    if (throwable instanceof feign.FeignException fe && fe.status() == 404) {
+                                    if (throwable instanceof FeignException fe && fe.status() == 404) {
                                         log.warn("User not found | userId: {}", id);
                                         throw new RuntimeException("User not found with id: " + id);
                                     }
@@ -132,7 +134,7 @@ public class AdminServiceImpl implements AdminService {
                 circuitBreakerFactory.create("adminJobService")
                         .run(() -> jobServiceClient.getJobById(id),
                                 throwable -> {
-                                    if (throwable instanceof feign.FeignException fe && fe.status() == 404) {
+                                    if (throwable instanceof FeignException fe && fe.status() == 404) {
                                         log.warn("Job not found | jobId: {}", id);
                                         throw new RuntimeException("Job not found with id: " + id);
                                     }
@@ -201,18 +203,18 @@ public class AdminServiceImpl implements AdminService {
                                     throw new RuntimeException("ApplicationService is unavailable (" + throwable.getMessage() + "). Cannot build reports.");
                                 });
 
-        java.util.Map<String, Long> statusCounts =
+        Map<String, Long> statusCounts =
                 circuitBreakerFactory.create("adminApplicationService")
                         .run(applicationServiceClient::getStatusCounts,
                                 throwable -> {
                                     log.warn("Failed to fetch status counts, defaulting to empty. Reason: {}", throwable.getMessage());
-                                    return java.util.Map.of();
+                                    return Map.of();
                                 });
 
         log.info("Reports generated | users: {} | jobSeekers: {} | recruiters: {} | jobs: {} | applications: {}",
                 totalUsers, jobSeekers, recruiters, totalJobs, totalApplications);
 
-        java.util.Map<String, Object> reportMap = new java.util.HashMap<>();
+        Map<String, Object> reportMap = new HashMap<>();
         reportMap.put("totalUsers", totalUsers);
         reportMap.put("jobSeekers", jobSeekers);
         reportMap.put("recruiters", recruiters);

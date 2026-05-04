@@ -4,6 +4,7 @@ import com.jobportal.jobservice.dto.JobFilter;
 import com.jobportal.jobservice.dto.request.JobRequest;
 import com.jobportal.jobservice.dto.response.JobResponse;
 import com.jobportal.jobservice.dto.response.PageResponse;
+import com.jobportal.jobservice.dto.response.MarketStatsResponse;
 
 public interface JobService {
     JobResponse createJob(JobRequest dto, Long recruiterId, String role);
@@ -23,5 +24,5 @@ public interface JobService {
     
     PageResponse<JobResponse> getJobsByRecruiter(Long recruiterId, Long requesterId, String role, int page, int size, String sortBy, String direction);
 
-    com.jobportal.jobservice.dto.response.MarketStatsResponse getMarketPulseStats();
+    MarketStatsResponse getMarketPulseStats();
 }

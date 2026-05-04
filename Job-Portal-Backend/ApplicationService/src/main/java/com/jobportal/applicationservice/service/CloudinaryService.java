@@ -3,6 +3,8 @@ package com.jobportal.applicationservice.service;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.nio.file.Path;
+import java.nio.file.Files;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,7 +33,7 @@ public class CloudinaryService {
         }
 
         // Security Hardening: Use Files.createTempFile for more secure permissions
-        java.nio.file.Path tempPath = java.nio.file.Files.createTempFile("resume-", ".pdf");
+        Path tempPath = Files.createTempFile("resume-", ".pdf");
         File tempFile = tempPath.toFile();
         tempFile.deleteOnExit(); 
         file.transferTo(tempPath);

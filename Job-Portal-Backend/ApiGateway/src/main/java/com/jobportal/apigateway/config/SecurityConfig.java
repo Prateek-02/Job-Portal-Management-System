@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.config.Customizer;
 
 @Configuration
 @EnableWebFluxSecurity
@@ -14,7 +15,7 @@ public class SecurityConfig {
     public SecurityWebFilterChain securityWebFilterChain(
             ServerHttpSecurity http) {
         http
-                .cors(org.springframework.security.config.Customizer.withDefaults())
+                .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeExchange(auth -> auth
                         .anyExchange().permitAll());

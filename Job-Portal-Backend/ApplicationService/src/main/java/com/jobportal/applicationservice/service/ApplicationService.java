@@ -1,5 +1,7 @@
 package com.jobportal.applicationservice.service;
 
+import java.util.Map;
+
 import com.jobportal.applicationservice.dto.request.ApplicationRequest;
 import com.jobportal.applicationservice.dto.response.ApplicationResponse;
 import com.jobportal.applicationservice.dto.response.JobApplicationResponse;
@@ -22,7 +24,7 @@ public interface ApplicationService {
 
     Long getTotalApplications();
 
-    java.util.Map<String, Long> getCountByStatus();
+    Map<String, Long> getCountByStatus();
 
     boolean hasApplied(Long userId, Long jobId);
 

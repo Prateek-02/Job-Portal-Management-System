@@ -153,7 +153,7 @@ public class ApplicationController {
     }
 
     @GetMapping("/status-counts")
-    public ResponseEntity<java.util.Map<String, Long>> getCountByStatus() {
+    public ResponseEntity<Map<String, Long>> getCountByStatus() {
         log.info("Status-wise application counts requested internally.");
         return ResponseEntity.ok(service.getCountByStatus());
     }

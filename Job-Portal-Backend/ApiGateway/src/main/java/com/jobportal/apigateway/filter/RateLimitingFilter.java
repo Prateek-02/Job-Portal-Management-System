@@ -5,6 +5,7 @@ import com.jobportal.apigateway.ratelimit.RateLimitStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
@@ -95,7 +96,7 @@ public class RateLimitingFilter extends AbstractGatewayFilterFactory<RateLimitin
         };
     }
 
-    private Mono<Void> handleRateLimitStatus(ServerWebExchange exchange, org.springframework.cloud.gateway.filter.GatewayFilterChain chain, 
+    private Mono<Void> handleRateLimitStatus(ServerWebExchange exchange, GatewayFilterChain chain, 
                                            RateLimitStatus status, String type, String identity) {
         if (status == null || !status.isAllowed()) {
             log.warn("{} rate limit exceeded | ID: {} | count: {}/{}", 

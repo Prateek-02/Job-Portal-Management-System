@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -34,6 +35,7 @@ import com.jobportal.applicationservice.entity.JobApplication;
 import com.jobportal.applicationservice.enums.ApplicationStatus;
 import com.jobportal.applicationservice.exception.*;
 import com.jobportal.applicationservice.repository.ApplicationRepository;
+import feign.FeignException;
 
 @ExtendWith(MockitoExtension.class)
 class ApplicationServiceImplTest {
@@ -219,7 +221,7 @@ class ApplicationServiceImplTest {
 
     @Test
     void getUserApplications_success() {
-        Page<JobApplication> pageArgs = new PageImpl<>(java.util.List.of(entity));
+        Page<JobApplication> pageArgs = new PageImpl<>(List.of(entity));
         when(repository.findByUserId(eq(1L), any(Pageable.class))).thenReturn(pageArgs);
         when(mapper.map(any(), eq(ApplicationResponse.class))).thenReturn(response);
         when(jobClient.getJobById(anyLong())).thenReturn(job);
@@ -241,7 +243,7 @@ class ApplicationServiceImplTest {
     @Test
     void getUserApplications_jobNotFound_SetsDefaultJobInfo() {
         // When the job fetch fails
-        Page<JobApplication> pageArgs = new PageImpl<>(java.util.List.of(entity));
+        Page<JobApplication> pageArgs = new PageImpl<>(List.of(entity));
         when(repository.findByUserId(eq(1L), any(Pageable.class))).thenReturn(pageArgs);
         when(mapper.map(any(), eq(ApplicationResponse.class))).thenReturn(response);
         lenient().when(jobClient.getJobById(anyLong())).thenThrow(new RuntimeException("Job failed"));
@@ -257,7 +259,7 @@ class ApplicationServiceImplTest {
 
     @Test
     void getJobApplications_success() {
-        Page<JobApplication> pageArgs = new PageImpl<>(java.util.List.of(entity));
+        Page<JobApplication> pageArgs = new PageImpl<>(List.of(entity));
         when(repository.findByJobId(eq(1L), any(Pageable.class))).thenReturn(pageArgs);
         when(jobClient.getJobById(1L)).thenReturn(job);
         when(userClient.getUserById(1L, SECRET)).thenReturn(user);
@@ -271,7 +273,7 @@ class ApplicationServiceImplTest {
 
     @Test
     void getJobApplications_AscSort() {
-        Page<JobApplication> pageArgs = new PageImpl<>(java.util.List.of(entity));
+        Page<JobApplication> pageArgs = new PageImpl<>(List.of(entity));
         when(repository.findByJobId(eq(1L), any(Pageable.class))).thenReturn(pageArgs);
         when(jobClient.getJobById(1L)).thenReturn(job);
         when(userClient.getUserById(1L, SECRET)).thenReturn(user);
@@ -284,7 +286,7 @@ class ApplicationServiceImplTest {
 
     @Test
     void getJobApplications_userNotFound_SetsDefaultUserInfo() {
-        Page<JobApplication> pageArgs = new PageImpl<>(java.util.List.of(entity));
+        Page<JobApplication> pageArgs = new PageImpl<>(List.of(entity));
         when(repository.findByJobId(eq(1L), any(Pageable.class))).thenReturn(pageArgs);
         when(jobClient.getJobById(1L)).thenReturn(job);
         lenient().when(userClient.getUserById(anyLong(), anyString())).thenThrow(new RuntimeException("User failed"));
@@ -321,7 +323,7 @@ class ApplicationServiceImplTest {
     @Test
     void getAllApplicationsForRecruiter_success() {
         PageResponse<JobResponse> jobPage = new PageResponse<>();
-        jobPage.setContent(java.util.List.of(job));
+        jobPage.setContent(List.of(job));
         when(jobClient.getJobsByRecruiter(1L, 1L, "RECRUITER", 0, 1000, "createdAt", "desc")).thenReturn(jobPage);
 
         JobApplication entity2 = new JobApplication();
@@ -343,10 +345,10 @@ class ApplicationServiceImplTest {
     @Test
     void getAllApplicationsForRecruiter_AscSort() {
         PageResponse<JobResponse> jobPage = new PageResponse<>();
-        jobPage.setContent(java.util.List.of(job));
+        jobPage.setContent(List.of(job));
         when(jobClient.getJobsByRecruiter(1L, 1L, "RECRUITER", 0, 1000, "createdAt", "desc")).thenReturn(jobPage);
 
-        Page<JobApplication> appPage = new PageImpl<>(java.util.List.of(entity));
+        Page<JobApplication> appPage = new PageImpl<>(List.of(entity));
         when(repository.findByJobId(eq(1L), any(Pageable.class))).thenReturn(appPage);
         when(jobClient.getJobById(1L)).thenReturn(job);
         when(userClient.getUserById(anyLong(), anyString())).thenReturn(user);
@@ -422,7 +424,7 @@ class ApplicationServiceImplTest {
 
     @Test
     void fetchUser_NotFound_ThrowsRuntimeException() {
-        feign.FeignException.NotFound fe = mock(feign.FeignException.NotFound.class);
+        FeignException.NotFound fe = mock(FeignException.NotFound.class);
         when(fe.status()).thenReturn(404);
         
         when(userClient.getUserById(anyLong(), anyString())).thenThrow(fe);
@@ -434,7 +436,7 @@ class ApplicationServiceImplTest {
 
     @Test
     void fetchUser_InternalError_ThrowsGenericException() {
-        feign.FeignException fe = mock(feign.FeignException.class);
+        FeignException fe = mock(FeignException.class);
         when(fe.status()).thenReturn(500);
         
         when(userClient.getUserById(anyLong(), anyString())).thenThrow(fe);
@@ -446,7 +448,7 @@ class ApplicationServiceImplTest {
 
     @Test
     void fetchJob_NotFound_ThrowsRuntimeException() {
-        feign.FeignException.NotFound fe = mock(feign.FeignException.NotFound.class);
+        FeignException.NotFound fe = mock(FeignException.NotFound.class);
         when(fe.status()).thenReturn(404);
         
         when(jobClient.getJobById(anyLong())).thenThrow(fe);
@@ -458,7 +460,7 @@ class ApplicationServiceImplTest {
 
     @Test
     void fetchJob_InternalError_ThrowsGenericException() {
-        feign.FeignException fe = mock(feign.FeignException.class);
+        FeignException fe = mock(FeignException.class);
         when(fe.status()).thenReturn(500);
         
         when(jobClient.getJobById(anyLong())).thenThrow(fe);
@@ -504,7 +506,7 @@ class ApplicationServiceImplTest {
     }
     @Test
     void getUserApplications_AscSort() {
-        Page<JobApplication> pageArgs = new PageImpl<>(java.util.List.of(entity));
+        Page<JobApplication> pageArgs = new PageImpl<>(List.of(entity));
         when(repository.findByUserId(eq(1L), any(Pageable.class))).thenReturn(pageArgs);
         when(mapper.map(any(), eq(ApplicationResponse.class))).thenReturn(response);
         when(jobClient.getJobById(1L)).thenReturn(job);

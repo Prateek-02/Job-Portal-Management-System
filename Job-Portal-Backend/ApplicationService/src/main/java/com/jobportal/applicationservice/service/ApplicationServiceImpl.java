@@ -3,6 +3,8 @@ package com.jobportal.applicationservice.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -27,6 +29,7 @@ import com.jobportal.applicationservice.entity.JobApplication;
 import com.jobportal.applicationservice.enums.ApplicationStatus;
 import com.jobportal.applicationservice.exception.*;
 import com.jobportal.applicationservice.repository.ApplicationRepository;
+import feign.FeignException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -351,9 +354,9 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public java.util.Map<String, Long> getCountByStatus() {
+    public Map<String, Long> getCountByStatus() {
         log.info("Fetching application counts by status");
-        java.util.Map<String, Long> counts = new java.util.HashMap<>();
+        Map<String, Long> counts = new HashMap<>();
         for (ApplicationStatus status : ApplicationStatus.values()) {
             counts.put(status.name(), applicationRepository.countByStatus(status));
         }
@@ -364,7 +367,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         return circuitBreakerFactory.create("applicationAuthService")
                 .run(() -> userClient.getUserById(userId, internalSecret),
                         throwable -> {
-                            if (throwable instanceof feign.FeignException fe) {
+                            if (throwable instanceof FeignException fe) {
                                 if (fe.status() == 404) {
                                     log.warn("User not found | userId: {}", userId);
                                     throw new RuntimeException("User not found with id: " + userId);
@@ -379,7 +382,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         return circuitBreakerFactory.create("applicationJobService")
                 .run(() -> jobClient.getJobById(jobId),
                         throwable -> {
-                            if (throwable instanceof feign.FeignException fe) {
+                            if (throwable instanceof FeignException fe) {
                                 if (fe.status() == 404) {
                                     log.warn("Job not found | jobId: {}", jobId);
                                     throw new RuntimeException("Job not found with id: " + jobId);

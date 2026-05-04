@@ -8,10 +8,14 @@ import org.springframework.web.multipart.MultipartFile;
 import com.jobportal.authservice.dto.request.LoginRequest;
 import com.jobportal.authservice.dto.request.RegisterRequest;
 import com.jobportal.authservice.dto.request.UpdateProfileRequest;
+import com.jobportal.authservice.dto.request.RefreshTokenRequest;
+import com.jobportal.authservice.dto.request.ForgotPasswordRequest;
+import com.jobportal.authservice.dto.request.ResetPasswordRequest;
 
 import com.jobportal.authservice.dto.response.LoginResponse;
 import com.jobportal.authservice.dto.response.RegisterResponse;
 import com.jobportal.authservice.dto.response.UserResponse;
+import com.jobportal.authservice.dto.response.PageResponse;
 
 public interface AuthService {
 
@@ -22,7 +26,7 @@ public interface AuthService {
     LoginResponse login(LoginRequest request);
     
     // Refresh token
-    LoginResponse refreshToken(com.jobportal.authservice.dto.request.RefreshTokenRequest request);
+    LoginResponse refreshToken(RefreshTokenRequest request);
     
     // Upload profile image
     UserResponse uploadProfileImage(Long userId,MultipartFile file) throws IOException;
@@ -31,7 +35,7 @@ public interface AuthService {
     UserResponse updateProfile(Long userId, UpdateProfileRequest request);
 
     // Get all users
-    com.jobportal.authservice.dto.response.PageResponse<UserResponse> getAllUsers(int page, int size, String sortBy, String direction);
+    PageResponse<UserResponse> getAllUsers(int page, int size, String sortBy, String direction);
 
     // Get user by ID
     UserResponse getUserById(Long id);
@@ -40,6 +44,6 @@ public interface AuthService {
     void deleteUser(Long id);
 
     // Password reset
-    void forgotPassword(com.jobportal.authservice.dto.request.ForgotPasswordRequest request);
-    void resetPassword(com.jobportal.authservice.dto.request.ResetPasswordRequest request);
+    void forgotPassword(ForgotPasswordRequest request);
+    void resetPassword(ResetPasswordRequest request);
 }

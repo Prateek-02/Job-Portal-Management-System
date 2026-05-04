@@ -28,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import com.jobportal.jobservice.dto.response.PageResponse;
+import com.jobportal.jobservice.dto.response.MarketStatsResponse;
 
 @Slf4j
 @RestController
@@ -164,7 +165,7 @@ public class JobController {
     }
 
     @GetMapping("/stats/market-pulse")
-    public ResponseEntity<com.jobportal.jobservice.dto.response.MarketStatsResponse> getMarketPulseStats() {
+    public ResponseEntity<MarketStatsResponse> getMarketPulseStats() {
         log.info("Get market pulse stats API called");
         return ResponseEntity.ok(jobService.getMarketPulseStats());
     }

@@ -9,6 +9,7 @@ import com.jobportal.applicationservice.entity.JobApplication;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import com.jobportal.applicationservice.enums.ApplicationStatus;
 
 @Repository
 public interface ApplicationRepository extends JpaRepository<JobApplication, Long> {
@@ -22,7 +23,7 @@ public interface ApplicationRepository extends JpaRepository<JobApplication, Lon
     // Check if user already applied for a job
     boolean existsByUserIdAndJobId(Long userId, Long jobId);
 
-    // ✅ REQUIRED for Saga (Idempotency check)
+    //  REQUIRED for Saga (Idempotency check)
     boolean existsByUserId(Long userId);
 
     // Delete all applications by userId
@@ -35,5 +36,5 @@ public interface ApplicationRepository extends JpaRepository<JobApplication, Lon
     long count();
 
     // Count by status
-    long countByStatus(com.jobportal.applicationservice.enums.ApplicationStatus status);
+    long countByStatus(ApplicationStatus status);
 }
