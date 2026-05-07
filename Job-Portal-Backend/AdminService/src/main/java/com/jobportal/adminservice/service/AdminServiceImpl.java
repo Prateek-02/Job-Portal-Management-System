@@ -31,6 +31,7 @@ public class AdminServiceImpl implements AdminService {
     private final ApplicationServiceClient applicationServiceClient;
     private final UserDeleteProducer userDeleteProducer;
     private final CircuitBreakerFactory<?, ?> circuitBreakerFactory;
+    
 
     @Value("${internal.secret}")
     private String internalSecret;

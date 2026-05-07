@@ -2,6 +2,7 @@ package com.jobportal.jobservice.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import java.util.List;
 
@@ -9,6 +10,7 @@ import java.util.List;
 public class JobRequest {
 
     @NotBlank(message = "Title is required")
+    @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "Job title should not contain numbers or special characters")
     private String title;
 
     @NotBlank(message = "Company name is required")

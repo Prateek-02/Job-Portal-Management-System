@@ -32,9 +32,6 @@ public interface ApplicationRepository extends JpaRepository<JobApplication, Lon
     // Delete all applications by jobId
     void deleteByJobId(Long jobId);
 
-    // Count all applications
-    long count();
-
     // Count by status
     long countByStatus(ApplicationStatus status);
 }
