@@ -55,7 +55,11 @@
               class="w-full px-6 py-4 bg-bg-secondary border border-glass-border rounded-2xl text-text-primary font-bold placeholder:text-text-muted/40 focus:bg-bg-primary focus:border-energy-emerald/40 focus:ring-4 focus:ring-energy-emerald/5 transition-all outline-none shadow-inner" 
               placeholder="e.g. Senior Software Engineer">
             @if (jobForm.get('title')?.touched && jobForm.get('title')?.invalid) {
-              <p class="text-[10px] font-bold text-red-500 ml-1 uppercase tracking-wider">Job title is required</p>
+              <p class="text-[10px] font-bold text-red-500 ml-1 uppercase tracking-wider">
+                @if (jobForm.get('title')?.errors?.['required']) { Job title is required }
+                @else if (jobForm.get('title')?.errors?.['minlength']) { Title must be at least 3 characters }
+                @else if (jobForm.get('title')?.errors?.['pattern']) { Job title should not contain numbers or special characters }
+              </p>
             }
           </div>
 

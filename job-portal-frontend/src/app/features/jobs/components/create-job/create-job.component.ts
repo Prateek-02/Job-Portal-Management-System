@@ -40,7 +40,7 @@ export class CreateJobComponent implements OnInit, OnDestroy, CanComponentDeacti
     private route: ActivatedRoute
   ) {
     this.jobForm = this.fb.group({
-      title: ['', [Validators.required, Validators.minLength(3)]],
+      title: ['', [Validators.required, Validators.minLength(3), Validators.pattern(/^[a-zA-Z\s]+$/)]],
       companyName: ['', Validators.required],
       location: ['', Validators.required],
       salary: [null, [Validators.required, Validators.min(0)]],
